@@ -3,9 +3,9 @@
 //     final taxiOrder = taxiOrderFromJson(jsonString);
 
 import 'dart:convert';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/models/currency.dart';
-import 'package:fuodz/models/vehicle_type.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/models/currency.dart';
+import 'package:chaskiy/models/vehicle_type.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 TaxiOrder taxiOrderFromJson(String str) => TaxiOrder.fromJson(json.decode(str));

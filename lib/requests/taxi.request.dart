@@ -1,12 +1,12 @@
-import 'package:fuodz/constants/api.dart';
-import 'package:fuodz/models/api_response.dart';
-import 'package:fuodz/models/delivery_address.dart';
-import 'package:fuodz/models/driver.dart';
-import 'package:fuodz/models/order.dart';
-import 'package:fuodz/models/tax_order_location.history.dart';
-import 'package:fuodz/models/vehicle.dart';
-import 'package:fuodz/models/vehicle_type.dart';
-import 'package:fuodz/services/http.service.dart';
+import 'package:chaskiy/constants/api.dart';
+import 'package:chaskiy/models/api_response.dart';
+import 'package:chaskiy/models/delivery_address.dart';
+import 'package:chaskiy/models/driver.dart';
+import 'package:chaskiy/models/order.dart';
+import 'package:chaskiy/models/tax_order_location.history.dart';
+import 'package:chaskiy/models/vehicle.dart';
+import 'package:chaskiy/models/vehicle_type.dart';
+import 'package:chaskiy/services/http.service.dart';
 
 class TaxiRequest extends HttpService {
   //

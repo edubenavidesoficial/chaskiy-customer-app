@@ -1,6 +1,6 @@
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/property_review.dart';
+import 'package:chaskiy/models/property_review.dart';
 import 'package:jiffy/jiffy.dart';
 import 'property_type.dart';
 import 'vendor.dart';

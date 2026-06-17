@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/constants/sizes.dart';
-import 'package:fuodz/models/property.dart';
-import 'package:fuodz/views/pages/booking/widgets/property_fav.icon.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/extensions/string.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/constants/sizes.dart';
+import 'package:chaskiy/models/property.dart';
+import 'package:chaskiy/views/pages/booking/widgets/property_fav.icon.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/extensions/string.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

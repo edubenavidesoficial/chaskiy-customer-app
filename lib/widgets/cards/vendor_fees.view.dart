@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/extensions/dynamic.dart';
-import 'package:fuodz/extensions/string.dart';
-import 'package:fuodz/models/fee.dart';
-import 'package:fuodz/views/pages/cart/widgets/amount_tile.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/extensions/dynamic.dart';
+import 'package:chaskiy/extensions/string.dart';
+import 'package:chaskiy/models/fee.dart';
+import 'package:chaskiy/views/pages/cart/widgets/amount_tile.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

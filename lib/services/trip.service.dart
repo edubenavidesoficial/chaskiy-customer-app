@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartx/dartx.dart';
-import 'package:fuodz/constants/app_strings.dart';
+import 'package:chaskiy/constants/app_strings.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:singleton/singleton.dart';
 import 'package:geohash_plus/geohash_plus.dart';

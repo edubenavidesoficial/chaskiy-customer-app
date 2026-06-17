@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/extensions/dynamic.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/utils/utils.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/extensions/dynamic.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';

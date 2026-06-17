@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/order.dart';
-import 'package:fuodz/requests/vendor.request.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/models/order.dart';
+import 'package:chaskiy/requests/vendor.request.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 
 class DriverRatingViewModel extends MyBaseViewModel {

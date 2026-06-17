@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:fuodz/models/order.dart';
+import 'package:chaskiy/models/order.dart';
 
 class OrderService {
   //

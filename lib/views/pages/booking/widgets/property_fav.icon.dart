@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/api_response.dart';
-import 'package:fuodz/requests/favourite.request.dart';
-import 'package:fuodz/services/auth.service.dart';
-import 'package:fuodz/views/pages/auth/login.page.dart';
-import 'package:fuodz/widgets/busy_indicator.dart';
+import 'package:chaskiy/models/api_response.dart';
+import 'package:chaskiy/requests/favourite.request.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/views/pages/auth/login.page.dart';
+import 'package:chaskiy/widgets/busy_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/models/property.dart';
+import 'package:chaskiy/models/property.dart';
 
 class PropertyFavIcon extends StatefulWidget {
   const PropertyFavIcon(this.property, {Key? key}) : super(key: key);

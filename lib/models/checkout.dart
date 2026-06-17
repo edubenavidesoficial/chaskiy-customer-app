@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:fuodz/models/cart.dart';
-import 'package:fuodz/models/coupon.dart';
-import 'package:fuodz/models/delivery_address.dart';
-import 'package:fuodz/models/fee.dart';
-import 'package:fuodz/models/payment_method.dart';
+import 'package:chaskiy/models/cart.dart';
+import 'package:chaskiy/models/coupon.dart';
+import 'package:chaskiy/models/delivery_address.dart';
+import 'package:chaskiy/models/fee.dart';
+import 'package:chaskiy/models/payment_method.dart';
 
 class CheckOut {
   double subTotal;

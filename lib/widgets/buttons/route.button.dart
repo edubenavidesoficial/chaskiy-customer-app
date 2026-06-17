@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/models/vendor.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/models/vendor.dart';
 import 'package:map_launcher/map_launcher.dart';
 import 'package:velocity_x/velocity_x.dart';
 

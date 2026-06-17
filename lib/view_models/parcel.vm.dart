@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/order.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/requests/order.request.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
-import 'package:fuodz/views/pages/order/orders_details.page.dart';
+import 'package:chaskiy/models/order.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/requests/order.request.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
+import 'package:chaskiy/views/pages/order/orders_details.page.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class ParcelViewModel extends MyBaseViewModel {
   //

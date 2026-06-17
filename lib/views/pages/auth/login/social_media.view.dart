@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/view_models/login.view_model.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/view_models/login.view_model.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:velocity_x/velocity_x.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/checkout.dart';
-import 'package:fuodz/view_models/checkout_base.vm.dart';
+import 'package:chaskiy/models/checkout.dart';
+import 'package:chaskiy/view_models/checkout_base.vm.dart';
 
 class CheckoutViewModel extends CheckoutBaseViewModel {
   //

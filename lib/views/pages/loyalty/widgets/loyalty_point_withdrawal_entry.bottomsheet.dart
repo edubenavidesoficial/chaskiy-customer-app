@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/services/validator.service.dart';
-import 'package:fuodz/widgets/buttons/custom_button.dart';
-import 'package:fuodz/widgets/custom_text_form_field.dart';
+import 'package:chaskiy/services/validator.service.dart';
+import 'package:chaskiy/widgets/buttons/custom_button.dart';
+import 'package:chaskiy/widgets/custom_text_form_field.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

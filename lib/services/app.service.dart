@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/views/pages/deep_link_loading.page.dart';
+import 'package:chaskiy/views/pages/deep_link_loading.page.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:intl/intl.dart' as intl;

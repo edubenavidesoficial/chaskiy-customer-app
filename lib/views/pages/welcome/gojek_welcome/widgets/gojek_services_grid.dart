@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:fuodz/services/navigation.service.dart';
-import 'package:fuodz/view_models/welcome.vm.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
+import 'package:chaskiy/services/navigation.service.dart';
+import 'package:chaskiy/view_models/welcome.vm.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class GojekServicesGrid extends StatelessWidget {

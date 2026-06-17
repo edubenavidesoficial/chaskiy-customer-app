@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:fuodz/models/tag.dart';
+import 'package:chaskiy/models/tag.dart';
 
 SearchData searchDataFromJson(String str) =>
     SearchData.fromJson(json.decode(str));

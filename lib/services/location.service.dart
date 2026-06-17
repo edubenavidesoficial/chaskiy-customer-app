@@ -4,10 +4,10 @@ import 'dart:io';
 
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/delivery_address.dart';
-import 'package:fuodz/services/app.service.dart';
-import 'package:fuodz/services/local_storage.service.dart';
-import 'package:fuodz/widgets/bottomsheets/location_permission.bottomsheet.dart';
+import 'package:chaskiy/models/delivery_address.dart';
+import 'package:chaskiy/services/app.service.dart';
+import 'package:chaskiy/services/local_storage.service.dart';
+import 'package:chaskiy/widgets/bottomsheets/location_permission.bottomsheet.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart';
 // import 'package:geocoder/geocoder.dart';

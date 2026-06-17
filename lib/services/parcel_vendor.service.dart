@@ -1,5 +1,5 @@
-import 'package:fuodz/models/order_stop.dart';
-import 'package:fuodz/models/vendor.dart';
+import 'package:chaskiy/models/order_stop.dart';
+import 'package:chaskiy/models/vendor.dart';
 
 class ParcelVendorService {
   static bool canServiceAllLocations(List<OrderStop> stops, Vendor vendor) {

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/view_models/service_vendor_details.vm.dart';
-import 'package:fuodz/view_models/vendor_details.vm.dart';
-import 'package:fuodz/views/pages/vendor_details/widgets/vendor_details_header.view.dart';
-import 'package:fuodz/widgets/custom_masonry_grid_view.dart';
-import 'package:fuodz/widgets/list_items/grid_view_service.list_item.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/view_models/service_vendor_details.vm.dart';
+import 'package:chaskiy/view_models/vendor_details.vm.dart';
+import 'package:chaskiy/views/pages/vendor_details/widgets/vendor_details_header.view.dart';
+import 'package:chaskiy/widgets/custom_masonry_grid_view.dart';
+import 'package:chaskiy/widgets/list_items/grid_view_service.list_item.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
 

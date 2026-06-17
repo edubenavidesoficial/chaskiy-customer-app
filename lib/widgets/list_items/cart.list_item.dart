@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/extensions/string.dart';
-import 'package:fuodz/models/cart.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/services/app_currency_system.service.dart';
-import 'package:fuodz/widgets/buttons/qty_stepper.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/extensions/string.dart';
+import 'package:chaskiy/models/cart.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/services/app_currency_system.service.dart';
+import 'package:chaskiy/widgets/buttons/qty_stepper.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class CartListItem extends StatelessWidget {

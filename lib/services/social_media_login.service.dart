@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/view_models/login.view_model.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/view_models/login.view_model.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';

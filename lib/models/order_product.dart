@@ -1,4 +1,4 @@
-import 'package:fuodz/models/product.dart';
+import 'package:chaskiy/models/product.dart';
 
 class OrderProduct {
   OrderProduct({

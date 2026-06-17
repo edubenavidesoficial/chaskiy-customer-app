@@ -1,13 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/constants/app_images.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/widgets/base.page.dart';
-import 'package:fuodz/widgets/busy_indicator.dart';
+import 'package:chaskiy/constants/app_images.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/widgets/base.page.dart';
+import 'package:chaskiy/widgets/busy_indicator.dart';
 import 'package:pinch_zoom/pinch_zoom.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class FullImagePreviewPage extends StatelessWidget {
   const FullImagePreviewPage(

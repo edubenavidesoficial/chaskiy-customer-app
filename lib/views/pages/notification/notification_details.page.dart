@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/notification.dart';
-import 'package:fuodz/widgets/base.page.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
+import 'package:chaskiy/models/notification.dart';
+import 'package:chaskiy/widgets/base.page.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:velocity_x/velocity_x.dart';
 

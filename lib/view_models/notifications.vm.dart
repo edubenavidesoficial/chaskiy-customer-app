@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/models/notification.dart';
-import 'package:fuodz/services/notification.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/models/notification.dart';
+import 'package:chaskiy/services/notification.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 
 class NotificationsViewModel extends MyBaseViewModel {
   //

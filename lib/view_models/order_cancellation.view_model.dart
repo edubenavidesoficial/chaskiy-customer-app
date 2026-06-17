@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/order.dart';
-import 'package:fuodz/requests/order.request.dart';
+import 'package:chaskiy/models/order.dart';
+import 'package:chaskiy/requests/order.request.dart';
 import 'base.view_model.dart';
 
 class OrderCancellationViewModel extends MyBaseViewModel {

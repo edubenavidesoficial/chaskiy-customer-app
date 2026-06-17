@@ -1,13 +1,13 @@
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/widgets/buttons/custom_button.dart';
-import 'package:fuodz/widgets/cards/custom.visibility.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/widgets/buttons/custom_button.dart';
+import 'package:chaskiy/widgets/cards/custom.visibility.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:timelines_plus/timelines_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/view_models/order_details.vm.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/view_models/order_details.vm.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:velocity_x/velocity_x.dart';
 

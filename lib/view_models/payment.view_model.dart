@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:fuodz/services/toast.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
-import 'package:fuodz/views/pages/payment/custom_webview.page.dart';
+import 'package:chaskiy/services/toast.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
+import 'package:chaskiy/views/pages/payment/custom_webview.page.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class MyChromeSafariBrowser extends ChromeSafariBrowser {
   @override

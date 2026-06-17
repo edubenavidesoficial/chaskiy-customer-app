@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/view_models/vendor_details.vm.dart';
-import 'package:fuodz/views/pages/parcel/parcel_vendor_details.page.dart';
-import 'package:fuodz/views/pages/vendor_details/widgets/property_vendor_details.view.dart';
-import 'package:fuodz/views/pages/vendor_details/widgets/vendor_with_menu.view.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/view_models/vendor_details.vm.dart';
+import 'package:chaskiy/views/pages/parcel/parcel_vendor_details.page.dart';
+import 'package:chaskiy/views/pages/vendor_details/widgets/property_vendor_details.view.dart';
+import 'package:chaskiy/views/pages/vendor_details/widgets/vendor_with_menu.view.dart';
 import 'package:stacked/stacked.dart';
 
-import 'package:fuodz/views/pages/vendor_details/widgets/vendor_plain_details.view.dart';
+import 'package:chaskiy/views/pages/vendor_details/widgets/vendor_plain_details.view.dart';
 
 class VendorDetailsPage extends StatelessWidget {
   const VendorDetailsPage({required this.vendor, Key? key}) : super(key: key);

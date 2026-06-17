@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:fuodz/constants/app_colors.dart';
+import 'package:chaskiy/constants/app_colors.dart';
 
 VendorType vendorTypeFromJson(String str) =>
     VendorType.fromJson(json.decode(str));

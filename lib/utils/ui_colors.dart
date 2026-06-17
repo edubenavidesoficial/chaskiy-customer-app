@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/services/app.service.dart';
+import 'package:chaskiy/services/app.service.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class UIColors {

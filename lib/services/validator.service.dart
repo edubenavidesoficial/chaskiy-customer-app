@@ -1,7 +1,7 @@
 import 'package:basic_utils/basic_utils.dart';
-import 'package:fuodz/extensions/dynamic.dart';
-import 'package:fuodz/models/delivery_address.dart';
-import 'package:fuodz/models/vendor.dart';
+import 'package:chaskiy/extensions/dynamic.dart';
+import 'package:chaskiy/models/delivery_address.dart';
+import 'package:chaskiy/models/vendor.dart';
 import 'package:inspection/inspection.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 

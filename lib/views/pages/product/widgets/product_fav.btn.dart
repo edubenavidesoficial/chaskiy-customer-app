@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/view_models/product_details.vm.dart';
-import 'package:fuodz/widgets/buttons/custom_outline_button.dart';
+import 'package:chaskiy/view_models/product_details.vm.dart';
+import 'package:chaskiy/widgets/buttons/custom_outline_button.dart';
 
 class ProductFavButton extends StatelessWidget {
   const ProductFavButton({

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/extensions/string.dart';
-import 'package:fuodz/models/order.dart';
-import 'package:fuodz/utils/utils.dart';
-import 'package:fuodz/widgets/currency_hstack.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/extensions/string.dart';
+import 'package:chaskiy/models/order.dart';
+import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/widgets/currency_hstack.dart';
 import 'package:intl/intl.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:timelines_plus/timelines_plus.dart';

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/view_models/delivery_address/base_delivery_addresses.vm.dart';
-import 'package:fuodz/widgets/custom_text_form_field.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/view_models/delivery_address/base_delivery_addresses.vm.dart';
+import 'package:chaskiy/widgets/custom_text_form_field.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

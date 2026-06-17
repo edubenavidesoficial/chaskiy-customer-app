@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/services/order.service.dart';
-import 'package:fuodz/view_models/order_details.vm.dart';
-import 'package:fuodz/widgets/buttons/custom_button.dart';
-import 'package:fuodz/widgets/cards/custom.visibility.dart';
+import 'package:chaskiy/services/order.service.dart';
+import 'package:chaskiy/view_models/order_details.vm.dart';
+import 'package:chaskiy/widgets/buttons/custom_button.dart';
+import 'package:chaskiy/widgets/cards/custom.visibility.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

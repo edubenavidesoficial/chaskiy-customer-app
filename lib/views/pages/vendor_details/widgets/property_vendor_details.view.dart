@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/sizes.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/view_models/property_vendor_details.vm.dart';
-import 'package:fuodz/views/pages/vendor_details/widgets/vendor_details_header.view.dart';
-import 'package:fuodz/widgets/custom_list_view.dart';
-import 'package:fuodz/widgets/list_items/property.list_item.dart';
+import 'package:chaskiy/constants/sizes.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/view_models/property_vendor_details.vm.dart';
+import 'package:chaskiy/views/pages/vendor_details/widgets/vendor_details_header.view.dart';
+import 'package:chaskiy/widgets/custom_list_view.dart';
+import 'package:chaskiy/widgets/list_items/property.list_item.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-import 'package:fuodz/widgets/base.page.dart';
-import 'package:fuodz/widgets/buttons/custom_rounded_leading.dart';
-import 'package:fuodz/widgets/buttons/share.btn.dart';
+import 'package:chaskiy/widgets/base.page.dart';
+import 'package:chaskiy/widgets/buttons/custom_rounded_leading.dart';
+import 'package:chaskiy/widgets/buttons/share.btn.dart';
 
 class PropertyVendorDetailsView extends StatelessWidget {
   const PropertyVendorDetailsView({required this.vendor, Key? key})

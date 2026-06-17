@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/constants/home_screen.config.dart';
-import 'package:fuodz/constants/sizes.dart';
-import 'package:fuodz/enums/product_fetch_data_type.enum.dart';
-import 'package:fuodz/models/search.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/view_models/welcome.vm.dart';
-import 'package:fuodz/views/pages/vendor/widgets/banners.view.dart';
-import 'package:fuodz/views/pages/vendor/widgets/section_products.view.dart';
-import 'package:fuodz/views/pages/vendor/widgets/section_vendors.view.dart';
-import 'package:fuodz/views/shared/widgets/section_coupons.view.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/constants/home_screen.config.dart';
+import 'package:chaskiy/constants/sizes.dart';
+import 'package:chaskiy/enums/product_fetch_data_type.enum.dart';
+import 'package:chaskiy/models/search.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/view_models/welcome.vm.dart';
+import 'package:chaskiy/views/pages/vendor/widgets/banners.view.dart';
+import 'package:chaskiy/views/pages/vendor/widgets/section_products.view.dart';
+import 'package:chaskiy/views/pages/vendor/widgets/section_vendors.view.dart';
+import 'package:chaskiy/views/shared/widgets/section_coupons.view.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-import 'package:fuodz/views/pages/welcome/gojek_welcome/widgets/gojek_header.dart';
-import 'package:fuodz/views/pages/welcome/gojek_welcome/widgets/gojek_wallet_card.dart';
-import 'package:fuodz/views/pages/welcome/gojek_welcome/widgets/gojek_services_grid.dart';
-import 'package:fuodz/widgets/states/loading.shimmer.dart';
+import 'package:chaskiy/views/pages/welcome/gojek_welcome/widgets/gojek_header.dart';
+import 'package:chaskiy/views/pages/welcome/gojek_welcome/widgets/gojek_wallet_card.dart';
+import 'package:chaskiy/views/pages/welcome/gojek_welcome/widgets/gojek_services_grid.dart';
+import 'package:chaskiy/widgets/states/loading.shimmer.dart';
 
 class GojekWelcomeView extends StatefulWidget {
   const GojekWelcomeView({required this.vm, Key? key}) : super(key: key);

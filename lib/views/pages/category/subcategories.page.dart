@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/utils/utils.dart';
-import 'package:fuodz/models/category.dart';
-import 'package:fuodz/view_models/vendor/sub_categories.vm.dart';
-import 'package:fuodz/widgets/base.page.dart';
-import 'package:fuodz/widgets/states/loading_indicator.dart';
+import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/models/category.dart';
+import 'package:chaskiy/view_models/vendor/sub_categories.vm.dart';
+import 'package:chaskiy/widgets/base.page.dart';
+import 'package:chaskiy/widgets/states/loading_indicator.dart';
 import 'package:stacked/stacked.dart';
 
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/widgets/cart_page_action.dart';
+import 'package:chaskiy/widgets/cart_page_action.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
-import 'package:fuodz/views/pages/category/widgets/subcategory_items.view.dart';
+import 'package:chaskiy/views/pages/category/widgets/subcategory_items.view.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class SubcategoriesPage extends StatelessWidget {

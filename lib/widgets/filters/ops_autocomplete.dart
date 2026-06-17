@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:fuodz/models/address.dart';
-import 'package:fuodz/view_models/ops_map.vm.dart';
+import 'package:chaskiy/models/address.dart';
+import 'package:chaskiy/view_models/ops_map.vm.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';

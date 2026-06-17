@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:fuodz/models/user.dart';
+import 'package:chaskiy/models/user.dart';
 
 ProductReview productReviewFromJson(String str) =>
     ProductReview.fromJson(json.decode(str));

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/view_models/new_parcel.vm.dart';
-import 'package:fuodz/views/pages/parcel/widgets/form_step_controller.dart';
-import 'package:fuodz/views/pages/parcel/widgets/parcel_stops.view.dart';
-import 'package:fuodz/views/pages/parcel/widgets/single_parcel_stop.view.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/view_models/new_parcel.vm.dart';
+import 'package:chaskiy/views/pages/parcel/widgets/form_step_controller.dart';
+import 'package:chaskiy/views/pages/parcel/widgets/parcel_stops.view.dart';
+import 'package:chaskiy/views/pages/parcel/widgets/single_parcel_stop.view.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

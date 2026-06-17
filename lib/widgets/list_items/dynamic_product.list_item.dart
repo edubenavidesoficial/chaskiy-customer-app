@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/widgets/list_items/food_horizontal_product.list_item.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/widgets/list_items/food_horizontal_product.list_item.dart';
 
 class DynamicProductListItem extends StatelessWidget {
   const DynamicProductListItem(

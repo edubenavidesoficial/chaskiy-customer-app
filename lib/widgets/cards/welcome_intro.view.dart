@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/user.dart';
-import 'package:fuodz/services/auth.service.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/utils/utils.dart';
-import 'package:fuodz/view_models/welcome.vm.dart';
-import 'package:fuodz/views/pages/welcome/widgets/welcome_simple_header.section.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
-import 'package:fuodz/widgets/dynamic_status_bar.dart';
+import 'package:chaskiy/models/user.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/view_models/welcome.vm.dart';
+import 'package:chaskiy/views/pages/welcome/widgets/welcome_simple_header.section.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
+import 'package:chaskiy/widgets/dynamic_status_bar.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

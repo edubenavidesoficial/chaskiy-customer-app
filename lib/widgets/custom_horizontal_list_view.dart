@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/widgets/states/empty.state.dart';
-import 'package:fuodz/widgets/states/loading.shimmer.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/widgets/states/empty.state.dart';
+import 'package:chaskiy/widgets/states/loading.shimmer.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
 class CustomHorizontalListView extends StatelessWidget {

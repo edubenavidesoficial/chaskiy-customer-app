@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/view_models/vendor/categories_services.vm.dart';
-import 'package:fuodz/views/pages/service/widgets/category_services.view.dart';
-import 'package:fuodz/widgets/states/loading.shimmer.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/view_models/vendor/categories_services.vm.dart';
+import 'package:chaskiy/views/pages/service/widgets/category_services.view.dart';
+import 'package:chaskiy/widgets/states/loading.shimmer.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/extensions/dynamic.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/utils/utils.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
+import 'package:chaskiy/extensions/dynamic.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class VendorDetailsSliverHeader extends StatelessWidget {

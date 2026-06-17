@@ -1,7 +1,7 @@
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/models/service.dart';
-import 'package:fuodz/models/vendor_type.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/models/service.dart';
+import 'package:chaskiy/models/vendor_type.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class Category {

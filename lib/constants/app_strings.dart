@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:fuodz/services/app_currency_system.service.dart';
-import 'package:fuodz/services/local_storage.service.dart';
+import 'package:chaskiy/services/app_currency_system.service.dart';
+import 'package:chaskiy/services/local_storage.service.dart';
 import 'package:supercharged/supercharged.dart';
 
 class AppStrings {

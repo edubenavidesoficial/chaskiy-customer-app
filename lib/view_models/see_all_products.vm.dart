@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/enums/product_fetch_data_type.enum.dart';
-import 'package:fuodz/models/category.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/requests/product.request.dart';
-import 'package:fuodz/services/navigation.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/enums/product_fetch_data_type.enum.dart';
+import 'package:chaskiy/models/category.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/requests/product.request.dart';
+import 'package:chaskiy/services/navigation.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class SeeAllProductsViewModel extends MyBaseViewModel {

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/extensions/string.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/view_models/product_details.vm.dart';
-import 'package:fuodz/widgets/buttons/qty_stepper.dart';
-import 'package:fuodz/widgets/currency_hstack.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/extensions/string.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/view_models/product_details.vm.dart';
+import 'package:chaskiy/widgets/buttons/qty_stepper.dart';
+import 'package:chaskiy/widgets/currency_hstack.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

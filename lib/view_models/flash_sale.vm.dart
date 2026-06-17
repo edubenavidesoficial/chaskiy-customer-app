@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/flash_sale.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/requests/flash_sale.request.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/models/flash_sale.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/requests/flash_sale.request.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
 class FlashSaleViewModel extends MyBaseViewModel {

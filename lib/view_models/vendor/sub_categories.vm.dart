@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/category.dart';
-import 'package:fuodz/models/search.dart';
-import 'package:fuodz/requests/category.request.dart';
-import 'package:fuodz/services/navigation.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/models/category.dart';
+import 'package:chaskiy/models/search.dart';
+import 'package:chaskiy/requests/category.request.dart';
+import 'package:chaskiy/services/navigation.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:rxdart/rxdart.dart';

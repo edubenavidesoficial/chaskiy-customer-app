@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/widgets/cards/custom.visibility.dart';
+import 'package:chaskiy/widgets/cards/custom.visibility.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class ToogleGridViewIcon extends StatefulWidget {

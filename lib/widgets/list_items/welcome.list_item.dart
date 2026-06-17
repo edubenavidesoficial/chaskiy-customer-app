@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_colors.dart';
+import 'package:chaskiy/constants/app_colors.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class WelcomeListItem extends StatelessWidget {

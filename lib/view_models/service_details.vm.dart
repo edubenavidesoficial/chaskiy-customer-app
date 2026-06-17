@@ -1,19 +1,19 @@
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/models/service.dart';
-import 'package:fuodz/models/service_option.dart';
-import 'package:fuodz/models/service_option_group.dart';
-import 'package:fuodz/requests/service.request.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/services/auth.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
-import 'package:fuodz/views/pages/auth/login.page.dart';
-import 'package:fuodz/views/pages/service/service_booking_summary.page.dart';
-import 'package:fuodz/widgets/bottomsheets/age_restriction.bottomsheet.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/models/service.dart';
+import 'package:chaskiy/models/service_option.dart';
+import 'package:chaskiy/models/service_option_group.dart';
+import 'package:chaskiy/requests/service.request.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
+import 'package:chaskiy/views/pages/auth/login.page.dart';
+import 'package:chaskiy/views/pages/service/service_booking_summary.page.dart';
+import 'package:chaskiy/widgets/bottomsheets/age_restriction.bottomsheet.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
-import 'package:fuodz/extensions/context.dart';
-import 'package:fuodz/constants/app_strings.dart';
+import 'package:chaskiy/extensions/context.dart';
+import 'package:chaskiy/constants/app_strings.dart';
 
 class ServiceDetailsViewModel extends MyBaseViewModel {
   //

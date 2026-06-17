@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
-import 'package:fuodz/widgets/cards/custom.visibility.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
+import 'package:chaskiy/widgets/cards/custom.visibility.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

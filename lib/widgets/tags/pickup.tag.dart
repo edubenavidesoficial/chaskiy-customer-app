@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/utils/utils.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/utils/utils.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

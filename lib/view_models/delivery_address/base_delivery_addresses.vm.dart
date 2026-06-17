@@ -1,11 +1,11 @@
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/models/delivery_address.dart';
-import 'package:fuodz/requests/delivery_address.request.dart';
-import 'package:fuodz/services/geocoder.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
-import 'package:fuodz/views/pages/delivery_address/widgets/address_search.view.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/models/delivery_address.dart';
+import 'package:chaskiy/requests/delivery_address.request.dart';
+import 'package:chaskiy/services/geocoder.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
+import 'package:chaskiy/views/pages/delivery_address/widgets/address_search.view.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:what3words/what3words.dart' hide Coordinates;

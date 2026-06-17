@@ -1,27 +1,27 @@
 import 'package:firestore_chat/firestore_chat.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/constants/app_ui_settings.dart';
-import 'package:fuodz/extensions/dynamic.dart';
-import 'package:fuodz/models/api_response.dart';
-import 'package:fuodz/models/order.dart';
-import 'package:fuodz/models/payment_method.dart';
-import 'package:fuodz/requests/order.request.dart';
-import 'package:fuodz/services/app.service.dart';
-import 'package:fuodz/services/chat.service.dart';
-import 'package:fuodz/services/order_details_websocket.service.dart';
-import 'package:fuodz/view_models/checkout_base.vm.dart';
-import 'package:fuodz/views/pages/checkout/widgets/payment_methods.view.dart';
-import 'package:fuodz/widgets/bottomsheets/driver_rating.bottomsheet.dart';
-import 'package:fuodz/widgets/bottomsheets/order_cancellation.bottomsheet.dart';
-import 'package:fuodz/widgets/bottomsheets/vendor_rating.bottomsheet.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/constants/app_ui_settings.dart';
+import 'package:chaskiy/extensions/dynamic.dart';
+import 'package:chaskiy/models/api_response.dart';
+import 'package:chaskiy/models/order.dart';
+import 'package:chaskiy/models/payment_method.dart';
+import 'package:chaskiy/requests/order.request.dart';
+import 'package:chaskiy/services/app.service.dart';
+import 'package:chaskiy/services/chat.service.dart';
+import 'package:chaskiy/services/order_details_websocket.service.dart';
+import 'package:chaskiy/view_models/checkout_base.vm.dart';
+import 'package:chaskiy/views/pages/checkout/widgets/payment_methods.view.dart';
+import 'package:chaskiy/widgets/bottomsheets/driver_rating.bottomsheet.dart';
+import 'package:chaskiy/widgets/bottomsheets/order_cancellation.bottomsheet.dart';
+import 'package:chaskiy/widgets/bottomsheets/vendor_rating.bottomsheet.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class OrderDetailsViewModel extends CheckoutBaseViewModel {
   //

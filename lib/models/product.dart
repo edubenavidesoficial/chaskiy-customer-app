@@ -1,10 +1,10 @@
 import 'package:dartx/dartx.dart';
-import 'package:fuodz/extensions/dynamic.dart';
-import 'package:fuodz/models/digital_file.dart';
-import 'package:fuodz/models/option.dart';
-import 'package:fuodz/models/tag.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/models/option_group.dart';
+import 'package:chaskiy/extensions/dynamic.dart';
+import 'package:chaskiy/models/digital_file.dart';
+import 'package:chaskiy/models/option.dart';
+import 'package:chaskiy/models/tag.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/models/option_group.dart';
 
 class Product {
   Product({

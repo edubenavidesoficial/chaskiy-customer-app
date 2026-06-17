@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/flash_sale.dart';
-import 'package:fuodz/view_models/flash_sale.vm.dart';
-import 'package:fuodz/views/pages/flash_sale/widgets/flash_sale.item_view.dart';
-import 'package:fuodz/widgets/base.page.dart';
-import 'package:fuodz/widgets/custom_dynamic_grid_view.dart';
+import 'package:chaskiy/models/flash_sale.dart';
+import 'package:chaskiy/view_models/flash_sale.vm.dart';
+import 'package:chaskiy/views/pages/flash_sale/widgets/flash_sale.item_view.dart';
+import 'package:chaskiy/widgets/base.page.dart';
+import 'package:chaskiy/widgets/custom_dynamic_grid_view.dart';
 import 'package:stacked/stacked.dart';
 
 class FlashSaleItemsPage extends StatelessWidget {

@@ -1,19 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/services/app.service.dart';
-import 'package:fuodz/services/auth.service.dart';
-import 'package:fuodz/services/cart.service.dart';
-import 'package:fuodz/services/local_storage.service.dart';
-import 'package:fuodz/services/navigation.service.dart';
-import 'package:fuodz/services/setup.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
-import 'package:fuodz/views/pages/auth/login.page.dart';
-import 'package:fuodz/views/pages/welcome/welcome.page.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/services/app.service.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/services/cart.service.dart';
+import 'package:chaskiy/services/local_storage.service.dart';
+import 'package:chaskiy/services/navigation.service.dart';
+import 'package:chaskiy/services/setup.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
+import 'package:chaskiy/views/pages/auth/login.page.dart';
+import 'package:chaskiy/views/pages/welcome/welcome.page.dart';
 import 'package:rx_shared_preferences/rx_shared_preferences.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class HomeViewModel extends MyBaseViewModel {
   //

@@ -2,14 +2,14 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
-import 'package:fuodz/constants/api.dart';
-import 'package:fuodz/models/api_response.dart';
-import 'package:fuodz/models/order_stop.dart';
-import 'package:fuodz/models/package_checkout.dart';
-import 'package:fuodz/models/package_type.dart';
-import 'package:fuodz/models/package_type_pricing.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/services/http.service.dart';
+import 'package:chaskiy/constants/api.dart';
+import 'package:chaskiy/models/api_response.dart';
+import 'package:chaskiy/models/order_stop.dart';
+import 'package:chaskiy/models/package_checkout.dart';
+import 'package:chaskiy/models/package_type.dart';
+import 'package:chaskiy/models/package_type_pricing.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/services/http.service.dart';
 
 class PackageRequest extends HttpService {
   //

@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/user.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/services/auth.service.dart';
-import 'package:fuodz/services/location.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/models/user.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/services/location.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
 class VendorViewModel extends MyBaseViewModel {

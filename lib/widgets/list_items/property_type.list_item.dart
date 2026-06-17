@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/sizes.dart';
-import 'package:fuodz/models/property_type.dart';
-import 'package:fuodz/utils/utils.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
+import 'package:chaskiy/constants/sizes.dart';
+import 'package:chaskiy/models/property_type.dart';
+import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class PropertyTypeListItem extends StatelessWidget {

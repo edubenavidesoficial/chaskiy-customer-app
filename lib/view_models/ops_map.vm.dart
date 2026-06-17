@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:fuodz/services/geocoder.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/services/geocoder.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class OPSMapViewModel extends MyBaseViewModel {
   //

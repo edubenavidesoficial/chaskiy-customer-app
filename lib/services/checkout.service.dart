@@ -1,4 +1,4 @@
-import 'package:fuodz/models/coupon.dart';
+import 'package:chaskiy/models/coupon.dart';
 
 class CheckoutService {
   static double generateOrderDiscount(

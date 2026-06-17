@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:fuodz/models/address.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/view_models/ops_map.vm.dart';
-import 'package:fuodz/widgets/base.page.dart';
-import 'package:fuodz/widgets/busy_indicator.dart';
-import 'package:fuodz/widgets/buttons/custom_button.dart';
-import 'package:fuodz/widgets/cards/custom.visibility.dart';
+import 'package:chaskiy/models/address.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/view_models/ops_map.vm.dart';
+import 'package:chaskiy/widgets/base.page.dart';
+import 'package:chaskiy/widgets/busy_indicator.dart';
+import 'package:chaskiy/widgets/buttons/custom_button.dart';
+import 'package:chaskiy/widgets/cards/custom.visibility.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:measure_size/measure_size.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class OPSMapPage extends StatelessWidget {
   const OPSMapPage({

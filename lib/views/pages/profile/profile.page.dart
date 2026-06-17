@@ -1,11 +1,11 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/services/app_currency_system.service.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/view_models/profile.vm.dart';
-import 'package:fuodz/widgets/base.page.dart';
-import 'package:fuodz/widgets/cards/profile.card.dart';
-import 'package:fuodz/widgets/menu_item.dart';
+import 'package:chaskiy/services/app_currency_system.service.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/view_models/profile.vm.dart';
+import 'package:chaskiy/widgets/base.page.dart';
+import 'package:chaskiy/widgets/cards/profile.card.dart';
+import 'package:chaskiy/widgets/menu_item.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:stacked/stacked.dart';

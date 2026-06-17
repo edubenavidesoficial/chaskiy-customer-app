@@ -1,4 +1,4 @@
-import 'package:fuodz/extensions/dynamic.dart';
+import 'package:chaskiy/extensions/dynamic.dart';
 
 class BookingOrderFee {
   int id;

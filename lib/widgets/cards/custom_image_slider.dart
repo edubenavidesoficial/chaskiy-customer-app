@@ -1,9 +1,9 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/utils/utils.dart';
-import 'package:fuodz/widgets/cards/custom.visibility.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/widgets/cards/custom.visibility.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
 

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/address.dart';
-import 'package:fuodz/models/delivery_address.dart';
-import 'package:fuodz/requests/delivery_address.request.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/view_models/delivery_address/base_delivery_addresses.vm.dart';
+import 'package:chaskiy/models/address.dart';
+import 'package:chaskiy/models/delivery_address.dart';
+import 'package:chaskiy/requests/delivery_address.request.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/view_models/delivery_address/base_delivery_addresses.vm.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 import 'package:google_maps_place_picker_mb_v2/google_maps_place_picker.dart';
 
 class EditDeliveryAddressesViewModel extends BaseDeliveryAddressesViewModel {

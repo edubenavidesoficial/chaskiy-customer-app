@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:fuodz/constants/app_strings.dart';
+import 'package:chaskiy/constants/app_strings.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class AppUpgradeSettings extends AppStrings {

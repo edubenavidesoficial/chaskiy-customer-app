@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/widgets/busy_indicator.dart';
+import 'package:chaskiy/widgets/busy_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class LoadingIndicator extends StatelessWidget {

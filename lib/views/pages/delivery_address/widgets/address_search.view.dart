@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/constants/app_map_settings.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/constants/input.styles.dart';
-import 'package:fuodz/models/address.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/widgets/busy_indicator.dart';
-import 'package:fuodz/widgets/buttons/custom_button.dart';
-import 'package:fuodz/widgets/cards/custom.visibility.dart';
-import 'package:fuodz/widgets/filters/ops_autocomplete.dart';
+import 'package:chaskiy/constants/app_map_settings.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/constants/input.styles.dart';
+import 'package:chaskiy/models/address.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/widgets/busy_indicator.dart';
+import 'package:chaskiy/widgets/buttons/custom_button.dart';
+import 'package:chaskiy/widgets/cards/custom.visibility.dart';
+import 'package:chaskiy/widgets/filters/ops_autocomplete.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class AddressSearchView extends StatefulWidget {
   const AddressSearchView(

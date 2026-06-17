@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:fuodz/constants/sizes.dart';
+import 'package:chaskiy/constants/sizes.dart';
 
 class WebViewer extends StatefulWidget {
   final String url;

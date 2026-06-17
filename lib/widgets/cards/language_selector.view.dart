@@ -2,15 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:flag/flag.dart';
-import 'package:fuodz/constants/app_languages.dart';
-import 'package:fuodz/services/auth.service.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/utils/utils.dart';
-import 'package:fuodz/widgets/buttons/custom_button.dart';
-import 'package:fuodz/widgets/custom_grid_view.dart';
+import 'package:chaskiy/constants/app_languages.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/widgets/buttons/custom_button.dart';
+import 'package:chaskiy/widgets/custom_grid_view.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class AppLanguageSelector extends StatefulWidget {
   const AppLanguageSelector({Key? key}) : super(key: key);

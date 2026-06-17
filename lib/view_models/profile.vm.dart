@@ -3,26 +3,26 @@ import 'dart:io';
 
 import 'package:custom_faqs/custom_faqs.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/extensions/dynamic.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/view_models/payment.view_model.dart';
-import 'package:fuodz/views/pages/loyalty/loyalty_point.page.dart';
-import 'package:fuodz/views/pages/profile/account_delete.page.dart';
-import 'package:fuodz/views/pages/splash.page.dart';
-import 'package:fuodz/constants/api.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/models/user.dart';
-import 'package:fuodz/requests/auth.request.dart';
-import 'package:fuodz/services/auth.service.dart';
-import 'package:fuodz/widgets/bottomsheets/referral.bottomsheet.dart';
-import 'package:fuodz/widgets/cards/language_selector.view.dart';
+import 'package:chaskiy/extensions/dynamic.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/view_models/payment.view_model.dart';
+import 'package:chaskiy/views/pages/loyalty/loyalty_point.page.dart';
+import 'package:chaskiy/views/pages/profile/account_delete.page.dart';
+import 'package:chaskiy/views/pages/splash.page.dart';
+import 'package:chaskiy/constants/api.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/models/user.dart';
+import 'package:chaskiy/requests/auth.request.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/widgets/bottomsheets/referral.bottomsheet.dart';
+import 'package:chaskiy/widgets/cards/language_selector.view.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class ProfileViewModel extends PaymentViewModel {
   //

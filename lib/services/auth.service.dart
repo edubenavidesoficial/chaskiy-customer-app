@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart' hide User;
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/models/user.dart';
-import 'package:fuodz/services/app.service.dart';
-import 'package:fuodz/services/firebase.service.dart';
-import 'package:fuodz/services/http.service.dart';
-import 'package:fuodz/view_models/splash.vm.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/models/user.dart';
+import 'package:chaskiy/services/app.service.dart';
+import 'package:chaskiy/services/firebase.service.dart';
+import 'package:chaskiy/services/http.service.dart';
+import 'package:chaskiy/view_models/splash.vm.dart';
 import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 
 import 'local_storage.service.dart';

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/constants/app_ui_sizes.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/view_models/vendor_details.vm.dart';
-import 'package:fuodz/views/pages/vendor_details/vendor_category_products.page.dart';
-import 'package:fuodz/views/pages/vendor_details/widgets/vendor_details_header.view.dart';
-import 'package:fuodz/widgets/busy_indicator.dart';
-import 'package:fuodz/widgets/custom_grid_view.dart';
-import 'package:fuodz/widgets/list_items/category.list_item.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/constants/app_ui_sizes.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/view_models/vendor_details.vm.dart';
+import 'package:chaskiy/views/pages/vendor_details/vendor_category_products.page.dart';
+import 'package:chaskiy/views/pages/vendor_details/widgets/vendor_details_header.view.dart';
+import 'package:chaskiy/widgets/busy_indicator.dart';
+import 'package:chaskiy/widgets/custom_grid_view.dart';
+import 'package:chaskiy/widgets/list_items/category.list_item.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
 

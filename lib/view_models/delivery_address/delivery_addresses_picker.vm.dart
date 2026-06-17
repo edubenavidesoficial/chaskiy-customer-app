@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/models/delivery_address.dart';
-import 'package:fuodz/requests/delivery_address.request.dart';
-import 'package:fuodz/services/app.service.dart';
-import 'package:fuodz/services/cart.service.dart';
-import 'package:fuodz/services/geocoder.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/models/delivery_address.dart';
+import 'package:chaskiy/requests/delivery_address.request.dart';
+import 'package:chaskiy/services/app.service.dart';
+import 'package:chaskiy/services/cart.service.dart';
+import 'package:chaskiy/services/geocoder.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 import 'package:google_maps_place_picker_mb_v2/google_maps_place_picker.dart';
 
 class DeliveryAddressPickerViewModel extends MyBaseViewModel {

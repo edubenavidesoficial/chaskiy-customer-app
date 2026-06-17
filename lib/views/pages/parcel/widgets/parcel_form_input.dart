@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/widgets/custom_text_form_field.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/widgets/custom_text_form_field.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class ParcelFormInput extends StatelessWidget {

@@ -1,5 +1,5 @@
 import 'package:currency_formatter/currency_formatter.dart';
-import 'package:fuodz/constants/app_strings.dart';
+import 'package:chaskiy/constants/app_strings.dart';
 import 'package:supercharged/supercharged.dart';
 
 extension NumberParsing on dynamic {

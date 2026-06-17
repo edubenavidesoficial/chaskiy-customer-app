@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/property.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/models/property.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 
 class PropertyChatViewModel extends MyBaseViewModel {
   PropertyChatViewModel(BuildContext context, this.property) {

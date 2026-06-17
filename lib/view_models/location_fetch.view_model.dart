@@ -1,16 +1,16 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/delivery_address.dart';
-import 'package:fuodz/services/geocoder.service.dart';
-import 'package:fuodz/services/location.service.dart';
-import 'package:fuodz/services/permission.service.dart';
+import 'package:chaskiy/models/delivery_address.dart';
+import 'package:chaskiy/services/geocoder.service.dart';
+import 'package:chaskiy/services/location.service.dart';
+import 'package:chaskiy/services/permission.service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:google_maps_place_picker_mb_v2/google_maps_place_picker.dart';
 import 'base.view_model.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class LocationFetchViewModel extends MyBaseViewModel {
   LocationFetchViewModel(BuildContext context, this.nextPage) {

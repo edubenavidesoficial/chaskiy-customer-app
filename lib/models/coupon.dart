@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/models/product.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/models/product.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 
 Coupon couponFromJson(String str) => Coupon.fromJson(json.decode(str));

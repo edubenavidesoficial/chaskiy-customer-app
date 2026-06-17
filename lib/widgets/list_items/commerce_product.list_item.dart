@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/extensions/string.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/services/app_currency_system.service.dart';
-import 'package:fuodz/views/pages/product/amazon_styled_commerce_product_details.page.dart';
-// import 'package:fuodz/views/pages/product/commerce_product_details.page.dart';
-import 'package:fuodz/widgets/cards/custom.visibility.dart';
-import 'package:fuodz/widgets/currency_hstack.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
-import 'package:fuodz/widgets/tags/fav.positioned.dart';
-import 'package:fuodz/widgets/tags/product_tags.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/extensions/string.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/services/app_currency_system.service.dart';
+import 'package:chaskiy/views/pages/product/amazon_styled_commerce_product_details.page.dart';
+// import 'package:chaskiy/views/pages/product/commerce_product_details.page.dart';
+import 'package:chaskiy/widgets/cards/custom.visibility.dart';
+import 'package:chaskiy/widgets/currency_hstack.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
+import 'package:chaskiy/widgets/tags/fav.positioned.dart';
+import 'package:chaskiy/widgets/tags/product_tags.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class CommerceProductListItem extends StatelessWidget {
   const CommerceProductListItem(

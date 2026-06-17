@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:dartx/dartx.dart';
 import 'package:flutter/foundation.dart';
-import 'package:fuodz/constants/api.dart';
-import 'package:fuodz/services/auth.service.dart';
-import 'package:fuodz/services/local_storage.service.dart';
+import 'package:chaskiy/constants/api.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/services/local_storage.service.dart';
 import 'package:singleton/singleton.dart';
 import 'package:laravel_echo_null/laravel_echo_null.dart';
 import 'package:pusher_client_socket/pusher_client_socket.dart' as PUSHER;

@@ -1,7 +1,7 @@
-import 'package:fuodz/enums/product_fetch_data_type.enum.dart';
-import 'package:fuodz/models/category.dart';
-import 'package:fuodz/models/tag.dart';
-import 'package:fuodz/models/vendor_type.dart';
+import 'package:chaskiy/enums/product_fetch_data_type.enum.dart';
+import 'package:chaskiy/models/category.dart';
+import 'package:chaskiy/models/tag.dart';
+import 'package:chaskiy/models/vendor_type.dart';
 
 class Search {
   String? type = "";

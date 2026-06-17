@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/extensions/string.dart';
-import 'package:fuodz/services/app_currency_system.service.dart';
-import 'package:fuodz/view_models/product_details.vm.dart';
-import 'package:fuodz/widgets/busy_indicator.dart';
-import 'package:fuodz/widgets/buttons/custom_button.dart';
-import 'package:fuodz/widgets/buttons/qty_stepper.dart';
-import 'package:fuodz/widgets/currency_hstack.dart';
-import 'package:fuodz/widgets/states/loading_indicator.dart';
+import 'package:chaskiy/extensions/string.dart';
+import 'package:chaskiy/services/app_currency_system.service.dart';
+import 'package:chaskiy/view_models/product_details.vm.dart';
+import 'package:chaskiy/widgets/busy_indicator.dart';
+import 'package:chaskiy/widgets/buttons/custom_button.dart';
+import 'package:chaskiy/widgets/buttons/qty_stepper.dart';
+import 'package:chaskiy/widgets/currency_hstack.dart';
+import 'package:chaskiy/widgets/states/loading_indicator.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

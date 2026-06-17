@@ -1,14 +1,14 @@
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/sizes.dart';
-import 'package:fuodz/extensions/string.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/models/service_option.dart';
-import 'package:fuodz/models/service_option_group.dart';
-import 'package:fuodz/services/app_currency_system.service.dart';
-import 'package:fuodz/view_models/service_details.vm.dart';
-import 'package:fuodz/widgets/currency_hstack.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
+import 'package:chaskiy/constants/sizes.dart';
+import 'package:chaskiy/extensions/string.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/models/service_option.dart';
+import 'package:chaskiy/models/service_option_group.dart';
+import 'package:chaskiy/services/app_currency_system.service.dart';
+import 'package:chaskiy/view_models/service_details.vm.dart';
+import 'package:chaskiy/widgets/currency_hstack.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class ServiceOptionListItem extends StatelessWidget {

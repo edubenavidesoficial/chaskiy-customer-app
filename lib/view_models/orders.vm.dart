@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/models/order.dart';
-import 'package:fuodz/requests/order.request.dart';
-import 'package:fuodz/services/app.service.dart';
-import 'package:fuodz/view_models/payment.view_model.dart';
-import 'package:fuodz/views/pages/order/taxi_order_details.page.dart';
-import 'package:fuodz/views/pages/booking/property_booking_details.page.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/models/order.dart';
+import 'package:chaskiy/requests/order.request.dart';
+import 'package:chaskiy/services/app.service.dart';
+import 'package:chaskiy/view_models/payment.view_model.dart';
+import 'package:chaskiy/views/pages/order/taxi_order_details.page.dart';
+import 'package:chaskiy/views/pages/booking/property_booking_details.page.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class OrdersViewModel extends PaymentViewModel {
   //

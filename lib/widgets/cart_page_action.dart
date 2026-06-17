@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/constants/app_ui_settings.dart';
-import 'package:fuodz/services/cart.service.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/utils/utils.dart';
-import 'package:fuodz/views/pages/cart/cart.page.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/constants/app_ui_settings.dart';
+import 'package:chaskiy/services/cart.service.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/views/pages/cart/cart.page.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class PageCartAction extends StatefulWidget {

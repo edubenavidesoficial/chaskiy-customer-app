@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/constants/app_text_styles.dart';
-import 'package:fuodz/widgets/busy_indicator.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/constants/app_text_styles.dart';
+import 'package:chaskiy/widgets/busy_indicator.dart';
 
 class CustomTextButton extends StatelessWidget {
   final Function()? onPressed;

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/search.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/view_models/coupons.vm.dart';
-import 'package:fuodz/widgets/custom_list_view.dart';
-import 'package:fuodz/widgets/list_items/coupon.list_item.dart';
-import 'package:fuodz/widgets/section.title.dart';
+import 'package:chaskiy/models/search.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/view_models/coupons.vm.dart';
+import 'package:chaskiy/widgets/custom_list_view.dart';
+import 'package:chaskiy/widgets/list_items/coupon.list_item.dart';
+import 'package:chaskiy/widgets/section.title.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
 

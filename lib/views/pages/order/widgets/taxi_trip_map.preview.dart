@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_images.dart';
-import 'package:fuodz/models/order.dart';
-import 'package:fuodz/utils/map.utils.dart';
+import 'package:chaskiy/constants/app_images.dart';
+import 'package:chaskiy/models/order.dart';
+import 'package:chaskiy/utils/map.utils.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:velocity_x/velocity_x.dart';
 

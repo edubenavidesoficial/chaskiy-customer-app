@@ -1,5 +1,5 @@
-import 'package:fuodz/models/delivery_address.dart';
-import 'package:fuodz/models/order_attachment.dart';
+import 'package:chaskiy/models/delivery_address.dart';
+import 'package:chaskiy/models/order_attachment.dart';
 
 class OrderStop {
   OrderStop({

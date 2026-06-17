@@ -1,17 +1,17 @@
-import 'package:fuodz/constants/api.dart';
-import 'package:fuodz/constants/app_map_settings.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/models/address.dart';
-import 'package:fuodz/models/api_response.dart';
-import 'package:fuodz/models/coordinates.dart';
-import 'package:fuodz/services/http.service.dart';
-import 'package:fuodz/services/location.service.dart';
-import 'package:fuodz/utils/utils.dart';
+import 'package:chaskiy/constants/api.dart';
+import 'package:chaskiy/constants/app_map_settings.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/models/address.dart';
+import 'package:chaskiy/models/api_response.dart';
+import 'package:chaskiy/models/coordinates.dart';
+import 'package:chaskiy/services/http.service.dart';
+import 'package:chaskiy/services/location.service.dart';
+import 'package:chaskiy/utils/utils.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:singleton/singleton.dart';
 
-export 'package:fuodz/models/address.dart';
-export 'package:fuodz/models/coordinates.dart';
+export 'package:chaskiy/models/address.dart';
+export 'package:chaskiy/models/coordinates.dart';
 
 class GeocoderService extends HttpService {
 //

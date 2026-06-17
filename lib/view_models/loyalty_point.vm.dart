@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_finance_settings.dart';
-import 'package:fuodz/models/loyalty_point.dart';
-import 'package:fuodz/models/loyalty_point_report.dart';
-import 'package:fuodz/requests/loyalty_point.request.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/view_models/payment.view_model.dart';
-import 'package:fuodz/views/pages/loyalty/widgets/loyalty_point_withdrawal_entry.bottomsheet.dart';
+import 'package:chaskiy/constants/app_finance_settings.dart';
+import 'package:chaskiy/models/loyalty_point.dart';
+import 'package:chaskiy/models/loyalty_point_report.dart';
+import 'package:chaskiy/requests/loyalty_point.request.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/view_models/payment.view_model.dart';
+import 'package:chaskiy/views/pages/loyalty/widgets/loyalty_point_withdrawal_entry.bottomsheet.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class LoyaltyPointViewModel extends PaymentViewModel {
   //

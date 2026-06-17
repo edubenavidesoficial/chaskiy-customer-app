@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/models/cart.dart';
-import 'package:fuodz/models/checkout.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/services/cart.service.dart';
-import 'package:fuodz/view_models/checkout_base.vm.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/models/cart.dart';
+import 'package:chaskiy/models/checkout.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/services/cart.service.dart';
+import 'package:chaskiy/view_models/checkout_base.vm.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:dartx/dartx.dart';
 

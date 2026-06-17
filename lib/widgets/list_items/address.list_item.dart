@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/models/address.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
+import 'package:chaskiy/models/address.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class AddressListItem extends StatelessWidget {

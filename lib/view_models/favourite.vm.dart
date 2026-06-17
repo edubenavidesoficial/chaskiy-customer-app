@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/requests/favourite.request.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/requests/favourite.request.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 
 class FavouriteViewModel extends MyBaseViewModel {
   //

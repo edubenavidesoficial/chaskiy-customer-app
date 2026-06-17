@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_images.dart';
-import 'package:fuodz/view_models/splash.vm.dart';
-import 'package:fuodz/widgets/base.page.dart';
+import 'package:chaskiy/constants/app_images.dart';
+import 'package:chaskiy/view_models/splash.vm.dart';
+import 'package:chaskiy/widgets/base.page.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
 

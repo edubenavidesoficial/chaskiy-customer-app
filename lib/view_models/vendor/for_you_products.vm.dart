@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/requests/product.request.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/requests/product.request.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 
 class ForYouProductsViewModel extends MyBaseViewModel {
   //

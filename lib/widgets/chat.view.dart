@@ -2,8 +2,8 @@
 
 // 
 // import 'package:flutter/material.dart';
-// import 'package:fuodz/constants/app_colors.dart';
-// import 'package:fuodz/requests/chat.request.dart';
+// import 'package:chaskiy/constants/app_colors.dart';
+// import 'package:chaskiy/requests/chat.request.dart';
 // import 'package:localize_and_translate/localize_and_translate.dart';
 
 // class ChatBody extends BaseChat {

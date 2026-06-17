@@ -1,10 +1,10 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/services/general_app.service.dart';
-import 'package:fuodz/services/notification.service.dart';
-import 'package:fuodz/services/phone_util.service.dart';
-import 'package:fuodz/services/permission.service.dart';
-import 'package:fuodz/services/firebase.service.dart';
+import 'package:chaskiy/services/general_app.service.dart';
+import 'package:chaskiy/services/notification.service.dart';
+import 'package:chaskiy/services/phone_util.service.dart';
+import 'package:chaskiy/services/permission.service.dart';
+import 'package:chaskiy/services/firebase.service.dart';
 
 class SetupService {
   static bool _isInitialized = false;

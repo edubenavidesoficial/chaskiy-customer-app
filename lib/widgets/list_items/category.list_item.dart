@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/models/category.dart';
-import 'package:fuodz/utils/utils.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/models/category.dart';
+import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class CategoryListItem extends StatelessWidget {

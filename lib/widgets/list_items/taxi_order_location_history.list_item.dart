@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/models/tax_order_location.history.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/utils/utils.dart';
+import 'package:chaskiy/models/tax_order_location.history.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/utils/utils.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class TaxiOrderHistoryListItem extends StatelessWidget {

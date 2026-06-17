@@ -1,5 +1,5 @@
-import 'package:fuodz/models/user.dart';
-import 'package:fuodz/models/vehicle.dart';
+import 'package:chaskiy/models/user.dart';
+import 'package:chaskiy/models/vehicle.dart';
 
 class Driver extends User {
   Vehicle? vehicle;

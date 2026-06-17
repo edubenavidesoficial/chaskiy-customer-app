@@ -1,7 +1,7 @@
 import 'package:firestore_chat/firestore_chat.dart';
-import 'package:fuodz/constants/api.dart';
-import 'package:fuodz/models/api_response.dart';
-import 'package:fuodz/services/http.service.dart';
+import 'package:chaskiy/constants/api.dart';
+import 'package:chaskiy/models/api_response.dart';
+import 'package:chaskiy/services/http.service.dart';
 
 class ChatRequest extends HttpService {
   //

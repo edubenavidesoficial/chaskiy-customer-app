@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/utils/utils.dart';
-import 'package:fuodz/views/shared/go_to_cart.view.dart';
-import 'package:fuodz/widgets/cart_page_action.dart';
-import 'package:fuodz/widgets/dynamic_status_bar.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/views/shared/go_to_cart.view.dart';
+import 'package:chaskiy/widgets/cart_page_action.dart';
+import 'package:chaskiy/widgets/dynamic_status_bar.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 import 'package:measure_size/measure_size.dart';
 import 'package:velocity_x/velocity_x.dart';

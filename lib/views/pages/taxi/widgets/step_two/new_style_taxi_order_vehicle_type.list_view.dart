@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/view_models/taxi.vm.dart';
-import 'package:fuodz/widgets/list_items/new_horizontal_vehicle_type.list_item.dart';
-import 'package:fuodz/widgets/states/loading_indicator.dart';
+import 'package:chaskiy/view_models/taxi.vm.dart';
+import 'package:chaskiy/widgets/list_items/new_horizontal_vehicle_type.list_item.dart';
+import 'package:chaskiy/widgets/states/loading_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class NewTaxiVehicleTypeListView extends StatelessWidget {

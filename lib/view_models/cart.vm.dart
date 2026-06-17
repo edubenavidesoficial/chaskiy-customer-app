@@ -1,19 +1,19 @@
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/models/cart.dart';
-import 'package:fuodz/models/checkout.dart';
-import 'package:fuodz/models/coupon.dart';
-import 'package:fuodz/requests/cart.request.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/services/auth.service.dart';
-import 'package:fuodz/services/cart.service.dart';
-import 'package:fuodz/services/cart_ui.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
-import 'package:fuodz/views/pages/checkout/multiple_order_checkout.page.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/models/cart.dart';
+import 'package:chaskiy/models/checkout.dart';
+import 'package:chaskiy/models/coupon.dart';
+import 'package:chaskiy/requests/cart.request.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/services/cart.service.dart';
+import 'package:chaskiy/services/cart_ui.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
+import 'package:chaskiy/views/pages/checkout/multiple_order_checkout.page.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class CartViewModel extends MyBaseViewModel {
   //

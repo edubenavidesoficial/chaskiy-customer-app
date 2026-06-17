@@ -1,4 +1,4 @@
-import 'package:fuodz/services/auth.service.dart';
+import 'package:chaskiy/services/auth.service.dart';
 
 class Api {
   static String get baseUrl {

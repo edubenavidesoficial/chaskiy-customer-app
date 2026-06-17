@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/view_models/taxi.vm.dart';
-import 'package:fuodz/widgets/busy_indicator.dart';
-import 'package:fuodz/widgets/buttons/custom_text_button.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/view_models/taxi.vm.dart';
+import 'package:chaskiy/widgets/busy_indicator.dart';
+import 'package:chaskiy/widgets/buttons/custom_text_button.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:measure_size/measure_size.dart';
 import 'package:velocity_x/velocity_x.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/product.dart';
+import 'package:chaskiy/models/product.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class ProductTags extends StatelessWidget {

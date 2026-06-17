@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:fuodz/models/option.dart';
+import 'package:chaskiy/models/option.dart';
 
 OptionGroup optionGroupFromJson(String str) =>
     OptionGroup.fromJson(json.decode(str));

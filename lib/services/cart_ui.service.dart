@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/cart.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/services/cart.service.dart';
-import 'package:fuodz/widgets/bottomsheets/age_restriction.bottomsheet.dart';
+import 'package:chaskiy/models/cart.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/services/cart.service.dart';
+import 'package:chaskiy/widgets/bottomsheets/age_restriction.bottomsheet.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 
 class CartUIServices extends CartServices {

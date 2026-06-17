@@ -1,25 +1,25 @@
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/extensions/string.dart';
-import 'package:fuodz/models/checkout.dart';
-import 'package:fuodz/models/delivery_address.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/models/payment_method.dart';
-import 'package:fuodz/requests/checkout.request.dart';
-import 'package:fuodz/requests/delivery_address.request.dart';
-import 'package:fuodz/requests/vendor.request.dart';
-import 'package:fuodz/requests/payment_method.request.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/services/app.service.dart';
-import 'package:fuodz/services/cart.service.dart';
-import 'package:fuodz/view_models/payment.view_model.dart';
-import 'package:fuodz/widgets/bottomsheets/delivery_address_picker.bottomsheet.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/extensions/string.dart';
+import 'package:chaskiy/models/checkout.dart';
+import 'package:chaskiy/models/delivery_address.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/models/payment_method.dart';
+import 'package:chaskiy/requests/checkout.request.dart';
+import 'package:chaskiy/requests/delivery_address.request.dart';
+import 'package:chaskiy/requests/vendor.request.dart';
+import 'package:chaskiy/requests/payment_method.request.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/services/app.service.dart';
+import 'package:chaskiy/services/cart.service.dart';
+import 'package:chaskiy/view_models/payment.view_model.dart';
+import 'package:chaskiy/widgets/bottomsheets/delivery_address_picker.bottomsheet.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class CheckoutBaseViewModel extends PaymentViewModel {
   //

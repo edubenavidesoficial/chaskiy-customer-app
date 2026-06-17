@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/view_models/taxi.vm.dart';
-import 'package:fuodz/view_models/taxi_new_order_summary.vm.dart';
+import 'package:chaskiy/view_models/taxi.vm.dart';
+import 'package:chaskiy/view_models/taxi_new_order_summary.vm.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'step_two/new_taxi_order_summary.collapsed.dart';

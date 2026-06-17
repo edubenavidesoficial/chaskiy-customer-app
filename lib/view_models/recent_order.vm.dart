@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:fuodz/models/order.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/requests/order.request.dart';
-import 'package:fuodz/view_models/orders.vm.dart';
+import 'package:chaskiy/models/order.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/requests/order.request.dart';
+import 'package:chaskiy/view_models/orders.vm.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
 class RecentOrderViewModel extends OrdersViewModel {

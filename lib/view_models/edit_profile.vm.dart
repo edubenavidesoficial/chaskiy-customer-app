@@ -2,15 +2,15 @@ import 'dart:io';
 
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/services/phone_util.service.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/services/phone_util.service.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:fuodz/models/user.dart';
-import 'package:fuodz/requests/auth.request.dart';
-import 'package:fuodz/services/auth.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/models/user.dart';
+import 'package:chaskiy/requests/auth.request.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class EditProfileViewModel extends MyBaseViewModel {
   User? currentUser;

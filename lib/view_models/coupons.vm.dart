@@ -1,9 +1,9 @@
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:fuodz/models/coupon.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/requests/coupon.request.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
-import 'package:fuodz/views/pages/coupon/coupon_details.page.dart';
+import 'package:chaskiy/models/coupon.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/requests/coupon.request.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
+import 'package:chaskiy/views/pages/coupon/coupon_details.page.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class CouponsViewModel extends MyBaseViewModel {

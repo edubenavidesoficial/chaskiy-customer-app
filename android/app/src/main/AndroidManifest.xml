@@ -104,7 +104,7 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <!-- Handle custom scheme deep links -->
-                <data android:scheme="glover" />
+                <data android:scheme="chaskiy" />
             </intent-filter>
 
 

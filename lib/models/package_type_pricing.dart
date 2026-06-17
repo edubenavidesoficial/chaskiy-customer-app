@@ -3,7 +3,7 @@
 //     final packageTypePricing = packageTypePricingFromJson(jsonString);
 
 import 'dart:convert';
-import 'package:fuodz/models/package_type.dart';
+import 'package:chaskiy/models/package_type.dart';
 import 'package:supercharged/supercharged.dart';
 
 PackageTypePricing packageTypePricingFromJson(String str) =>

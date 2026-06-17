@@ -5,14 +5,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/services/app.service.dart';
-import 'package:fuodz/services/http.service.dart';
-import 'package:fuodz/widgets/base.page.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/services/app.service.dart';
+import 'package:chaskiy/services/http.service.dart';
+import 'package:chaskiy/widgets/base.page.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class CustomWebviewPage extends StatefulWidget {
   //

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/views/pages/welcome/gojek_welcome/gojek_welcome.view.dart';
-import 'package:fuodz/views/pages/welcome/widgets/modern.welcome.empty.dart';
-import 'package:fuodz/views/pages/welcome/widgets/plain.welcome.empty.dart';
-import 'package:fuodz/views/pages/welcome/widgets/welcome.empty.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/views/pages/welcome/gojek_welcome/gojek_welcome.view.dart';
+import 'package:chaskiy/views/pages/welcome/widgets/modern.welcome.empty.dart';
+import 'package:chaskiy/views/pages/welcome/widgets/plain.welcome.empty.dart';
+import 'package:chaskiy/views/pages/welcome/widgets/welcome.empty.dart';
 import 'package:supercharged/supercharged.dart';
 
 class HomeScreenConfig {

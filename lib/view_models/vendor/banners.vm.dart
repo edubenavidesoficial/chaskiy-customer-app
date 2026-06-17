@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart' hide Banner;
-import 'package:fuodz/models/banner.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/requests/banner.request.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/models/search.dart';
+import 'package:chaskiy/models/banner.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/requests/banner.request.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/models/search.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class BannersViewModel extends MyBaseViewModel {

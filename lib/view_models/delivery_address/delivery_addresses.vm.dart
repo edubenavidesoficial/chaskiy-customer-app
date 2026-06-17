@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/models/delivery_address.dart';
-import 'package:fuodz/requests/delivery_address.request.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/models/delivery_address.dart';
+import 'package:chaskiy/requests/delivery_address.request.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 
 class DeliveryAddressesViewModel extends MyBaseViewModel {

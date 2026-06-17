@@ -1,6 +1,6 @@
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/widgets/states/loading.shimmer.dart';
+import 'package:chaskiy/widgets/states/loading.shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class CustomEasyRefreshView extends StatelessWidget {

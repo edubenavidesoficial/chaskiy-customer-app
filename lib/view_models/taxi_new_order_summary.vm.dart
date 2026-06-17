@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_ui_sizes.dart';
-import 'package:fuodz/models/coupon.dart';
-import 'package:fuodz/requests/taxi.request.dart';
-import 'package:fuodz/services/geocoder.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
-import 'package:fuodz/view_models/taxi.vm.dart';
-import 'package:fuodz/views/shared/payment_method_selection.page.dart';
-import 'package:fuodz/views/pages/taxi/apply_discount.page.dart';
+import 'package:chaskiy/constants/app_ui_sizes.dart';
+import 'package:chaskiy/models/coupon.dart';
+import 'package:chaskiy/requests/taxi.request.dart';
+import 'package:chaskiy/services/geocoder.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
+import 'package:chaskiy/view_models/taxi.vm.dart';
+import 'package:chaskiy/views/shared/payment_method_selection.page.dart';
+import 'package:chaskiy/views/pages/taxi/apply_discount.page.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class NewTaxiOrderSummaryViewModel extends MyBaseViewModel {
   //

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/view_models/recent_order.vm.dart';
-import 'package:fuodz/widgets/custom_list_view.dart';
-import 'package:fuodz/widgets/list_items/order.list_item.dart';
-import 'package:fuodz/widgets/states/empty.state.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/view_models/recent_order.vm.dart';
+import 'package:chaskiy/widgets/custom_list_view.dart';
+import 'package:chaskiy/widgets/list_items/order.list_item.dart';
+import 'package:chaskiy/widgets/states/empty.state.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';

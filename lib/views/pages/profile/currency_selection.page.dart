@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/currency.dart';
-import 'package:fuodz/services/app_currency_system.service.dart';
-import 'package:fuodz/widgets/base.page.dart';
+import 'package:chaskiy/models/currency.dart';
+import 'package:chaskiy/services/app_currency_system.service.dart';
+import 'package:chaskiy/widgets/base.page.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

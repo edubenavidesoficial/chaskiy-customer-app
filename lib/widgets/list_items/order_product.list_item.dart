@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/extensions/dynamic.dart';
-import 'package:fuodz/extensions/string.dart';
-import 'package:fuodz/models/order.dart';
-import 'package:fuodz/models/order_product.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/views/pages/order/widgets/order_digitial_product_download.dart';
-import 'package:fuodz/widgets/bottomsheets/order_product_action.bottomsheet.dart';
-import 'package:fuodz/widgets/buttons/arrow_indicator.dart';
-import 'package:fuodz/widgets/cards/rounded_container.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
+import 'package:chaskiy/extensions/dynamic.dart';
+import 'package:chaskiy/extensions/string.dart';
+import 'package:chaskiy/models/order.dart';
+import 'package:chaskiy/models/order_product.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/views/pages/order/widgets/order_digitial_product_download.dart';
+import 'package:chaskiy/widgets/bottomsheets/order_product_action.bottomsheet.dart';
+import 'package:chaskiy/widgets/buttons/arrow_indicator.dart';
+import 'package:chaskiy/widgets/cards/rounded_container.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

@@ -1,13 +1,13 @@
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/extensions/context.dart';
-import 'package:fuodz/services/local_storage.service.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/extensions/context.dart';
+import 'package:chaskiy/services/local_storage.service.dart';
 import 'package:singleton/singleton.dart';
-import 'package:fuodz/models/currency.dart';
-import 'package:fuodz/services/app.service.dart';
-import 'package:fuodz/views/pages/profile/currency_selection.page.dart';
-import 'package:fuodz/views/pages/splash.page.dart';
+import 'package:chaskiy/models/currency.dart';
+import 'package:chaskiy/services/app.service.dart';
+import 'package:chaskiy/views/pages/profile/currency_selection.page.dart';
+import 'package:chaskiy/views/pages/splash.page.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class AppCurrencySystemService {

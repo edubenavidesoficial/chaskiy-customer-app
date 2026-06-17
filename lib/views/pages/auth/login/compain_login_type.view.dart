@@ -1,11 +1,11 @@
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/constants/sizes.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/view_models/login.view_model.dart';
-import 'package:fuodz/views/pages/auth/login/email_login.view.dart';
-import 'package:fuodz/views/pages/auth/login/otp_login.view.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/constants/sizes.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/view_models/login.view_model.dart';
+import 'package:chaskiy/views/pages/auth/login/email_login.view.dart';
+import 'package:chaskiy/views/pages/auth/login/otp_login.view.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

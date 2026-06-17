@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/services/auth.service.dart';
-import 'package:fuodz/view_models/payment.view_model.dart';
-import 'package:fuodz/models/user.dart';
-import 'package:fuodz/requests/auth.request.dart';
-import 'package:fuodz/views/pages/splash.page.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/view_models/payment.view_model.dart';
+import 'package:chaskiy/models/user.dart';
+import 'package:chaskiy/requests/auth.request.dart';
+import 'package:chaskiy/views/pages/splash.page.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class AccountDeleteViewModel extends PaymentViewModel {

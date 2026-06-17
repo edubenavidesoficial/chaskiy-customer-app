@@ -4,16 +4,16 @@
 
 import 'dart:convert';
 
-import 'package:fuodz/extensions/dynamic.dart';
-import 'package:fuodz/models/category.dart';
-import 'package:fuodz/models/delivery_address.dart';
-import 'package:fuodz/models/delivery_slot.dart';
-import 'package:fuodz/models/fee.dart';
-import 'package:fuodz/models/menu.dart';
-import 'package:fuodz/models/package_type_pricing.dart';
-import 'package:fuodz/models/vendor_date.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/utils/utils.dart';
+import 'package:chaskiy/extensions/dynamic.dart';
+import 'package:chaskiy/models/category.dart';
+import 'package:chaskiy/models/delivery_address.dart';
+import 'package:chaskiy/models/delivery_slot.dart';
+import 'package:chaskiy/models/fee.dart';
+import 'package:chaskiy/models/menu.dart';
+import 'package:chaskiy/models/package_type_pricing.dart';
+import 'package:chaskiy/models/vendor_date.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/utils/utils.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 
 class Vendor {

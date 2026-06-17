@@ -1,10 +1,10 @@
-import 'package:fuodz/constants/api.dart';
-import 'package:fuodz/models/api_response.dart';
-import 'package:fuodz/models/order_stop.dart';
-import 'package:fuodz/models/review.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/services/http.service.dart';
-import 'package:fuodz/services/location.service.dart';
+import 'package:chaskiy/constants/api.dart';
+import 'package:chaskiy/models/api_response.dart';
+import 'package:chaskiy/models/order_stop.dart';
+import 'package:chaskiy/models/review.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/services/http.service.dart';
+import 'package:chaskiy/services/location.service.dart';
 
 class VendorRequest extends HttpService {
   //

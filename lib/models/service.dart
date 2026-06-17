@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'package:fuodz/extensions/dynamic.dart';
-import 'package:fuodz/models/category.dart';
-import 'package:fuodz/models/vendor.dart';
+import 'package:chaskiy/extensions/dynamic.dart';
+import 'package:chaskiy/models/category.dart';
+import 'package:chaskiy/models/vendor.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 
 import 'service_option.dart';

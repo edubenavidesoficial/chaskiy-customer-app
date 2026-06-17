@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:fuodz/models/product.dart';
+import 'package:chaskiy/models/product.dart';
 
 FlashSale flashSaleFromJson(String str) => FlashSale.fromJson(json.decode(str));
 

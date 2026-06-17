@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/property.dart';
-import 'package:fuodz/requests/property.request.dart';
-import 'package:fuodz/services/auth.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
-import 'package:fuodz/views/pages/booking/property_chat.page.dart';
-import 'package:fuodz/views/pages/booking/report_property_listing.page.dart';
-import 'package:fuodz/views/pages/booking/property_booking_summary.page.dart';
-import 'package:fuodz/views/pages/booking/widgets/property_booking_date_selection.page.dart';
-import 'package:fuodz/views/pages/booking/widgets/property_booking_price_details.modal.dart';
+import 'package:chaskiy/models/property.dart';
+import 'package:chaskiy/requests/property.request.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
+import 'package:chaskiy/views/pages/booking/property_chat.page.dart';
+import 'package:chaskiy/views/pages/booking/report_property_listing.page.dart';
+import 'package:chaskiy/views/pages/booking/property_booking_summary.page.dart';
+import 'package:chaskiy/views/pages/booking/widgets/property_booking_date_selection.page.dart';
+import 'package:chaskiy/views/pages/booking/widgets/property_booking_price_details.modal.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
 class PropertyDetailsViewModel extends MyBaseViewModel {

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/extensions/string.dart';
-import 'package:fuodz/services/app_currency_system.service.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/utils/utils.dart';
-import 'package:fuodz/view_models/taxi.vm.dart';
-import 'package:fuodz/views/pages/cart/widgets/amount_tile.dart';
-import 'package:fuodz/widgets/buttons/custom_button.dart';
-import 'package:fuodz/widgets/currency_hstack.dart';
-import 'package:fuodz/widgets/directional_chevron.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/extensions/string.dart';
+import 'package:chaskiy/services/app_currency_system.service.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/view_models/taxi.vm.dart';
+import 'package:chaskiy/views/pages/cart/widgets/amount_tile.dart';
+import 'package:chaskiy/widgets/buttons/custom_button.dart';
+import 'package:chaskiy/widgets/currency_hstack.dart';
+import 'package:chaskiy/widgets/directional_chevron.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

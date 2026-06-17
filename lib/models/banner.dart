@@ -1,5 +1,5 @@
-import 'package:fuodz/models/category.dart';
-import 'package:fuodz/models/vendor.dart';
+import 'package:chaskiy/models/category.dart';
+import 'package:chaskiy/models/vendor.dart';
 
 class Banner {
   int? id;

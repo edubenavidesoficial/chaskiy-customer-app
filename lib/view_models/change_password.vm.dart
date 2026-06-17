@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/user.dart';
-import 'package:fuodz/requests/auth.request.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/models/user.dart';
+import 'package:chaskiy/requests/auth.request.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class ChangePasswordViewModel extends MyBaseViewModel {
   User? currentUser;

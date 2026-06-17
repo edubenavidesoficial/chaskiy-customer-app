@@ -1,8 +1,8 @@
-import 'package:fuodz/constants/api.dart';
-import 'package:fuodz/models/api_response.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/services/http.service.dart';
-import 'package:fuodz/services/location.service.dart';
+import 'package:chaskiy/constants/api.dart';
+import 'package:chaskiy/models/api_response.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/services/http.service.dart';
+import 'package:chaskiy/services/location.service.dart';
 
 class VendorTypeRequest extends HttpService {
   //

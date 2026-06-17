@@ -2,17 +2,17 @@ import 'package:country_picker/country_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/requests/auth.request.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/services/auth.service.dart';
-import 'package:fuodz/services/phone_util.service.dart';
-import 'package:fuodz/widgets/bottomsheets/account_verification_entry.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/requests/auth.request.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/services/phone_util.service.dart';
+import 'package:chaskiy/widgets/bottomsheets/account_verification_entry.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'base.view_model.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class RegisterViewModel extends MyBaseViewModel {
   //

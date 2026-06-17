@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'package:fuodz/models/booking_order_fee.dart';
-import 'package:fuodz/models/cancellation_policy.dart';
-import 'package:fuodz/models/property.dart';
+import 'package:chaskiy/models/booking_order_fee.dart';
+import 'package:chaskiy/models/cancellation_policy.dart';
+import 'package:chaskiy/models/property.dart';
 
 BookingOrder bookingOrderFromJson(String str) =>
     BookingOrder.fromJson(json.decode(str));

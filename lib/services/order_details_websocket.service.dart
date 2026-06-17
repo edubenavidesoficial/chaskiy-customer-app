@@ -1,4 +1,4 @@
-import 'package:fuodz/services/websocket.service.dart';
+import 'package:chaskiy/services/websocket.service.dart';
 import 'package:laravel_echo_null/laravel_echo_null.dart';
 
 class OrderDetailsWebsocketService {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/utils/utils.dart';
+import 'package:chaskiy/utils/utils.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class CurrencyHStack extends StatelessWidget {

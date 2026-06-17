@@ -1,5 +1,5 @@
 import 'package:firestore_chat/models/chat_entity.dart';
-import 'package:fuodz/requests/chat.request.dart';
+import 'package:chaskiy/requests/chat.request.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 
 class ChatService {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/constants/input.styles.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/constants/input.styles.dart';
 
 class CustomTextFormField extends StatefulWidget {
   CustomTextFormField({

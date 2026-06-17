@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/models/menu.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/requests/product.request.dart';
-import 'package:fuodz/requests/vendor.request.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/views/pages/pharmacy/pharmacy_upload_prescription.page.dart';
-import 'package:fuodz/views/pages/vendor_search/vendor_search.page.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/models/menu.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/requests/product.request.dart';
+import 'package:chaskiy/requests/vendor.request.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/views/pages/pharmacy/pharmacy_upload_prescription.page.dart';
+import 'package:chaskiy/views/pages/vendor_search/vendor_search.page.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 import 'vendor_details.vm.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/utils/utils.dart';
+import 'package:chaskiy/utils/utils.dart';
 
 class DirectionalChevron extends StatelessWidget {
   const DirectionalChevron({

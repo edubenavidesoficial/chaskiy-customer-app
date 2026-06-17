@@ -1,25 +1,25 @@
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/extensions/dynamic.dart';
-import 'package:fuodz/models/cart.dart';
-import 'package:fuodz/models/option.dart';
-import 'package:fuodz/models/option_group.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/requests/favourite.request.dart';
-import 'package:fuodz/requests/product.request.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/services/cart.service.dart';
-import 'package:fuodz/services/cart_ui.service.dart';
-import 'package:fuodz/utils/utils.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
-import 'package:fuodz/views/pages/cart/cart.page.dart';
-import 'package:fuodz/views/pages/vendor_details/vendor_details.page.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/extensions/dynamic.dart';
+import 'package:chaskiy/models/cart.dart';
+import 'package:chaskiy/models/option.dart';
+import 'package:chaskiy/models/option_group.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/requests/favourite.request.dart';
+import 'package:chaskiy/requests/product.request.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/services/cart.service.dart';
+import 'package:chaskiy/services/cart_ui.service.dart';
+import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
+import 'package:chaskiy/views/pages/cart/cart.page.dart';
+import 'package:chaskiy/views/pages/vendor_details/vendor_details.page.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class ProductDetailsViewModel extends MyBaseViewModel {
   //

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/extensions/string.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/services/app_currency_system.service.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/widgets/buttons/custom_steppr.view.dart';
-import 'package:fuodz/widgets/cards/custom.visibility.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
-import 'package:fuodz/widgets/inputs/drop_down.input.dart';
-import 'package:fuodz/widgets/states/product_stock.dart';
-import 'package:fuodz/widgets/tags/discount.positioned.dart';
-import 'package:fuodz/widgets/tags/fav.positioned.dart';
-import 'package:fuodz/widgets/tags/product_tags.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/extensions/string.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/services/app_currency_system.service.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/widgets/buttons/custom_steppr.view.dart';
+import 'package:chaskiy/widgets/cards/custom.visibility.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
+import 'package:chaskiy/widgets/inputs/drop_down.input.dart';
+import 'package:chaskiy/widgets/states/product_stock.dart';
+import 'package:chaskiy/widgets/tags/discount.positioned.dart';
+import 'package:chaskiy/widgets/tags/fav.positioned.dart';
+import 'package:chaskiy/widgets/tags/product_tags.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class GroceryProductListItem extends StatefulWidget {

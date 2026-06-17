@@ -1,7 +1,7 @@
 // 
 // import 'package:firebase_chat/models/chat_entity.dart';
 // import 'package:flutter/material.dart';
-// import 'package:fuodz/widgets/chat.view.dart';
+// import 'package:chaskiy/widgets/chat.view.dart';
 // import 'package:velocity_x/velocity_x.dart';
 
 // class ChatPage extends StatelessWidget {

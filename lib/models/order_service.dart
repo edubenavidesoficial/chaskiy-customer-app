@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:fuodz/models/service.dart';
+import 'package:chaskiy/models/service.dart';
 
 OrderService OrderServiceFromJson(String str) =>
     OrderService.fromJson(json.decode(str));

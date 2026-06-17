@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/services/validator.service.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/view_models/new_parcel.vm.dart';
-import 'package:fuodz/views/pages/parcel/widgets/parcel_form_input.dart';
+import 'package:chaskiy/services/validator.service.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/view_models/new_parcel.vm.dart';
+import 'package:chaskiy/views/pages/parcel/widgets/parcel_form_input.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

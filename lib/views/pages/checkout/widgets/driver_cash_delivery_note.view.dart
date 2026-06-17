@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_finance_settings.dart';
-import 'package:fuodz/models/delivery_address.dart';
+import 'package:chaskiy/constants/app_finance_settings.dart';
+import 'package:chaskiy/models/delivery_address.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

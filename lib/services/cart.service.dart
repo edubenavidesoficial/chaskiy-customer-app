@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:dartx/dartx.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/models/cart.dart';
-import 'package:fuodz/models/coupon.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/services/local_storage.service.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/models/cart.dart';
+import 'package:chaskiy/models/coupon.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/services/local_storage.service.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 

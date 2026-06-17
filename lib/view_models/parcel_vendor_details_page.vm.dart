@@ -1,8 +1,8 @@
-import 'package:fuodz/models/package_type_pricing.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/requests/package.request.dart';
-import 'package:fuodz/services/app.service.dart';
-import 'package:fuodz/view_models/vendor_details.vm.dart';
+import 'package:chaskiy/models/package_type_pricing.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/requests/package.request.dart';
+import 'package:chaskiy/services/app.service.dart';
+import 'package:chaskiy/view_models/vendor_details.vm.dart';
 
 class ParcelVendorDetailsPageViewModel extends VendorDetailsViewModel {
   final Vendor vendor;

@@ -2,14 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/api_response.dart';
-import 'package:fuodz/models/user.dart';
-import 'package:fuodz/models/wallet.dart';
-import 'package:fuodz/requests/wallet.request.dart';
-import 'package:fuodz/traits/qrcode_scanner.trait.dart';
-import 'package:fuodz/view_models/payment.view_model.dart';
+import 'package:chaskiy/models/api_response.dart';
+import 'package:chaskiy/models/user.dart';
+import 'package:chaskiy/models/wallet.dart';
+import 'package:chaskiy/requests/wallet.request.dart';
+import 'package:chaskiy/traits/qrcode_scanner.trait.dart';
+import 'package:chaskiy/view_models/payment.view_model.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class WalletTransferViewModel extends PaymentViewModel with QrcodeScannerTrait {
   //

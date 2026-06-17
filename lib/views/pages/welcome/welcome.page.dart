@@ -1,9 +1,9 @@
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/home_screen.config.dart';
-import 'package:fuodz/view_models/welcome.vm.dart';
-import 'package:fuodz/widgets/base.page.dart';
-import 'package:fuodz/widgets/custom_easy_refresh_view.dart';
+import 'package:chaskiy/constants/home_screen.config.dart';
+import 'package:chaskiy/view_models/welcome.vm.dart';
+import 'package:chaskiy/widgets/base.page.dart';
+import 'package:chaskiy/widgets/custom_easy_refresh_view.dart';
 import 'package:stacked/stacked.dart';
 
 class WelcomePage extends StatefulWidget {

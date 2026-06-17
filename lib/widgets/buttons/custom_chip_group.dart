@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/utils/utils.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/utils/utils.dart';
 
 class CustomChipGroup<T, V> extends StatelessWidget {
   const CustomChipGroup({

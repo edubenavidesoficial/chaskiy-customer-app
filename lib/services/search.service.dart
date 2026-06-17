@@ -1,4 +1,4 @@
-import 'package:fuodz/services/local_storage.service.dart';
+import 'package:chaskiy/services/local_storage.service.dart';
 import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 
 class SearchService {

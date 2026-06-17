@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/sizes.dart';
-import 'package:fuodz/utils/utils.dart';
-import 'package:fuodz/view_models/order_details.vm.dart';
-import 'package:fuodz/views/pages/cart/widgets/amount_tile.dart';
-import 'package:fuodz/views/pages/order/widgets/order_stops.view.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
-import 'package:fuodz/widgets/custom_list_view.dart';
-import 'package:fuodz/widgets/list_items/order_product.list_item.dart';
+import 'package:chaskiy/constants/sizes.dart';
+import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/view_models/order_details.vm.dart';
+import 'package:chaskiy/views/pages/cart/widgets/amount_tile.dart';
+import 'package:chaskiy/views/pages/order/widgets/order_stops.view.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
+import 'package:chaskiy/widgets/custom_list_view.dart';
+import 'package:chaskiy/widgets/list_items/order_product.list_item.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

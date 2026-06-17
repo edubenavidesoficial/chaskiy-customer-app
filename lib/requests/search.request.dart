@@ -1,14 +1,14 @@
-import 'package:fuodz/constants/api.dart';
-import 'package:fuodz/models/api_response.dart';
-import 'package:fuodz/models/search.dart';
-import 'package:fuodz/models/search_data.dart';
-import 'package:fuodz/models/service.dart';
-import 'package:fuodz/models/tag.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/services/http.service.dart';
-import 'package:fuodz/services/location.service.dart';
-import 'package:fuodz/services/search.service.dart';
+import 'package:chaskiy/constants/api.dart';
+import 'package:chaskiy/models/api_response.dart';
+import 'package:chaskiy/models/search.dart';
+import 'package:chaskiy/models/search_data.dart';
+import 'package:chaskiy/models/service.dart';
+import 'package:chaskiy/models/tag.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/services/http.service.dart';
+import 'package:chaskiy/services/location.service.dart';
+import 'package:chaskiy/services/search.service.dart';
 
 class SearchRequest extends HttpService {
   //

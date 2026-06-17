@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/checkout.dart';
-import 'package:fuodz/models/coupon.dart';
-import 'package:fuodz/models/payment_method.dart';
-import 'package:fuodz/models/service.dart';
-import 'package:fuodz/requests/cart.request.dart';
-import 'package:fuodz/requests/payment_method.request.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/services/app.service.dart';
-import 'package:fuodz/view_models/checkout_base.vm.dart';
+import 'package:chaskiy/models/checkout.dart';
+import 'package:chaskiy/models/coupon.dart';
+import 'package:chaskiy/models/payment_method.dart';
+import 'package:chaskiy/models/service.dart';
+import 'package:chaskiy/requests/cart.request.dart';
+import 'package:chaskiy/requests/payment_method.request.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/services/app.service.dart';
+import 'package:chaskiy/view_models/checkout_base.vm.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class ServiceBookingSummaryViewModel extends CheckoutBaseViewModel {
   //

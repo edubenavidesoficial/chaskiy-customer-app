@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 import 'package:dartx/dartx.dart';
-import 'package:fuodz/models/currency.dart';
+import 'package:chaskiy/models/currency.dart';
 
 VehicleType vehicleTypeFromJson(String str) =>
     VehicleType.fromJson(json.decode(str));

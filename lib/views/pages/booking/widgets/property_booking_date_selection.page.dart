@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/constants/sizes.dart';
-import 'package:fuodz/models/property.dart';
-import 'package:fuodz/widgets/base.page.dart';
-import 'package:fuodz/widgets/buttons/custom_button.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/constants/sizes.dart';
+import 'package:chaskiy/models/property.dart';
+import 'package:chaskiy/widgets/base.page.dart';
+import 'package:chaskiy/widgets/buttons/custom_button.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';

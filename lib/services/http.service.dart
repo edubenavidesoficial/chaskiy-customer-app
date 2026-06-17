@@ -2,14 +2,14 @@ import 'dart:io';
 // import 'package:dartx/dartx.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_http_cache_lts/dio_http_cache_lts.dart';
-import 'package:fuodz/constants/api.dart';
-import 'package:fuodz/services/location.service.dart';
+import 'package:chaskiy/constants/api.dart';
+import 'package:chaskiy/services/location.service.dart';
 // import 'package:geolocator/geolocator.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
-// import 'package:fuodz/services/app.service.dart';
+// import 'package:chaskiy/services/app.service.dart';
 // import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 // import 'package:supercharged/supercharged.dart';
 

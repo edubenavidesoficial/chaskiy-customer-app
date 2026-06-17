@@ -1,9 +1,9 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/utils/utils.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/utils/utils.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class CustomLeading extends StatelessWidget {
   const CustomLeading({

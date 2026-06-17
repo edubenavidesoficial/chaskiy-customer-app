@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/sizes.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/view_models/property_booking_summary.vm.dart';
-import 'package:fuodz/widgets/buttons/custom_button.dart';
+import 'package:chaskiy/constants/sizes.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/view_models/property_booking_summary.vm.dart';
+import 'package:chaskiy/widgets/buttons/custom_button.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';

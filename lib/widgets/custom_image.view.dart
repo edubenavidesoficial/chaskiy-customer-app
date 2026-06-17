@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:fuodz/constants/app_images.dart';
-import 'package:fuodz/extensions/string.dart';
-import 'package:fuodz/views/shared/full_image_preview.page.dart';
+import 'package:chaskiy/constants/app_images.dart';
+import 'package:chaskiy/extensions/string.dart';
+import 'package:chaskiy/views/shared/full_image_preview.page.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class CustomImage extends StatefulWidget {
   CustomImage({

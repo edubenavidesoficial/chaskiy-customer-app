@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:fuodz/models/option.dart';
-import 'package:fuodz/models/product.dart';
+import 'package:chaskiy/models/option.dart';
+import 'package:chaskiy/models/product.dart';
 
 Cart cartFromJson(String str) => Cart.fromJson(json.decode(str));
 

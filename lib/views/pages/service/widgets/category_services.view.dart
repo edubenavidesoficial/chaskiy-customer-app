@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/category.dart';
-import 'package:fuodz/models/service.dart';
-import 'package:fuodz/services/navigation.service.dart';
-import 'package:fuodz/views/pages/service/service_details.page.dart';
-import 'package:fuodz/widgets/buttons/custom_text_button.dart';
-import 'package:fuodz/widgets/list_items/service.gridview_item.dart';
+import 'package:chaskiy/models/category.dart';
+import 'package:chaskiy/models/service.dart';
+import 'package:chaskiy/services/navigation.service.dart';
+import 'package:chaskiy/views/pages/service/service_details.page.dart';
+import 'package:chaskiy/widgets/buttons/custom_text_button.dart';
+import 'package:chaskiy/widgets/list_items/service.gridview_item.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

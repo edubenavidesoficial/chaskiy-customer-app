@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/property.dart';
-import 'package:fuodz/models/property_review.dart';
-import 'package:fuodz/requests/property.request.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/models/property.dart';
+import 'package:chaskiy/models/property_review.dart';
+import 'package:chaskiy/requests/property.request.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
 class PropertyReviewsViewModel extends MyBaseViewModel {

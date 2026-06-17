@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_routes.dart';
+import 'package:chaskiy/constants/app_routes.dart';
 
 extension NavigationExtensions on BuildContext {
   void pop([dynamic result]) {

@@ -1,14 +1,14 @@
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/enums/product_fetch_data_type.enum.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/models/user.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/requests/product.request.dart';
-import 'package:fuodz/services/auth.service.dart';
-import 'package:fuodz/services/location.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/enums/product_fetch_data_type.enum.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/models/user.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/requests/product.request.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/services/location.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 
 class ProductsViewModel extends MyBaseViewModel {
   //

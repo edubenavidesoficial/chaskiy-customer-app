@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/order.dart';
+import 'package:chaskiy/models/order.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/service.dart';
-import 'package:fuodz/models/vendor.dart';
+import 'package:chaskiy/models/service.dart';
+import 'package:chaskiy/models/vendor.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:fuodz/requests/service.request.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/requests/service.request.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 
 class ServiceVendorDetailsViewModel extends MyBaseViewModel {
   //

@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:fuodz/models/product.dart';
+import 'package:chaskiy/models/product.dart';
 
 Menu menuFromJson(String str) => Menu.fromJson(json.decode(str));
 

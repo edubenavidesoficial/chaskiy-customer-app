@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/category.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/requests/category.request.dart';
-import 'package:fuodz/services/navigation.service.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/models/category.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/requests/category.request.dart';
+import 'package:chaskiy/services/navigation.service.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 
 class CategoriesViewModel extends MyBaseViewModel {
   CategoriesViewModel(BuildContext context, {this.vendorType, this.page}) {

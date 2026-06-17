@@ -1,17 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/wallet.dart';
-import 'package:fuodz/models/wallet_transaction.dart';
-import 'package:fuodz/requests/wallet.request.dart';
-import 'package:fuodz/services/app.service.dart';
-import 'package:fuodz/view_models/payment.view_model.dart';
-import 'package:fuodz/views/pages/wallet/wallet_transfer.page.dart';
-import 'package:fuodz/widgets/bottomsheets/wallet_amount_entry.bottomsheet.dart';
-import 'package:fuodz/widgets/finance/wallet_address.bottom_sheet.dart';
+import 'package:chaskiy/models/wallet.dart';
+import 'package:chaskiy/models/wallet_transaction.dart';
+import 'package:chaskiy/requests/wallet.request.dart';
+import 'package:chaskiy/services/app.service.dart';
+import 'package:chaskiy/view_models/payment.view_model.dart';
+import 'package:chaskiy/views/pages/wallet/wallet_transfer.page.dart';
+import 'package:chaskiy/widgets/bottomsheets/wallet_amount_entry.bottomsheet.dart';
+import 'package:chaskiy/widgets/finance/wallet_address.bottom_sheet.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class WalletViewModel extends PaymentViewModel {
   //

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
 
 class CustomVisibilty extends StatelessWidget {
   const CustomVisibilty({required this.child, this.visible = true, Key? key})

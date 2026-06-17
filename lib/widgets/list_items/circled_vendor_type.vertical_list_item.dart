@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/constants/app_ui_styles.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/constants/app_ui_styles.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class CircledVendorTypeVerticalListItem extends StatelessWidget {

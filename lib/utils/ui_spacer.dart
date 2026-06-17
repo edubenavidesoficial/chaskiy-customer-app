@@ -1,6 +1,6 @@
 import 'package:custom_clippers/custom_clippers.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/utils/ui_colors.dart';
+import 'package:chaskiy/utils/ui_colors.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class UiSpacer {

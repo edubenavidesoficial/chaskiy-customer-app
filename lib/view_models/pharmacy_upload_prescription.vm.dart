@@ -1,17 +1,17 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_file_limit.dart';
-import 'package:fuodz/extensions/dynamic.dart';
-import 'package:fuodz/models/checkout.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/requests/vendor.request.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/view_models/checkout_base.vm.dart';
+import 'package:chaskiy/constants/app_file_limit.dart';
+import 'package:chaskiy/extensions/dynamic.dart';
+import 'package:chaskiy/models/checkout.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/requests/vendor.request.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/view_models/checkout_base.vm.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class PharmacyUploadPrescriptionViewModel extends CheckoutBaseViewModel {
   //

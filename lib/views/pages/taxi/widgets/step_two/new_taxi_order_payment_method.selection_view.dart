@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/utils/utils.dart';
-import 'package:fuodz/view_models/taxi_new_order_summary.vm.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
-import 'package:fuodz/widgets/directional_chevron.dart';
+import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/view_models/taxi_new_order_summary.vm.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
+import 'package:chaskiy/widgets/directional_chevron.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class NewTaxiOrderPaymentMethodSelectionView extends StatelessWidget {

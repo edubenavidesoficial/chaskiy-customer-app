@@ -1,10 +1,10 @@
-import 'package:fuodz/models/coupon.dart';
-import 'package:fuodz/models/delivery_address.dart';
-import 'package:fuodz/models/fee.dart';
-import 'package:fuodz/models/order_stop.dart';
-import 'package:fuodz/models/package_type.dart';
-import 'package:fuodz/models/payment_method.dart';
-import 'package:fuodz/models/vendor.dart';
+import 'package:chaskiy/models/coupon.dart';
+import 'package:chaskiy/models/delivery_address.dart';
+import 'package:chaskiy/models/fee.dart';
+import 'package:chaskiy/models/order_stop.dart';
+import 'package:chaskiy/models/package_type.dart';
+import 'package:chaskiy/models/payment_method.dart';
+import 'package:chaskiy/models/vendor.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class PackageCheckout {

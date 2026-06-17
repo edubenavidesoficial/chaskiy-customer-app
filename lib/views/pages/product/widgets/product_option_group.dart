@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/option_group.dart';
-import 'package:fuodz/view_models/product_details.vm.dart';
-import 'package:fuodz/widgets/custom_list_view.dart';
-import 'package:fuodz/widgets/list_items/option.list_item.dart';
+import 'package:chaskiy/models/option_group.dart';
+import 'package:chaskiy/view_models/product_details.vm.dart';
+import 'package:chaskiy/widgets/custom_list_view.dart';
+import 'package:chaskiy/widgets/list_items/option.list_item.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class ProductOptionGroup extends StatelessWidget {

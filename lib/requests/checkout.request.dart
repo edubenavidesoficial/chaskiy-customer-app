@@ -3,16 +3,16 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:fuodz/constants/api.dart';
-import 'package:fuodz/constants/app_file_limit.dart';
-import 'package:fuodz/models/api_response.dart';
-import 'package:fuodz/models/checkout.dart';
-import 'package:fuodz/models/package_checkout.dart';
-import 'package:fuodz/models/payment_method.dart';
-import 'package:fuodz/models/service.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/services/http.service.dart';
-import 'package:fuodz/utils/utils.dart';
+import 'package:chaskiy/constants/api.dart';
+import 'package:chaskiy/constants/app_file_limit.dart';
+import 'package:chaskiy/models/api_response.dart';
+import 'package:chaskiy/models/checkout.dart';
+import 'package:chaskiy/models/package_checkout.dart';
+import 'package:chaskiy/models/payment_method.dart';
+import 'package:chaskiy/models/service.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/services/http.service.dart';
+import 'package:chaskiy/utils/utils.dart';
 
 class CheckoutRequest extends HttpService {
   //

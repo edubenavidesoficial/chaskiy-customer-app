@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/services/app_currency_system.service.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
-import 'package:fuodz/widgets/states/product_stock.dart';
-import 'package:fuodz/widgets/tags/product_tags.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/services/app_currency_system.service.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
+import 'package:chaskiy/widgets/states/product_stock.dart';
+import 'package:chaskiy/widgets/tags/product_tags.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class ProductListItem extends StatelessWidget {

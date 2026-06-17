@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/models/delivery_address.dart';
-import 'package:fuodz/services/app.service.dart';
-import 'package:fuodz/services/auth.service.dart';
-import 'package:fuodz/services/location.service.dart';
-import 'package:fuodz/utils/utils.dart';
-import 'package:fuodz/view_models/welcome.vm.dart';
-import 'package:fuodz/views/pages/notification/notifications.page.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
-import 'package:fuodz/widgets/inputs/search_bar.input.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/models/delivery_address.dart';
+import 'package:chaskiy/services/app.service.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/services/location.service.dart';
+import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/view_models/welcome.vm.dart';
+import 'package:chaskiy/views/pages/notification/notifications.page.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
+import 'package:chaskiy/widgets/inputs/search_bar.input.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

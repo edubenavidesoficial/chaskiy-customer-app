@@ -1,4 +1,4 @@
-import 'package:fuodz/constants/app_strings.dart';
+import 'package:chaskiy/constants/app_strings.dart';
 
 class AppTaxiSettings extends AppStrings {
   static bool get requiredBookingCode {

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/property.dart';
-import 'package:fuodz/models/address.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/models/property_amenity.dart';
-import 'package:fuodz/models/property_type.dart';
-import 'package:fuodz/requests/property.request.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
-import 'package:fuodz/views/pages/booking/widgets/property_search_filter.bottomsheet.dart';
+import 'package:chaskiy/models/property.dart';
+import 'package:chaskiy/models/address.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/models/property_amenity.dart';
+import 'package:chaskiy/models/property_type.dart';
+import 'package:chaskiy/requests/property.request.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
+import 'package:chaskiy/views/pages/booking/widgets/property_search_filter.bottomsheet.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
 class PropertySearchViewModel extends MyBaseViewModel {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_routes.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/requests/vendor.request.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
+import 'package:chaskiy/constants/app_routes.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/requests/vendor.request.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
 
 class FeaturedVendorsPageViewModel extends MyBaseViewModel {
   FeaturedVendorsPageViewModel(BuildContext context) {

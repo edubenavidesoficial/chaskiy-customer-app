@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/extensions/dynamic.dart';
-import 'package:fuodz/services/cart.service.dart';
-import 'package:fuodz/views/pages/cart/cart.page.dart';
-import 'package:fuodz/widgets/buttons/custom_button.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/extensions/dynamic.dart';
+import 'package:chaskiy/services/cart.service.dart';
+import 'package:chaskiy/views/pages/cart/cart.page.dart';
+import 'package:chaskiy/widgets/buttons/custom_button.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class GoToCartView extends StatelessWidget {
   const GoToCartView({Key? key}) : super(key: key);

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/view_models/search.vm.dart';
-import 'package:fuodz/views/pages/search/widget/search_type.tag.dart';
-// import 'package:fuodz/widgets/cards/custom.visibility.dart';
-// import 'package:fuodz/widgets/toogle_grid_view.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/view_models/search.vm.dart';
+import 'package:chaskiy/views/pages/search/widget/search_type.tag.dart';
+// import 'package:chaskiy/widgets/cards/custom.visibility.dart';
+// import 'package:chaskiy/widgets/toogle_grid_view.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 

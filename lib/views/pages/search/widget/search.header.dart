@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fuodz/constants/sizes.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
-import 'package:fuodz/view_models/search.vm.dart';
-import 'package:fuodz/widgets/inputs/search_bar.input.dart';
+import 'package:chaskiy/constants/sizes.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/view_models/search.vm.dart';
+import 'package:chaskiy/widgets/inputs/search_bar.input.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class SearchHeader extends StatelessWidget {
   const SearchHeader(

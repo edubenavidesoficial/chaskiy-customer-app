@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/order.dart';
-import 'package:fuodz/requests/order.request.dart';
-import 'package:fuodz/view_models/base.view_model.dart';
-import 'package:fuodz/requests/property.request.dart';
-import 'package:fuodz/views/pages/booking/property_details.page.dart';
+import 'package:chaskiy/models/order.dart';
+import 'package:chaskiy/requests/order.request.dart';
+import 'package:chaskiy/view_models/base.view_model.dart';
+import 'package:chaskiy/requests/property.request.dart';
+import 'package:chaskiy/views/pages/booking/property_details.page.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class PropertyBookingDetailsViewModel extends MyBaseViewModel {
   PropertyBookingDetailsViewModel(

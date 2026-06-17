@@ -1,8 +1,8 @@
-import 'package:fuodz/constants/api.dart';
-import 'package:fuodz/models/api_response.dart';
-import 'package:fuodz/models/loyalty_point.dart';
-import 'package:fuodz/models/loyalty_point_report.dart';
-import 'package:fuodz/services/http.service.dart';
+import 'package:chaskiy/constants/api.dart';
+import 'package:chaskiy/models/api_response.dart';
+import 'package:chaskiy/models/loyalty_point.dart';
+import 'package:chaskiy/models/loyalty_point_report.dart';
+import 'package:chaskiy/services/http.service.dart';
 
 class LoyaltyPointRequest extends HttpService {
   //

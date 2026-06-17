@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/utils/ui_spacer.dart';
+import 'package:chaskiy/utils/ui_spacer.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class TimeTag extends StatelessWidget {

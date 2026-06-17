@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
-import 'package:fuodz/constants/api.dart';
-import 'package:fuodz/models/api_response.dart';
-import 'package:fuodz/services/firebase_token.service.dart';
-import 'package:fuodz/services/http.service.dart';
+import 'package:chaskiy/constants/api.dart';
+import 'package:chaskiy/models/api_response.dart';
+import 'package:chaskiy/services/firebase_token.service.dart';
+import 'package:chaskiy/services/http.service.dart';
 
 class AuthRequest extends HttpService {
   //

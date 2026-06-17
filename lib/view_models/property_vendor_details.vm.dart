@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/vendor.dart';
-import 'package:fuodz/models/property.dart';
-import 'package:fuodz/requests/property.request.dart';
-import 'package:fuodz/view_models/vendor_details.vm.dart';
+import 'package:chaskiy/models/vendor.dart';
+import 'package:chaskiy/models/property.dart';
+import 'package:chaskiy/requests/property.request.dart';
+import 'package:chaskiy/view_models/vendor_details.vm.dart';
 
 class PropertyVendorDetailsViewModel extends VendorDetailsViewModel {
   PropertyVendorDetailsViewModel(BuildContext context, Vendor vendor)

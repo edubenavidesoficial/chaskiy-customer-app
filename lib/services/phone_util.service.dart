@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:country_picker/country_picker.dart';
-import 'package:fuodz/services/local_storage.service.dart';
+import 'package:chaskiy/services/local_storage.service.dart';
 import 'package:sim_card_code/sim_card_code.dart';
 
 class PhoneUtilService {

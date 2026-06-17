@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_colors.dart';
-import 'package:fuodz/models/product.dart';
-import 'package:fuodz/widgets/cards/custom.visibility.dart';
-import 'package:fuodz/widgets/custom_image.view.dart';
-import 'package:fuodz/widgets/custom_list_view.dart';
+import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/models/product.dart';
+import 'package:chaskiy/widgets/cards/custom.visibility.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
+import 'package:chaskiy/widgets/custom_list_view.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class ProductImagesGalleryView extends StatefulWidget {

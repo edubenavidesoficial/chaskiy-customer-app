@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/view_models/vendor/popular_services.vm.dart';
-import 'package:fuodz/widgets/buttons/custom_text_button.dart';
-import 'package:fuodz/widgets/list_items/service.gridview_item.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/view_models/vendor/popular_services.vm.dart';
+import 'package:chaskiy/widgets/buttons/custom_text_button.dart';
+import 'package:chaskiy/widgets/list_items/service.gridview_item.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';

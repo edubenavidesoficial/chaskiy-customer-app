@@ -4,22 +4,22 @@ import 'package:country_picker/country_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fuodz/constants/app_strings.dart';
-import 'package:fuodz/models/api_response.dart';
-import 'package:fuodz/requests/auth.request.dart';
-import 'package:fuodz/services/alert.service.dart';
-import 'package:fuodz/services/auth.service.dart';
-import 'package:fuodz/services/phone_util.service.dart';
-import 'package:fuodz/services/social_media_login.service.dart';
-import 'package:fuodz/traits/qrcode_scanner.trait.dart';
-import 'package:fuodz/views/pages/auth/forgot_password.page.dart';
-import 'package:fuodz/views/pages/auth/register.page.dart';
-import 'package:fuodz/views/pages/home.page.dart';
-import 'package:fuodz/widgets/bottomsheets/account_verification_entry.dart';
+import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/models/api_response.dart';
+import 'package:chaskiy/requests/auth.request.dart';
+import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/services/phone_util.service.dart';
+import 'package:chaskiy/services/social_media_login.service.dart';
+import 'package:chaskiy/traits/qrcode_scanner.trait.dart';
+import 'package:chaskiy/views/pages/auth/forgot_password.page.dart';
+import 'package:chaskiy/views/pages/auth/register.page.dart';
+import 'package:chaskiy/views/pages/home.page.dart';
+import 'package:chaskiy/widgets/bottomsheets/account_verification_entry.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'base.view_model.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:fuodz/extensions/context.dart';
+import 'package:chaskiy/extensions/context.dart';
 
 class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
   //the textediting controllers

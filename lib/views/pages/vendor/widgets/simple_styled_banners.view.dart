@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fuodz/models/vendor_type.dart';
-import 'package:fuodz/view_models/vendor/banners.vm.dart';
-import 'package:fuodz/widgets/busy_indicator.dart';
-import 'package:fuodz/widgets/list_items/banner.list_item.dart';
+import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/view_models/vendor/banners.vm.dart';
+import 'package:chaskiy/widgets/busy_indicator.dart';
+import 'package:chaskiy/widgets/list_items/banner.list_item.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:carousel_slider/carousel_slider.dart';
