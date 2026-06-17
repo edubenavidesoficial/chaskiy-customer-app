@@ -1,4 +1,4 @@
-# fuodz
+# Chaskiy App
 
 A new Flutter project.
 

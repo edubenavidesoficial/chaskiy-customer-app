@@ -1,4 +1,4 @@
-package online.edentech.fuodz
+package com.chaskiy.app
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

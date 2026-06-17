@@ -1,7 +1,7 @@
 flutter_application_id:
   android:
-    id: "online.edentech.fuodz"
-    name: "Glover"
+    id: "com.chaskiy.app"
+    name: "Chaskiy"
   ios:
-    id: "online.edentech.fuodz"
-    name: "Glover"
+    id: "com.chaskiy.app"
+    name: "Chaskiy"

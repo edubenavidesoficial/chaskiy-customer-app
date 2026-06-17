@@ -7,8 +7,8 @@ import 'package:singleton/singleton.dart';
 
 class DeepLinkService {
   // Deep link constants
-  static const String _customScheme = 'glover';
-  static const String _httpsHost = 'glover.edentech.online';
+  static const String _customScheme = 'chaskiy';
+  static const String _httpsHost = 'app.chaskiy.com';
 
   /// Factory method that reuse same instance automatically
   factory DeepLinkService() => Singleton.lazy(() => DeepLinkService._());

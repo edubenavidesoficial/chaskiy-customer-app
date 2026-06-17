@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:977502122572:android:07a9e9b559cd67b8c3bae9",
         "android_client_info": {
-          "package_name": "online.edentech.fuodz"
+          "package_name": "com.chaskiy.app"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "977502122572-gjgr2771jdiuj2fa9t8qpgk2mj1272ar.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "online.edentech.fuodz",
+            "package_name": "com.chaskiy.app",
             "certificate_hash": "cc0a30303f46755bb4de1b35537cf14c2e8328b8"
           }
         },
