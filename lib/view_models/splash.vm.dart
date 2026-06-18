@@ -15,7 +15,7 @@ import 'package:chaskiy/services/auth.service.dart';
 import 'package:chaskiy/services/firebase.service.dart';
 import 'package:chaskiy/services/websocket.service.dart';
 import 'package:chaskiy/utils/utils.dart';
-import 'package:chaskiy/widgets/cards/language_selector.view.dart';
+//import 'package:chaskiy/widgets/cards/language_selector.view.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'base.view_model.dart';
@@ -106,19 +106,15 @@ class SplashViewModel extends MyBaseViewModel {
     //
     await Utils.setJiffyLocale();
     //
-    if (AuthServices.firstTimeOnApp()) {
-      //choose language
-      await Navigator.of(
-        viewContext,
-      ).push(MaterialPageRoute(builder: (ctx) => AppLanguageSelector()));
-      // await showModalBottomSheet(
-      //   context: viewContext,
-      //   isScrollControlled: true,
-      //   builder: (context) {
-      //     return AppLanguageSelector();
-      //   },
-      // );
-    }
+   if (AuthServices.firstTimeOnApp()) {
+     await AuthServices.setLocale("es");
+     await translator.setNewLanguage(
+       viewContext,
+       newLanguage: "es",
+       remember: true,
+     );
+     await Utils.setJiffyLocale();
+   }
     //
     if (AuthServices.firstTimeOnApp()) {
       Navigator.of(viewContext).pushNamedAndRemoveUntil(
