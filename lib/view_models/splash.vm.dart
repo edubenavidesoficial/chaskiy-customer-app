@@ -44,15 +44,27 @@ class SplashViewModel extends MyBaseViewModel {
     setBusy(true);
     try {
       final appSettingsObject = await settingsRequest.appSettings();
+      if (appSettingsObject.hasError() || appSettingsObject.body is! Map) {
+        throw appSettingsObject.message?.isNotEmpty == true
+            ? appSettingsObject.message!
+            : "No se pudo cargar la configuración de la app. Intenta nuevamente.";
+      }
+      final appSettingsBody = appSettingsObject.body as Map;
+      if (appSettingsBody["strings"] is! Map ||
+          appSettingsBody["colors"] == null) {
+        throw "La configuración recibida del servidor está incompleta. Intenta nuevamente.";
+      }
       //START: WEBSOCKET SETTINGS
-      if (appSettingsObject.body["websocket"] != null) {
+      if (appSettingsBody["websocket"] != null) {
         await WebsocketService().saveWebsocketDetails(
-          appSettingsObject.body["websocket"],
+          appSettingsBody["websocket"],
         );
       }
       //END: WEBSOCKET SETTINGS
 
-      Map<String, dynamic> appGenSettings = appSettingsObject.body["strings"];
+      Map<String, dynamic> appGenSettings = Map<String, dynamic>.from(
+        appSettingsBody["strings"],
+      );
       //set the app name ffrom package to the app settings
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       String appName = packageInfo.appName;
@@ -60,10 +72,8 @@ class SplashViewModel extends MyBaseViewModel {
       //app settings
       await updateAppVariables(appGenSettings);
       //colors
-      await updateAppTheme(appSettingsObject.body["colors"]);
-      await AppCurrencySystemService().init(
-        appSettingsObject.body["exchange_rates"],
-      );
+      await updateAppTheme(appSettingsBody["colors"]);
+      await AppCurrencySystemService().init(appSettingsBody["exchange_rates"]);
       loadNextPage();
     } catch (error) {
       setError(error);
@@ -71,7 +81,7 @@ class SplashViewModel extends MyBaseViewModel {
       //show a dialog
       AlertService.error(
         title: "An error occurred".tr(),
-        text: "$error",
+        text: friendlyStartupError(error),
         confirmBtnText: "Retry".tr(),
         onConfirm: () {
           initialise();
@@ -79,6 +89,19 @@ class SplashViewModel extends MyBaseViewModel {
       );
     }
     setBusy(false);
+  }
+
+  String friendlyStartupError(dynamic error) {
+    final message = "$error";
+    final lowerMessage = message.toLowerCase();
+    if (lowerMessage.contains("type 'null'") ||
+        lowerMessage.contains("type 'string'") ||
+        lowerMessage.contains("subtype") ||
+        lowerMessage.contains("<html") ||
+        lowerMessage.contains("one moment")) {
+      return "No se pudo cargar la configuración de la app. Verifica tu conexión e intenta nuevamente.";
+    }
+    return message;
   }
 
   //
@@ -133,8 +156,8 @@ class SplashViewModel extends MyBaseViewModel {
     }
 
     //
-    RemoteMessage? initialMessage =
-        await FirebaseService().firebaseMessaging.getInitialMessage();
+    RemoteMessage? initialMessage = await FirebaseService().firebaseMessaging
+        .getInitialMessage();
     if (initialMessage != null) {
       //
       FirebaseService().saveNewNotification(initialMessage);

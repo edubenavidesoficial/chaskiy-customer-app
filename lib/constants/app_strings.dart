@@ -13,34 +13,37 @@ class AppStrings {
   static String get currencySymbol => env('currency');
   static String get currencyCode => env('currency_code');
   static String get countryCode => env('country_code');
-  static bool get enableOtp => env('enble_otp') == "1";
-  static bool get enableOTPLogin => env('enableOTPLogin') == "1";
+  static bool get enableOtp => boolEnv('enble_otp');
+  static bool get enableOTPLogin => boolEnv('enableOTPLogin');
 
   //
   static String get currentCurrencySymbol =>
       AppCurrencySystemService().currentCurrencySymbol;
 
   //
-  static bool get enableEmailLogin => env('enableEmailLogin');
-  static bool get enableProfileUpdate => env('enableProfileUpdate');
+  static bool get enableEmailLogin =>
+      boolEnv('enableEmailLogin', fallback: true);
+  static bool get enableProfileUpdate =>
+      boolEnv('enableProfileUpdate', fallback: true);
 
-  static bool get enableGoogleDistance => env('enableGoogleDistance') == "1";
-  static bool get enableSingleVendor => env('enableSingleVendor') == "1";
+  static bool get enableGoogleDistance => boolEnv('enableGoogleDistance');
+  static bool get enableSingleVendor => boolEnv('enableSingleVendor');
   static bool get enableMultipleVendorOrder =>
-      env('enableMultipleVendorOrder') ?? false;
-  static bool get enableReferSystem => env('enableReferSystem') == "1";
+      boolEnv('enableMultipleVendorOrder');
+  static bool get enableReferSystem => boolEnv('enableReferSystem');
   static String get referAmount => env('referAmount');
-  static bool get enableChat => env('enableChat') == "1";
-  static bool get enableOrderTracking => env('enableOrderTracking') == "1";
-  static bool get enableFatchByLocation => env('enableFatchByLocation') ?? true;
-  static bool get showVendorTypeImageOnly =>
-      env('showVendorTypeImageOnly') == "1";
+  static bool get enableChat => boolEnv('enableChat', fallback: true);
+  static bool get enableOrderTracking =>
+      boolEnv('enableOrderTracking', fallback: true);
+  static bool get enableFatchByLocation =>
+      boolEnv('enableFatchByLocation', fallback: true);
+  static bool get showVendorTypeImageOnly => boolEnv('showVendorTypeImageOnly');
   static bool get enableUploadPrescription =>
-      env('enableUploadPrescription') == "1";
+      boolEnv('enableUploadPrescription', fallback: true);
   static bool get enableParcelVendorByLocation =>
-      env('enableParcelVendorByLocation') == "1";
+      boolEnv('enableParcelVendorByLocation');
   static bool get enableParcelMultipleStops =>
-      env('enableParcelMultipleStops') == "1";
+      boolEnv('enableParcelMultipleStops');
   static int get maxParcelStops =>
       env('maxParcelStops').toString().toInt() ?? 1;
   static String get what3wordsApiKey => env('what3wordsApiKey') ?? "";
@@ -49,16 +52,14 @@ class AppStrings {
   static String get androidDownloadLink => env('androidDownloadLink') ?? "";
   static String get iOSDownloadLink => env('iosDownloadLink') ?? "";
   //
-  static bool get isSingleVendorMode => env('isSingleVendorMode') == "1";
+  static bool get isSingleVendorMode => boolEnv('isSingleVendorMode');
   static bool get canScheduleTaxiOrder =>
-      env('taxi')['canScheduleTaxiOrder'] != null
-          ? (env('taxi')['canScheduleTaxiOrder'] == "1")
-          : false;
+      boolValue(mapEnv('taxi')['canScheduleTaxiOrder']);
   static int get taxiMaxScheduleDays =>
-      (env('taxi')['taxiMaxScheduleDays'].toString().toInt()) ?? 2;
+      (mapEnv('taxi')['taxiMaxScheduleDays'].toString().toInt()) ?? 2;
 
   static Map<String, dynamic> get enabledVendorType =>
-      env('enabledVendorType') ?? {};
+      mapEnv('enabledVendorType');
   static double get bannerHeight =>
       double.parse("${env('bannerHeight') ?? 150.00}");
 
@@ -71,10 +72,10 @@ class AppStrings {
   static String get emergencyContact => env('emergencyContact') ?? "911";
 
   //Social media logins
-  static bool get googleLogin => env('auth')['googleLogin'] ?? false;
-  static bool get appleLogin => env('auth')['appleLogin'] ?? false;
-  static bool get facebbokLogin => env('auth')['facebbokLogin'] ?? false;
-  static bool get qrcodeLogin => env('auth')['qrcodeLogin'] ?? false;
+  static bool get googleLogin => boolValue(mapEnv('auth')['googleLogin']);
+  static bool get appleLogin => boolValue(mapEnv('auth')['appleLogin']);
+  static bool get facebbokLogin => boolValue(mapEnv('auth')['facebbokLogin']);
+  static bool get qrcodeLogin => boolValue(mapEnv('auth')['qrcodeLogin']);
 
   //UI Configures
   static dynamic get uiConfig {
@@ -142,7 +143,7 @@ class AppStrings {
   }
 
   static bool get useWebsocketAssignment {
-    return (env('useWebsocketAssignment') ?? false);
+    return boolEnv('useWebsocketAssignment');
   }
 
   //DONT'T TOUCH
@@ -190,6 +191,35 @@ class AppStrings {
     getAppSettingsFromLocalStorage();
     //
     return appSettingsObject != null ? appSettingsObject[ref] : "";
+  }
+
+  static Map<String, dynamic> mapEnv(String ref) {
+    final value = env(ref);
+    return value is Map ? Map<String, dynamic>.from(value) : {};
+  }
+
+  static bool boolEnv(String ref, {bool fallback = false}) {
+    return boolValue(env(ref), fallback: fallback);
+  }
+
+  static bool boolValue(dynamic value, {bool fallback = false}) {
+    if (value == null) {
+      return fallback;
+    }
+    if (value is bool) {
+      return value;
+    }
+    if (value is num) {
+      return value == 1;
+    }
+    final normalized = value.toString().trim().toLowerCase();
+    if (["1", "true", "yes", "on"].contains(normalized)) {
+      return true;
+    }
+    if (["0", "false", "no", "off", ""].contains(normalized)) {
+      return false;
+    }
+    return fallback;
   }
 
   //

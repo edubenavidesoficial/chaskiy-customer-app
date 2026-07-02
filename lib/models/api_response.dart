@@ -11,12 +11,7 @@ class ApiResponse {
   dynamic body;
   List? errors;
 
-  ApiResponse({
-    this.code,
-    this.message,
-    this.body,
-    this.errors,
-  });
+  ApiResponse({this.code, this.message, this.body, this.errors});
 
   factory ApiResponse.fromResponse(dynamic response) {
     //
@@ -28,15 +23,27 @@ class ApiResponse {
     switch (code) {
       case 200:
         try {
-          message = body is Map ? (body["message"] ?? "") : "";
+          if (body is String) {
+            final lowerBody = body.toLowerCase();
+            if (lowerBody.contains("<html") ||
+                lowerBody.contains("one moment")) {
+              message =
+                  "No se pudo conectar con el servidor. Intenta nuevamente en unos segundos.";
+              errors.add(message);
+            }
+          } else {
+            message = body is Map ? (body["message"] ?? "") : "";
+          }
         } catch (error) {
           print("Message reading error ==> $error");
         }
 
         break;
       default:
-        message = body["message"] ??
-            "Whoops! Something went wrong, please contact support.";
+        message = body is Map
+            ? (body["message"] ??
+                  "Ocurrió un error. Intenta nuevamente o contacta a soporte.")
+            : "Ocurrió un error. Intenta nuevamente o contacta a soporte.";
         errors.add(message);
         break;
     }
