@@ -136,6 +136,12 @@ dependencies:
   what3words: ^3.2.0
 
 dependency_overrides:
+  eva_icons_flutter:
+    path: third_party/eva_icons_flutter
+  flutter_icons:
+    path: third_party/flutter_icons
+  font_awesome_flutter:
+    path: third_party/font_awesome_flutter
   # archive: ^3.6.1
   flutter_widget_from_html: ^0.10.1
   # geolocator: ^14.0.0

@@ -64,7 +64,12 @@ class HttpService {
     final userToken = await AuthServices.getAuthBearerToken();
     return {
       HttpHeaders.acceptHeader: "application/json",
+      HttpHeaders.userAgentHeader:
+          "Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 ChaskiyCustomer/${packageInfo.version}",
       HttpHeaders.authorizationHeader: "Bearer $userToken",
+      "X-Requested-With": "XMLHttpRequest",
+      "X-Mobile-App": "ChaskiyCustomer",
+      "X-App-Platform": Platform.operatingSystem,
       "lang": translator.activeLocale.languageCode,
       //
       'Cache-Control': 'no-cache',
