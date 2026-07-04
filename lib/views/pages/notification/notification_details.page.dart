@@ -3,6 +3,7 @@ import 'package:chaskiy/models/notification.dart';
 import 'package:chaskiy/widgets/base.page.dart';
 import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class NotificationDetailsPage extends StatelessWidget {
@@ -16,7 +17,7 @@ class NotificationDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      title: "Notification Details",
+      title: "Notification Details".tr(),
       showAppBar: true,
       showLeadingAction: true,
       body: SafeArea(

@@ -90,8 +90,8 @@ class NotificationService {
     //fcm_fallback_notification_channel
     return NotificationChannel(
       channelKey: 'basic_channel',
-      channelName: 'Basic notifications',
-      channelDescription: 'Notification channel for app',
+      channelName: 'Notificaciones',
+      channelDescription: 'Canal de notificaciones de Chaskiy',
       importance: NotificationImportance.High,
       soundSource: "resource://raw/alert",
       playSound: true,

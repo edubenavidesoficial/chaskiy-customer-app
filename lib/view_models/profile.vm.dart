@@ -25,6 +25,9 @@ import 'package:share_plus/share_plus.dart';
 import 'package:chaskiy/extensions/context.dart';
 
 class ProfileViewModel extends PaymentViewModel {
+  static const String _supportWhatsAppUrl =
+      "https://api.whatsapp.com/message/ZW23J2G63IGEP1?autoload=1&app_absent=0";
+
   //
   String appVersionInfo = "";
   bool authenticated = false;
@@ -210,6 +213,10 @@ class ProfileViewModel extends PaymentViewModel {
   openLivesupport() async {
     final url = Api.inappSupport;
     openWebpageLink(url);
+  }
+
+  openLearnMoreSupport() async {
+    openWebpageLink(_supportWhatsAppUrl);
   }
 
   //

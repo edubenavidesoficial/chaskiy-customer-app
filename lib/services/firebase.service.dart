@@ -46,6 +46,11 @@ class FirebaseService {
   FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
   Map? notificationPayloadData;
 
+  String _notificationText(String? value) {
+    final text = (value ?? "").trim();
+    return text.isEmpty ? text : text.tr();
+  }
+
   setUpFirebaseMessaging() async {
     //Request for notification permission
     /*NotificationSettings settings = */
@@ -96,10 +101,12 @@ class FirebaseService {
     }
     //Saving the notification
     notificationModel = NotificationModel();
-    notificationModel!.title =
-        message?.notification?.title ?? title ?? message?.data["title"] ?? "";
-    notificationModel!.body =
-        message?.notification?.body ?? body ?? message?.data["body"] ?? "";
+    notificationModel!.title = _notificationText(
+      message?.notification?.title ?? title ?? message?.data["title"],
+    );
+    notificationModel!.body = _notificationText(
+      message?.notification?.body ?? body ?? message?.data["body"],
+    );
     //
 
     final imageUrl =
@@ -148,8 +155,12 @@ class FirebaseService {
             id: Random().nextInt(20),
             channelKey:
                 NotificationService.appNotificationChannel().channelKey!,
-            title: message.data["title"] ?? message.notification?.title,
-            body: message.data["body"] ?? message.notification?.body,
+            title: _notificationText(
+              message.data["title"] ?? message.notification?.title,
+            ),
+            body: _notificationText(
+              message.data["body"] ?? message.notification?.body,
+            ),
             bigPicture: imageUrl,
             icon: "resource://drawable/notification_icon",
             notificationLayout: NotificationLayout.BigPicture,
@@ -163,8 +174,12 @@ class FirebaseService {
             id: Random().nextInt(20),
             channelKey:
                 NotificationService.appNotificationChannel().channelKey!,
-            title: message.data["title"] ?? message.notification?.title,
-            body: message.data["body"] ?? message.notification?.body,
+            title: _notificationText(
+              message.data["title"] ?? message.notification?.title,
+            ),
+            body: _notificationText(
+              message.data["body"] ?? message.notification?.body,
+            ),
             icon: "resource://drawable/notification_icon",
             notificationLayout: NotificationLayout.Default,
             payload: Map<String, String>.from(message.data),

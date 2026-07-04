@@ -11,6 +11,12 @@ import 'package:velocity_x/velocity_x.dart';
 
 class AlertService {
   //
+  static String? _translated(String? value) {
+    if (value == null) {
+      return null;
+    }
+    return value.tr();
+  }
 
   static Future<bool> showConfirm({
     String? title,
@@ -27,8 +33,8 @@ class AlertService {
       borderRadius: Sizes.radiusSmall,
       context: context,
       type: QuickAlertType.confirm,
-      text: text,
-      title: title,
+      text: _translated(text),
+      title: _translated(title),
       confirmBtnText: confirmBtnText.tr(),
       cancelBtnText: cancelBtnText.tr(),
       confirmBtnColor: AppColor.primaryColor,
@@ -97,8 +103,8 @@ class AlertService {
     await QuickAlert.show(
       context: AppService().navigatorKey.currentContext!,
       type: QuickAlertType.success,
-      title: title,
-      text: text,
+      title: _translated(title),
+      text: _translated(text),
       confirmBtnText: confirmBtnText.tr(),
       cancelBtnText: cancelBtnText.tr(),
       onConfirmBtnTap: () {
@@ -147,8 +153,8 @@ class AlertService {
     await QuickAlert.show(
       context: context,
       type: QuickAlertType.error,
-      title: title,
-      text: text,
+      title: _translated(title),
+      text: _translated(text),
       confirmBtnText: confirmBtnText.tr(),
       onConfirmBtnTap: onConfirm != null
           ? () {
@@ -190,8 +196,8 @@ class AlertService {
     await QuickAlert.show(
       context: context,
       type: QuickAlertType.warning,
-      title: title,
-      text: text,
+      title: _translated(title),
+      text: _translated(text),
       confirmBtnText: confirmBtnText.tr(),
       onConfirmBtnTap: onConfirm != null
           ? () {
@@ -235,8 +241,8 @@ class AlertService {
       type: type != null
           ? QuickAlertType.values[type.index]
           : QuickAlertType.info,
-      title: title,
-      text: text,
+      title: _translated(title),
+      text: _translated(text),
       titleColor: context.textTheme.bodyLarge!.color!,
       textColor: context.textTheme.bodyLarge!.color!,
       backgroundColor: context.theme.dialogBackgroundColor,
@@ -295,8 +301,8 @@ class AlertService {
       type: type != null
           ? QuickAlertType.values[type.index]
           : QuickAlertType.info,
-      title: title,
-      text: text,
+      title: _translated(title),
+      text: _translated(text),
       confirmBtnText: confirmBtnText.tr(),
       cancelBtnText: (cancelBtnText ?? "").tr(),
       onConfirmBtnTap: onConfirm != null
@@ -329,7 +335,7 @@ class AlertService {
       context: AppService().navigatorKey.currentContext!,
       type: QuickAlertType.loading,
       title: '',
-      text: "Processing. Please wait...".tr(),
+      text: _translated("Processing. Please wait..."),
     );
 
     // CoolAlert.show(
@@ -350,7 +356,7 @@ class AlertService {
       context: AppService().navigatorKey.currentContext!,
       type: QuickAlertType.loading,
       title: '',
-      text: "Processing. Please wait...".tr(),
+      text: _translated(text ?? "Processing. Please wait..."),
     );
 
     // CoolAlert.show(

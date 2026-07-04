@@ -10,13 +10,13 @@ class ToastService {
     try {
       AlertController.show(
         title ?? "Successful".tr(),
-        msg,
+        msg.tr(),
         TypeAlert.success,
       );
     } catch (error) {
       AlertService.success(
         title: title ?? "Successful".tr(),
-        text: msg,
+        text: msg.tr(),
       );
     }
   }
@@ -25,13 +25,13 @@ class ToastService {
     try {
       AlertController.show(
         title ?? "Error".tr(),
-        msg,
+        msg.tr(),
         TypeAlert.error,
       );
     } catch (error) {
       AlertService.error(
         title: title ?? "Error".tr(),
-        text: msg,
+        text: msg.tr(),
       );
     }
   }
