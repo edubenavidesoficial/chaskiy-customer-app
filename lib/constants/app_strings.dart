@@ -176,12 +176,21 @@ class AppStrings {
   }
 
   static dynamic appSettingsObject;
+  static String? _cachedAppSettingsString;
+
   static Future<void> getAppSettingsFromLocalStorage() async {
-    appSettingsObject = LocalStorageService.prefs?.getString(
+    final rawSettings = LocalStorageService.prefs?.getString(
       AppStrings.appRemoteSettings,
     );
-    if (appSettingsObject != null) {
-      appSettingsObject = jsonDecode(appSettingsObject);
+    if (rawSettings == _cachedAppSettingsString && appSettingsObject != null) {
+      return;
+    }
+
+    _cachedAppSettingsString = rawSettings;
+    if (rawSettings != null && rawSettings.isNotEmpty) {
+      appSettingsObject = jsonDecode(rawSettings);
+    } else {
+      appSettingsObject = null;
     }
   }
 

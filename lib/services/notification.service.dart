@@ -13,6 +13,8 @@ import 'local_storage.service.dart';
 class NotificationService {
   //
   static const platform = MethodChannel('notifications.manage');
+  static String? _cachedNotificationsString;
+  static List<NotificationModel>? _cachedNotifications;
 
   //
   static initializeAwesomeNotification() async {
@@ -104,11 +106,20 @@ class NotificationService {
     final notificationsStringList = (await LocalStorageService.getPrefs())
         .getString(AppStrings.notificationsKey);
 
-    if (notificationsStringList == null) {
+    if (notificationsStringList == _cachedNotificationsString &&
+        _cachedNotifications != null) {
+      return _cachedNotifications!;
+    }
+
+    _cachedNotificationsString = notificationsStringList;
+
+    if (notificationsStringList == null || notificationsStringList.isEmpty) {
+      _cachedNotifications = [];
       return [];
     }
 
-    return (jsonDecode(notificationsStringList) as List).asMap().entries.map((
+    _cachedNotifications =
+        (jsonDecode(notificationsStringList) as List).asMap().entries.map((
       notificationObject,
     ) {
       //
@@ -124,18 +135,17 @@ class NotificationService {
         timeStamp: notificationObject.value["timeStamp"],
       );
     }).toList();
+    return _cachedNotifications!;
   }
 
   static void addNotification(NotificationModel notification) async {
     //
     final notifications = await getNotifications();
     notifications.insert(0, notification);
+    _syncIndexes(notifications);
 
     //
-    await LocalStorageService.prefs?.setString(
-      AppStrings.notificationsKey,
-      jsonEncode(notifications),
-    );
+    await _saveNotifications(notifications);
   }
 
   static void updateNotification(NotificationModel notificationModel) async {
@@ -143,9 +153,25 @@ class NotificationService {
     final notifications = await getNotifications();
     notifications.removeAt(notificationModel.index!);
     notifications.insert(notificationModel.index!, notificationModel);
+    _syncIndexes(notifications);
+    await _saveNotifications(notifications);
+  }
+
+  static void _syncIndexes(List<NotificationModel> notifications) {
+    for (int index = 0; index < notifications.length; index++) {
+      notifications[index].index = index;
+    }
+  }
+
+  static Future<void> _saveNotifications(
+    List<NotificationModel> notifications,
+  ) async {
+    final rawNotifications = jsonEncode(notifications);
+    _cachedNotificationsString = rawNotifications;
+    _cachedNotifications = notifications;
     await LocalStorageService.prefs?.setString(
       AppStrings.notificationsKey,
-      jsonEncode(notifications),
+      rawNotifications,
     );
   }
 

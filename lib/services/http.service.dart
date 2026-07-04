@@ -21,9 +21,14 @@ class HttpService {
   BaseOptions? baseOptions;
   Dio? dio;
   SharedPreferences? prefs;
+  static Future<PackageInfo>? _packageInfoFuture;
+
+  static Future<PackageInfo> get _packageInfo {
+    return _packageInfoFuture ??= PackageInfo.fromPlatform();
+  }
 
   Future<Map<String, String>> getHeaders() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    final packageInfo = await _packageInfo;
     double? cLat;
     double? cLng;
     //

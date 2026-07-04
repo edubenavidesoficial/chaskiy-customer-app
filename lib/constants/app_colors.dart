@@ -104,11 +104,19 @@ class AppColor {
   }
 
   static dynamic appColorsObject;
+  static String? _cachedColorsString;
+
   static Future<void> getColorsFromLocalStorage() async {
-    appColorsObject =
-        LocalStorageService.prefs!.getString(AppStrings.appColors);
-    if (appColorsObject != null) {
-      appColorsObject = jsonDecode(appColorsObject);
+    final rawColors = LocalStorageService.prefs!.getString(AppStrings.appColors);
+    if (rawColors == _cachedColorsString && appColorsObject != null) {
+      return;
+    }
+
+    _cachedColorsString = rawColors;
+    if (rawColors != null && rawColors.isNotEmpty) {
+      appColorsObject = jsonDecode(rawColors);
+    } else {
+      appColorsObject = null;
     }
   }
 

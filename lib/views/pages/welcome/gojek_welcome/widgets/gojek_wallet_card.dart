@@ -108,7 +108,7 @@ class _GojekWalletCardState extends State<GojekWalletCard>
                               ),
                             const SizedBox(height: 2),
                             Text(
-                              "Tap for history".tr(),
+                              "Ver".tr(),
                               style: const TextStyle(
                                 fontSize: 9,
                                 fontWeight: FontWeight.w600,
