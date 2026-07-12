@@ -835,5 +835,14 @@
   "Schedule Time": "Hora programada",
   "Vendor is not open. Please schedule order": "El proveedor no está abierto. Por favor programa el pedido",
   "Basic notifications": "Notificaciones",
-  "Notification channel for app": "Canal de notificaciones de Chaskiy"
+  "Notification channel for app": "Canal de notificaciones de Chaskiy",
+  "Failed": "Fallido",
+  "Success": "Éxito",
+  "Code sent successfully": "Código enviado correctamente",
+  "Checking for Update. Please wait...": "Buscando actualizaciones. Por favor espera...",
+  "Nuevo mensaje de": "Nuevo mensaje de",
+  "Sin notificaciones": "Sin notificaciones",
+  "Ocurrió un error": "Ocurrió un error",
+  "Solicitar permiso": "Solicitar permiso",
+  "Siguiente": "Siguiente"
 }

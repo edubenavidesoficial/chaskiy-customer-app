@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:chaskiy/services/firebase.service.dart';
+import 'package:chaskiy/services/firebase.service.dart' as app_firebase;
 
 class GeneralAppService {
   //
@@ -12,8 +12,8 @@ class GeneralAppService {
     //if it has not data then it is a normal notification, so ignore it
     if (message.data.isEmpty) return;
     await Firebase.initializeApp();
-    FirebaseService().saveNewNotification(message);
+    app_firebase.FirebaseService().saveNewNotification(message);
     //normal notifications
-    FirebaseService().showNotification(message);
+    app_firebase.FirebaseService().showNotification(message);
   }
 }

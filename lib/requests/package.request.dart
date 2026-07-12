@@ -107,7 +107,6 @@ class PackageRequest extends HttpService {
 
     final apiResponse = ApiResponse.fromResponse(apiResult);
     if (apiResponse.allGood) {
-      print("Response ==> ${apiResponse.body}");
       return PackageCheckout.fromJson(apiResponse.body);
     }
 

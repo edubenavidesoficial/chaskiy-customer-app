@@ -11,15 +11,13 @@ class ChatService {
     );
     //
     final otherPeer = chatEntity.peers[otherPeerKey];
-    final apiResponse = await ChatRequest().sendNotification(
-      title: "New Message from".tr() + " ${chatEntity.mainUser.name}",
+    await ChatRequest().sendNotification(
+      title: "Nuevo mensaje de".tr() + " ${chatEntity.mainUser.name}",
       body: message,
       topic: otherPeer!.id,
       path: chatEntity.path,
       user: chatEntity.mainUser,
       otherUser: otherPeer,
     );
-
-    print("Result ==> ${apiResponse.body}");
   }
 }

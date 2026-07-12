@@ -23,9 +23,9 @@ class EmptySubcategoriesView extends StatelessWidget {
         VStack(
           [
             //title
-            "No Subcategories Found".tr().text.xl.semiBold.center.make(),
+            "No se encontraron subcategorías".tr().text.xl.semiBold.center.make(),
             //body
-            "There are currently no active subcategories under the selected category. Please check back later"
+            "Actualmente no hay subcategorías activas en la categoría seleccionada. Vuelve a intentarlo más tarde"
                 .tr()
                 .text
                 .center

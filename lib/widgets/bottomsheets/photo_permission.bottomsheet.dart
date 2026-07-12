@@ -19,21 +19,21 @@ class PhotoPermissionDialog extends StatelessWidget {
       child: VStack(
         [
           //title
-          "Photo Permission Request".tr().text.semiBold.xl.make().py12(),
+          "Solicitud de permiso para fotos".tr().text.semiBold.xl.make().py12(),
           ("${AppStrings.appName} " +
-                  "needs your permission to access your photos to select a photo for your profile picture, or to upload order photos."
+                  "necesita tu permiso para acceder a tus fotos, seleccionar una imagen de perfil o subir fotos del pedido."
                       .tr() +
                   "\n\n" +
-                  "We understand that your privacy is important, and we will not use your photos for any other purpose."
+                  "Sabemos que tu privacidad es importante y no usaremos tus fotos para ningún otro propósito."
                       .tr() +
                   "\n" +
-                  "You can change this permission in your device settings."
+                  "Puedes cambiar este permiso en la configuración de tu dispositivo."
                       .tr())
               .text
               .make(),
           UiSpacer.verticalSpace(),
           CustomButton(
-            title: Platform.isIOS ? "Next" : "Request Permission".tr(),
+            title: Platform.isIOS ? "Siguiente" : "Solicitar permiso".tr(),
             onPressed: () {
               AppService().navigatorKey.currentContext?.pop(true);
             },

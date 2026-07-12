@@ -99,8 +99,6 @@ class _AccountVerificationEntryState extends State<AccountVerificationEntry> {
             backgroundColor: Colors.transparent,
             enableActiveFill: false,
             onCompleted: (pin) {
-              print("Completed");
-              print("Pin ==> $pin");
               smsCode = pin;
             },
             onChanged: (value) {

@@ -12,10 +12,10 @@ class SettingsRequest extends HttpService {
       return ApiResponse.fromResponse(apiResult);
     } on DioError catch (error) {
       if (error.type == DioErrorType.unknown) {
-        throw "Connection failed. Please check that your have internet connection on this device."
+        throw "Falló la conexión. Verifica que tengas internet en este dispositivo."
                 .tr() +
             "\n" +
-            "Try again later".tr();
+            "Inténtalo nuevamente más tarde".tr();
       }
       throw error;
     } catch (error) {
@@ -29,10 +29,10 @@ class SettingsRequest extends HttpService {
       return ApiResponse.fromResponse(apiResult);
     } on DioError catch (error) {
       if (error.type == DioErrorType.unknown) {
-        throw "Connection failed. Please check that your have internet connection on this device."
+        throw "Falló la conexión. Verifica que tengas internet en este dispositivo."
                 .tr() +
             "\n" +
-            "Try again later".tr();
+            "Inténtalo nuevamente más tarde".tr();
       }
       throw error;
     } catch (error) {

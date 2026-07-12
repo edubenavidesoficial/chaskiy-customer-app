@@ -70,10 +70,10 @@ class WalletTransferViewModel extends PaymentViewModel with QrcodeScannerTrait {
         );
         //
         if (apiResponse.allGood) {
-          toastSuccessful(apiResponse.message ?? "Operation successful".tr());
+          toastSuccessful(apiResponse.message ?? "Operación realizada correctamente".tr());
           viewContext.pop(true);
         } else {
-          toastError(apiResponse.message ?? "Operation failed".tr());
+          toastError(apiResponse.message ?? "La operación falló".tr());
         }
       } catch (error) {
         toastError("$error");

@@ -223,25 +223,25 @@ class HttpService {
     try {
       if (ex.type == DioErrorType.connectionTimeout) {
         msg =
-            "Connection timeout. Please check your internet connection and try again"
+            "Tiempo de conexión agotado. Revisa tu conexión a internet e inténtalo nuevamente"
                 .tr();
       } else if (ex.type == DioErrorType.sendTimeout) {
         msg =
-            "Timeout. Please check your internet connection and try again".tr();
+            "Tiempo de espera agotado. Revisa tu conexión a internet e inténtalo nuevamente".tr();
       } else if (ex.type == DioErrorType.receiveTimeout) {
         msg =
-            "Timeout. Please check your internet connection and try again".tr();
+            "Tiempo de espera agotado. Revisa tu conexión a internet e inténtalo nuevamente".tr();
       } else if (ex.type == DioErrorType.connectionTimeout) {
         msg =
-            "Connection timeout. Please check your internet connection and try again"
+            "Tiempo de conexión agotado. Revisa tu conexión a internet e inténtalo nuevamente"
                 .tr();
       } else {
-        msg = "Please check your internet connection and try again".tr();
+        msg = "Revisa tu conexión a internet e inténtalo nuevamente".tr();
       }
       response.data = {"message": msg};
     } catch (error) {
       response.statusCode = 400;
-      msg = "Please check your internet connection and try again".tr();
+      msg = "Revisa tu conexión a internet e inténtalo nuevamente".tr();
       response.data = {"message": msg};
     }
 

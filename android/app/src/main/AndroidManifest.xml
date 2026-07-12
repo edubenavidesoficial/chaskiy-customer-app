@@ -31,7 +31,6 @@
     <application
         android:name="${applicationName}"
         android:label="Chaskiy App"
-        android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/launcher_icon"
         tools:replace="android:label">

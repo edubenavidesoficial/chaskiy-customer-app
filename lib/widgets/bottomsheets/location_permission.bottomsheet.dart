@@ -29,8 +29,8 @@ class LocationPermissionDialog extends StatelessWidget {
       child: VStack(
         [
           //title
-          "Location Permission Request".tr().text.semiBold.xl.make().py12(),
-          "Thank you for using %s. To provide you with the best experience possible, our app needs access to your location. We use your location data to show you nearby vendors, enable you to set up a delivery address or location during checkout, and provide live tracking of your order and delivery persons. Your privacy is important to us, and we will never share your location data with third parties."
+          "Solicitud de permiso de ubicación".tr().text.semiBold.xl.make().py12(),
+          "Gracias por usar %s. Para ofrecerte una mejor experiencia, la app necesita acceder a tu ubicación. Usamos estos datos para mostrarte comercios cercanos, configurar direcciones de entrega durante el pago y permitir el seguimiento en vivo de tu pedido y repartidor. Tu privacidad es importante para nosotros y nunca compartiremos tu ubicación con terceros."
               .tr()
               .fill([AppStrings.appName])
               .text

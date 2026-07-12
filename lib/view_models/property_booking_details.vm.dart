@@ -92,7 +92,7 @@ class PropertyBookingDetailsViewModel extends MyBaseViewModel {
     try {
       await PropertyRequest().cancelBooking(id: order.id, reason: "");
       setBusy(false);
-      toastSuccessful("Booking cancelled successfully");
+      toastSuccessful("Reserva cancelada correctamente".tr());
       fetchOrderDetails();
     } catch (e) {
       setBusy(false);

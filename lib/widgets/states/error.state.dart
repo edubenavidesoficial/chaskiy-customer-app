@@ -18,10 +18,9 @@ class LoadingError extends StatelessWidget {
       showAction: true,
       actionPressed: onrefresh,
       actionText: "Retry".tr(),
-      title: "An error occured".tr(),
+      title: "Ocurrió un error".tr(),
       description:
-          "There was an error while processing your request. Please try again"
-              .tr(),
+          "Hubo un error al procesar tu solicitud. Inténtalo nuevamente".tr(),
     ).p20();
   }
 }

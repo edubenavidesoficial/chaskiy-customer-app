@@ -26,9 +26,9 @@ class NotificationsPage extends StatelessWidget {
             child: CustomListView(
               dataSet: model.notifications,
               emptyWidget: EmptyState(
-                title: "No Notifications".tr(),
+                title: "Sin notificaciones".tr(),
                 description:
-                    "You dont' have notifications yet. When you get notifications, they will appear here"
+                    "Aún no tienes notificaciones. Cuando recibas una, aparecerá aquí"
                         .tr(),
               ),
               itemBuilder: (context, index) {

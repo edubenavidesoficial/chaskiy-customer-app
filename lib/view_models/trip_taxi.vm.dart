@@ -69,12 +69,12 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
       //
       if (apiResponse.allGood) {
         toastSuccessful(
-          apiResponse.message ?? "Trip cancelled successfully".tr(),
+          apiResponse.message ?? "Viaje cancelado correctamente".tr(),
         );
         setCurrentStep(1);
         clearMapData();
       } else {
-        toastError(apiResponse.message ?? "Failed to cancel trip".tr());
+        toastError(apiResponse.message ?? "No se pudo cancelar el viaje".tr());
       }
     } catch (error) {
       print("trip ongoing error ==> $error");
@@ -422,10 +422,10 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     );
     //
     if (apiResponse.allGood) {
-      toastSuccessful(apiResponse.message ?? "Trip rated successfully".tr());
+      toastSuccessful(apiResponse.message ?? "Viaje calificado correctamente".tr());
       dismissTripRating();
     } else {
-      toastError(apiResponse.message ?? "Failed to rate trip".tr());
+      toastError(apiResponse.message ?? "No se pudo calificar el viaje".tr());
     }
     setBusyForObject(newTripRating, false);
   }

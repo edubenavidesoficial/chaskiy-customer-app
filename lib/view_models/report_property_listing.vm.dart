@@ -66,7 +66,7 @@ class ReportPropertyListingViewModel extends MyBaseViewModel {
       ApiResponse apiResponse = ApiResponse.fromResponse(response);
       if (apiResponse.allGood) {
         await AlertService.success(
-          title: "Listing Reported Successfully".tr(),
+          title: "Anuncio reportado correctamente".tr(),
           text: apiResponse.message,
         );
         setBusy(false);

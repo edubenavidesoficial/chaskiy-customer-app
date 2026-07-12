@@ -17,16 +17,16 @@ class ContactPermissionDialog extends StatelessWidget {
       child: VStack(
         [
           //title
-          "Contact Permission Request".tr().text.semiBold.xl.make().py12(),
+          "Solicitud de permiso para contactos".tr().text.semiBold.xl.make().py12(),
           ("${AppStrings.appName} " +
-                  "collects and utilizes your contact information to enable the 'Autofill Recipient Details' feature when you are placing orders. This process involves accessing your contact list solely for the purpose of identifying and suggesting recipient information, ensuring a streamlined and efficient order placement experience."
+                  "usa tu información de contactos para completar automáticamente los datos del destinatario al realizar pedidos. Solo accedemos a tu lista de contactos para sugerir información del destinatario y agilizar el proceso."
                       .tr())
               .text
               .make(),
 
           UiSpacer.verticalSpace(),
           CustomButton(
-            title: "Request Permission".tr(),
+            title: "Solicitar permiso".tr(),
             onPressed: () {
               AppService().navigatorKey.currentContext?.pop(true);
             },

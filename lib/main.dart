@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:chaskiy/my_app.dart';
 import 'package:chaskiy/services/cart.service.dart';
@@ -13,8 +14,7 @@ import 'package:localize_and_translate/localize_and_translate.dart';
 
 import 'constants/app_languages.dart';
 
-//ssll handshake error
-class MyHttpOverrides extends HttpOverrides {
+class DevHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
@@ -41,8 +41,9 @@ void main() async {
       await LocalStorageService.getPrefs();
       await CartServices.getCartItems();
 
-      //prevent ssl error
-      HttpOverrides.global = new MyHttpOverrides();
+      if (kDebugMode) {
+        HttpOverrides.global = DevHttpOverrides();
+      }
       //setting up crashlytics only for production
       FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
 

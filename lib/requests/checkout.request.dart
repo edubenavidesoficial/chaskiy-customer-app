@@ -56,9 +56,6 @@ class CheckoutRequest extends HttpService {
       "total": checkout.total,
       "token": checkout.token,
     };
-    //
-    print("Order Payload: $payload");
-    //
     final apiResult = await post(
       Api.orders,
       payload,
@@ -89,7 +86,9 @@ class CheckoutRequest extends HttpService {
       "total": checkout.total,
     };
 
-    log("Multiple Vendor Order Payload: ${jsonEncode(orderPayload)}");
+    if (kDebugMode) {
+      log("Multiple Vendor Order Payload: ${jsonEncode(orderPayload)}");
+    }
     final apiResult = await post(
       Api.orders,
       orderPayload,
