@@ -26,6 +26,7 @@ class HomeViewModel extends MyBaseViewModel {
   PageController pageViewController = PageController(initialPage: 0);
   int totalCartItems = 0;
   StreamSubscription? homePageChangeStream;
+  StreamSubscription<int?>? cartItemsStream;
   Widget homeView = WelcomePage();
 
   @override
@@ -45,14 +46,15 @@ class HomeViewModel extends MyBaseViewModel {
     }
 
     //start listening to changes to items in cart
-    LocalStorageService.rxPrefs?.getIntStream(CartServices.totalItemKey).listen(
-      (total) {
-        if (total != null) {
-          totalCartItems = total;
-          notifyListeners();
-        }
-      },
-    );
+    await cartItemsStream?.cancel();
+    cartItemsStream = LocalStorageService.rxPrefs
+        ?.getIntStream(CartServices.totalItemKey)
+        .listen((total) {
+          if (total != null) {
+            totalCartItems = total;
+            notifyListeners();
+          }
+        });
 
     //
     homePageChangeStream = AppService().homePageIndex.stream.listen((index) {
@@ -65,10 +67,13 @@ class HomeViewModel extends MyBaseViewModel {
   }
 
   //
-  // dispose() {
-  //   super.dispose();
-  //   homePageChangeStream.cancel();
-  // }
+  @override
+  void dispose() {
+    cartItemsStream?.cancel();
+    homePageChangeStream?.cancel();
+    pageViewController.dispose();
+    super.dispose();
+  }
 
   //
   onPageChanged(int index) {
@@ -82,8 +87,8 @@ class HomeViewModel extends MyBaseViewModel {
       currentIndex = index;
       pageViewController.animateToPage(
         currentIndex,
-        duration: Duration(microseconds: 5),
-        curve: Curves.bounceInOut,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
       );
     } catch (error) {
       print("error ==> $error");

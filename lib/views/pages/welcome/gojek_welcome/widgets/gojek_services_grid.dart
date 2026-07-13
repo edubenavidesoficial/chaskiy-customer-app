@@ -16,35 +16,67 @@ class GojekServicesGrid extends StatelessWidget {
 
     return AnimationLimiter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Wrap(
-          spacing: 0,
-          runSpacing: 20, // Vertical spacing between rows
-          children: List.generate(vm.vendorTypes.length, (index) {
-            final vt = vm.vendorTypes[index];
-            return AnimationConfiguration.staggeredList(
-              position: index,
-              duration: const Duration(milliseconds: 300),
-              child: SlideAnimation(
-                verticalOffset: 20.0,
-                horizontalOffset: 0,
-                child: FadeInAnimation(
-                  child: SizedBox(
-                    // strictly 4 items per row
-                    width: (MediaQuery.of(context).size.width - 32) / 4,
-                    child: _ServiceCircleItem(
-                      vendorType: vt,
-                      onTap:
-                          () => NavigationService.pageSelected(
-                            vt,
-                            context: context,
-                          ),
-                    ),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'Servicios',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
                   ),
                 ),
+                TextButton(
+                  onPressed: vm.openFeaturedVendors,
+                  child: const Text('Ver todos'),
+                ),
+              ],
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(22),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: .05),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
-            );
-          }),
+              child: Wrap(
+                spacing: 0,
+                runSpacing: 18,
+                children: List.generate(vm.vendorTypes.take(8).length, (index) {
+                  final vt = vm.vendorTypes[index];
+                  return AnimationConfiguration.staggeredList(
+                    position: index,
+                    duration: const Duration(milliseconds: 300),
+                    child: SlideAnimation(
+                      verticalOffset: 20.0,
+                      horizontalOffset: 0,
+                      child: FadeInAnimation(
+                        child: SizedBox(
+                          // strictly 4 items per row
+                          width: (MediaQuery.of(context).size.width - 40) / 4,
+                          child: _ServiceCircleItem(
+                            vendorType: vt,
+                            onTap:
+                                () => NavigationService.pageSelected(
+                                  vt,
+                                  context: context,
+                                ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -73,11 +105,11 @@ class _ServiceCircleItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 54,
+            height: 54,
             decoration: BoxDecoration(
               color: tint.withOpacity(0.12),
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(17),
             ),
             padding: const EdgeInsets.all(8),
             child: CustomImage(
@@ -92,7 +124,7 @@ class _ServiceCircleItem extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: FontWeight.w500,
               height: 1.1,
             ),

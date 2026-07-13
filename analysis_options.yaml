@@ -1,5 +1,10 @@
 enable-experiment:
   - extension-methods
 analyzer:
+  exclude:
+    - build/**
+    - third_party/**/example/**
+    - third_party/**/test/**
+    - third_party/**/util/**
   errors:
     deprecated_member_use: ignore

@@ -6,6 +6,7 @@ import 'package:chaskiy/requests/property.request.dart';
 import 'package:chaskiy/views/pages/booking/property_details.page.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:chaskiy/extensions/context.dart';
+import 'package:localize_and_translate/localize_and_translate.dart';
 
 class PropertyBookingDetailsViewModel extends MyBaseViewModel {
   PropertyBookingDetailsViewModel(

@@ -47,25 +47,32 @@ class WelcomeViewModel extends MyBaseViewModel {
     await currentLocSub?.cancel();
     currentLocSub = LocationService.currenctDeliveryAddressSubject
         .skipWhile((_) => true)
-        .listen(
-      (event) {
-        initialise(initial: false);
-      },
-    );
+        .listen((event) {
+          initialise(initial: false);
+        });
 
     await currentLoc2Sub?.cancel();
     currentLoc2Sub = LocationService.currenctDeliveryAddressSubject.stream
         .skipWhile((_) => true)
         .listen((event) {
-      initialise(initial: false);
-    });
+          initialise(initial: false);
+        });
   }
 
   listenToAuth() {
+    authStateSub?.cancel();
     authStateSub = AuthServices.listenToAuthState().listen((event) {
       genKey = GlobalKey();
       notifyListeners();
     });
+  }
+
+  @override
+  void dispose() {
+    authStateSub?.cancel();
+    currentLocSub?.cancel();
+    currentLoc2Sub?.cancel();
+    super.dispose();
   }
 
   getVendorTypes() async {
@@ -80,10 +87,8 @@ class WelcomeViewModel extends MyBaseViewModel {
   }
 
   openFeaturedVendors() async {
-    Navigator.of(viewContext).push(
-      MaterialPageRoute(
-        builder: (context) => FeaturedVendorsPage(),
-      ),
-    );
+    Navigator.of(
+      viewContext,
+    ).push(MaterialPageRoute(builder: (context) => FeaturedVendorsPage()));
   }
 }

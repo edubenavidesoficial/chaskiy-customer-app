@@ -110,7 +110,8 @@ dependencies:
   pretty_dio_logger: ^1.4.0
   pull_to_refresh_flutter3: ^2.0.2
   pusher_client_socket: ^0.0.5
-  qr_code_scanner_plus: ^2.1.1
+  # 2.2.0 omits the Kotlin Android plugin and fails native compilation.
+  qr_code_scanner_plus: 2.1.1
   qr_flutter: ^4.1.0
   quickalert: ^1.1.0
   rx_shared_preferences: ^4.0.0

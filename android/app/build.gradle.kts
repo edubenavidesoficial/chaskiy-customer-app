@@ -19,11 +19,11 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.chaskiy.app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
 
@@ -31,7 +31,6 @@ android {
         applicationId = "com.chaskiy.app"
         minSdk = 24
         targetSdk = 35
-        ndkVersion = "27.0.12077973"
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
@@ -61,6 +60,6 @@ flutter {
 
 kotlin {
     compilerOptions {
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }

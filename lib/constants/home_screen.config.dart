@@ -118,9 +118,9 @@ class HomeScreenConfig {
     if (uiEnv == null ||
         uiEnv["home"] == null ||
         uiEnv['home']["homeViewStyle"] == null) {
-      style = 1;
+      style = 4;
     }
-    style = (uiEnv['home']["homeViewStyle"].toString().toInt()) ?? 1;
+    style = (uiEnv['home']["homeViewStyle"].toString().toInt()) ?? 4;
     Widget ui;
     switch (style) {
       case 1:

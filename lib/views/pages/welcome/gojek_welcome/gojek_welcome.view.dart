@@ -31,9 +31,10 @@ class _GojekWelcomeViewState extends State<GojekWelcomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: AppColor.primaryColor,
-      extendBodyBehindAppBar: true,
-      extendBody: true,
+      backgroundColor:
+          Theme.of(context).brightness == Brightness.light
+              ? const Color(0xFFF6F9FE)
+              : Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -47,9 +48,6 @@ class _GojekWelcomeViewState extends State<GojekWelcomeView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Drag handle indicator
-                _buildDragIndicator(),
-                // STEP 4: The custom Wallet Card
                 const GojekWalletCard(),
 
                 // STEP 5: The custom Services Grid
@@ -58,7 +56,7 @@ class _GojekWelcomeViewState extends State<GojekWelcomeView> {
                 else
                   GojekServicesGrid(vm: widget.vm),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
                 // STEP 6: The remaining sections
                 _buildRemainingSections(context),
@@ -69,38 +67,6 @@ class _GojekWelcomeViewState extends State<GojekWelcomeView> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildDragIndicator() {
-    return Stack(
-      children: [
-        //primary color background
-        Container(
-          height: Sizes.radiusLarge,
-          width: double.infinity,
-          color: context.primaryColor,
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: context.theme.colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(Sizes.radiusLarge),
-            ),
-          ),
-          child: Center(
-            child: Container(
-              margin: const EdgeInsets.only(top: 10, bottom: 4),
-              height: 4,
-              width: 38,
-              decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 

@@ -1,151 +1,167 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/models/delivery_address.dart';
 import 'package:chaskiy/services/app.service.dart';
 import 'package:chaskiy/services/auth.service.dart';
 import 'package:chaskiy/services/location.service.dart';
-import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/view_models/welcome.vm.dart';
 import 'package:chaskiy/views/pages/notification/notifications.page.dart';
 import 'package:chaskiy/widgets/custom_image.view.dart';
-import 'package:chaskiy/widgets/inputs/search_bar.input.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class GojekHeader extends StatelessWidget {
-  const GojekHeader({required this.vm, required this.onLocationTap, Key? key})
-    : super(key: key);
+  const GojekHeader({required this.vm, required this.onLocationTap, super.key});
 
   final WelcomeViewModel vm;
   final Future<void> Function() onLocationTap;
 
   @override
   Widget build(BuildContext context) {
-    final textColor = Utils.textColorByPrimaryColor();
-
-    return Container(
-      decoration: BoxDecoration(color: AppColor.primaryColor),
+    final colors = Theme.of(context).colorScheme;
+    return ColoredBox(
+      color: colors.surface,
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Row: location  |  bell  |  avatar
               Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Location pill
+                  Icon(
+                    HugeIcons.strokeRoundedLocation01,
+                    color: AppColor.primaryColor,
+                    size: 34,
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
+                    child: InkWell(
                       onTap: onLocationTap,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: textColor.withOpacity(0.2),
-                              shape: BoxShape.circle,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Deliver To'.tr(),
+                              style: TextStyle(
+                                color: colors.onSurfaceVariant,
+                                fontSize: 13,
+                              ),
                             ),
-                            child: Icon(
-                              FlutterIcons.location_pin_ent,
-                              color: textColor,
-                              size: 14,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  "Deliver To".tr(),
-                                  style: TextStyle(
-                                    color: textColor.withOpacity(0.8),
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                StreamBuilder<DeliveryAddress?>(
-                                  stream:
-                                      LocationService
-                                          .currenctDeliveryAddressSubject,
-                                  initialData: vm.deliveryaddress,
-                                  builder: (_, snap) {
-                                    String? address = snap.data?.address;
-                                    address ??= "Select Location".tr();
-                                    return Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Flexible(
-                                          child: Text(
-                                            address,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              color: textColor,
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w700,
-                                            ),
+                            StreamBuilder<DeliveryAddress?>(
+                              stream:
+                                  LocationService
+                                      .currenctDeliveryAddressSubject,
+                              initialData: vm.deliveryaddress,
+                              builder:
+                                  (_, snapshot) => Row(
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          snapshot.data?.address ??
+                                              'Select Location'.tr(),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
                                           ),
                                         ),
-                                        const SizedBox(width: 4),
-                                        Icon(
-                                          FlutterIcons.chevron_down_ent,
-                                          color: textColor,
-                                          size: 12,
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ],
+                                      ),
+                                      const SizedBox(width: 4),
+                                      const Icon(
+                                        Icons.keyboard_arrow_down_rounded,
+                                        size: 22,
+                                      ),
+                                    ],
+                                  ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  // Bell
-                  _IconButton(
-                    icon: SimpleLineIcons.bell,
+                  _HeaderAction(
+                    icon: HugeIcons.strokeRoundedNotification02,
+                    showBadge: true,
                     onTap: () => context.nextPage(const NotificationsPage()),
                   ),
-                  const SizedBox(width: 12),
-                  // Avatar
+                  const SizedBox(width: 8),
                   StreamBuilder<dynamic>(
                     stream: AuthServices.listenToAuthState(),
-                    initialData: false,
-                    builder: (ctx, snap) {
-                      if (snap.data is bool && snap.data == true) {
-                        return CustomImage(
-                              imageUrl: AuthServices.currentUser?.photo ?? "",
-                            )
-                            .wh(36, 36)
-                            .box
-                            .roundedFull
-                            .clip(Clip.antiAlias)
-                            .make()
-                            .onInkTap(() => AppService().homePageIndex.add(3));
-                      }
-                      return const SizedBox.shrink();
+                    builder: (_, snapshot) {
+                      final photo = AuthServices.currentUser?.photo ?? '';
+                      return InkWell(
+                        onTap: () => AppService().homePageIndex.add(3),
+                        borderRadius: BorderRadius.circular(24),
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: colors.surfaceContainerHighest,
+                            border: Border.all(color: colors.outlineVariant),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child:
+                              photo.isEmpty
+                                  ? Icon(
+                                    HugeIcons.strokeRoundedUser,
+                                    color: colors.onSurfaceVariant,
+                                  )
+                                  : CustomImage(
+                                    imageUrl: photo,
+                                    boxFit: BoxFit.cover,
+                                  ),
+                        ),
+                      );
                     },
                   ),
                 ],
               ),
-
-              const SizedBox(height: 16),
-
-              // Search bar
-              SearchBarInput(
-                onTap: () => AppService().homePageIndex.add(2),
-                showFilter: false,
+              const SizedBox(height: 18),
+              Material(
+                color: colors.surface,
+                elevation: 2,
+                shadowColor: Colors.black.withValues(alpha: .12),
+                borderRadius: BorderRadius.circular(18),
+                child: InkWell(
+                  onTap: () => AppService().homePageIndex.add(2),
+                  borderRadius: BorderRadius.circular(18),
+                  child: Container(
+                    height: 58,
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: colors.outlineVariant),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(HugeIcons.strokeRoundedSearch01, size: 27),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Text(
+                            'Buscar servicios, restaurantes, tiendas...',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: colors.onSurfaceVariant,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                        const Icon(
+                          HugeIcons.strokeRoundedFilterHorizontal,
+                          size: 25,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -155,26 +171,27 @@ class GojekHeader extends StatelessWidget {
   }
 }
 
-// Small icon button used in the header
-class _IconButton extends StatelessWidget {
-  const _IconButton({required this.icon, required this.onTap, Key? key})
-    : super(key: key);
+class _HeaderAction extends StatelessWidget {
+  const _HeaderAction({
+    required this.icon,
+    required this.onTap,
+    this.showBadge = false,
+  });
 
   final IconData icon;
   final VoidCallback onTap;
+  final bool showBadge;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(50),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Utils.textColorByPrimaryColor().withOpacity(0.2),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, color: Colors.white, size: 18),
+    return IconButton(
+      tooltip: 'Notifications'.tr(),
+      onPressed: onTap,
+      icon: Badge(
+        isLabelVisible: showBadge,
+        smallSize: 9,
+        backgroundColor: const Color(0xFFFF4D55),
+        child: Icon(icon, size: 27),
       ),
     );
   }
