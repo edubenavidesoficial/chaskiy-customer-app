@@ -10,8 +10,8 @@ class AppStrings {
   static String get companyName => env('company_name');
   static String get googleMapApiKey => env('google_maps_key');
   static String get fcmApiKey => env('fcm_key');
-  static String get currencySymbol => env('currency');
-  static String get currencyCode => env('currency_code');
+  static String get currencySymbol => r'$';
+  static String get currencyCode => 'USD';
   static String get countryCode => env('country_code');
   static bool get enableOtp => env('enble_otp') == "1";
   static bool get enableOTPLogin => env('enableOTPLogin') == "1";

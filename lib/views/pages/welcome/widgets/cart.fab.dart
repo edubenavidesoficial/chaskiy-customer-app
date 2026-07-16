@@ -14,37 +14,47 @@ class CartHomeFab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-      backgroundColor: AppColor.primaryColorDark,
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      onPressed: model.openCart,
-      child: StreamBuilder<int>(
-        stream: CartServices.cartItemsCountStream.stream,
-        initialData: CartServices.productsInCart.length,
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          Widget child = Icon(
-            // FlutterIcons.shopping_bag_fea,
-            HugeIcons.strokeRoundedShoppingBasket01,
-            color: Utils.textColorByPrimaryColor(),
-          );
-          if (snapshot.hasData && snapshot.data > 0) {
-            return child.p(Sizes.paddingSizeExtraSmall).badge(
-                  position: Utils.isArabic
-                      ? VxBadgePosition.leftTop
-                      : VxBadgePosition.rightTop,
-                  count: snapshot.data,
-                  color: Colors.white,
-                  textStyle: context.textTheme.bodyLarge?.copyWith(
-                    color: AppColor.primaryColor,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                  ),
-                );
-          }
+    return SizedBox.square(
+      dimension: 64,
+      child: FloatingActionButton(
+        elevation: 7,
+        highlightElevation: 4,
+        shape: const CircleBorder(),
+        backgroundColor: AppColor.primaryColor,
+        foregroundColor: Colors.white,
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        onPressed: model.openCart,
+        child: StreamBuilder<int>(
+          stream: CartServices.cartItemsCountStream.stream,
+          initialData: CartServices.productsInCart.length,
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            Widget child = Icon(
+              // FlutterIcons.shopping_bag_fea,
+              HugeIcons.strokeRoundedShoppingBasket01,
+              color: Colors.white,
+              size: 28,
+            );
+            if (snapshot.hasData && snapshot.data > 0) {
+              return child
+                  .p(Sizes.paddingSizeExtraSmall)
+                  .badge(
+                    position:
+                        Utils.isArabic
+                            ? VxBadgePosition.leftTop
+                            : VxBadgePosition.rightTop,
+                    count: snapshot.data,
+                    color: Colors.white,
+                    textStyle: context.textTheme.bodyLarge?.copyWith(
+                      color: AppColor.primaryColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  );
+            }
 
-          return child;
-        },
+            return child;
+          },
+        ),
       ),
     );
     // : SizedBox(

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:double_back_to_close/double_back_to_close.dart';
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_colors.dart';
@@ -14,7 +13,6 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:stacked/stacked.dart';
 import 'package:upgrader/upgrader.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 import 'order/orders.page.dart';
 import 'search/main_search.page.dart';
@@ -57,7 +55,7 @@ class _HomePageState extends State<HomePage>
         viewModelBuilder: () => vm,
         builder: (context, model, child) {
           return BasePage(
-            // extendBodyBehindAppBar: false,
+            extendBody: true,
             backgroundColor: AppColor.faintBgColor,
             body: UpgradeAlert(
               showIgnore: !AppUpgradeSettings.forceUpgrade(),
@@ -85,89 +83,121 @@ class _HomePageState extends State<HomePage>
                 AppUISettings.showCart
                     ? FloatingActionButtonLocation.centerDocked
                     : null,
-            bottomNavigationBar: Container(
-              decoration: BoxDecoration(
-                color: context.backgroundColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    offset: Offset(0, -2), // Negative Y offset for top shadow
-                    blurRadius: 8,
-                    spreadRadius: 0,
+            bottomNavigationBar: SafeArea(
+              minimum: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.12),
+                      offset: const Offset(0, 8),
+                      blurRadius: 28,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: SizedBox(
+                  height: 76,
+                  child: Row(
+                    children: [
+                      _HomeNavItem(
+                        index: 0,
+                        currentIndex: model.currentIndex,
+                        icon: HugeIcons.strokeRoundedHome03,
+                        activeIcon: HugeIcons.strokeRoundedHome02,
+                        label: "Home".tr(),
+                        onTap: model.onTabChange,
+                      ),
+                      _HomeNavItem(
+                        index: 1,
+                        currentIndex: model.currentIndex,
+                        icon: HugeIcons.strokeRoundedInboxUnread,
+                        activeIcon: HugeIcons.strokeRoundedInbox,
+                        label: "Orders".tr(),
+                        onTap: model.onTabChange,
+                      ),
+                      if (AppUISettings.showCart) const SizedBox(width: 72),
+                      _HomeNavItem(
+                        index: 2,
+                        currentIndex: model.currentIndex,
+                        icon: HugeIcons.strokeRoundedSearch01,
+                        activeIcon: HugeIcons.strokeRoundedSearch02,
+                        label: "Search".tr(),
+                        onTap: model.onTabChange,
+                      ),
+                      _HomeNavItem(
+                        index: 3,
+                        currentIndex: model.currentIndex,
+                        icon: HugeIcons.strokeRoundedMenu08,
+                        activeIcon: HugeIcons.strokeRoundedMenu03,
+                        label: "Menu".tr(),
+                        onTap: model.onTabChange,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: SafeArea(
-                child: AnimatedBottomNavigationBar.builder(
-                  itemCount: 4,
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-                  blurEffect: false,
-                  elevation: 0,
-                  activeIndex: model.currentIndex,
-                  onTap: model.onTabChange,
-                  gapLocation: GapLocation.center,
-                  notchSmoothness: NotchSmoothness.defaultEdge,
-                  leftCornerRadius: 0,
-                  rightCornerRadius: 0,
-                  splashSpeedInMilliseconds: 10,
-                  tabBuilder: (int index, bool isActive) {
-                    final color =
-                        isActive
-                            ? AppColor.primaryColor
-                            : Theme.of(context).textTheme.bodyLarge?.color;
-                    List<String> titles = [
-                      "Home".tr(),
-                      "Orders".tr(),
-                      "Search".tr(),
-                      "Menu".tr(),
-                    ];
-                    List<IconData> icons = [
-                      HugeIcons.strokeRoundedHome03,
-                      HugeIcons.strokeRoundedInboxUnread,
-                      HugeIcons.strokeRoundedSearch01,
-                      HugeIcons.strokeRoundedMenu08,
-                    ];
-                    //filled icons
-                    List<IconData> filledIcons = [
-                      HugeIcons.strokeRoundedHome02,
-                      HugeIcons.strokeRoundedInbox,
-                      HugeIcons.strokeRoundedSearch02,
-                      HugeIcons.strokeRoundedMenu03,
-                    ];
-
-                    Widget tab = Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isActive ? filledIcons[index] : icons[index],
-                          size: 22,
-                          color: color,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(0.5),
-                          child:
-                              titles[index].text
-                                  .scale(0.89)
-                                  .fontWeight(
-                                    isActive
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                  )
-                                  .color(color)
-                                  .make(),
-                        ),
-                      ],
-                    );
-
-                    //
-                    return tab;
-                  },
                 ),
               ),
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _HomeNavItem extends StatelessWidget {
+  const _HomeNavItem({
+    required this.index,
+    required this.currentIndex,
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final int index;
+  final int currentIndex;
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final ValueChanged<int> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final isActive = index == currentIndex;
+    final color =
+        isActive
+            ? AppColor.primaryColor
+            : Theme.of(context).colorScheme.onSurface;
+
+    return Expanded(
+      child: Semantics(
+        button: true,
+        selected: isActive,
+        label: label,
+        child: InkWell(
+          onTap: () => onTap(index),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(isActive ? activeIcon : icon, size: 24, color: color),
+              const SizedBox(height: 3),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 12,
+                  fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

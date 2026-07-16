@@ -26,16 +26,18 @@ class AppCurrencySystemService {
     //
     try {
       appExchangeRatesObject = exchangeRates;
-      supportedCurrencies =
+      final availableCurrencies =
           (appExchangeRatesObject["currencies"] as List)
               .map((json) => Currency.fromJSON(json))
               .toList();
-      final selectedCurrencyCode =
-          LocalStorageService.prefs?.getString(selectedCurrencyCodeKey) ??
-          AppStrings.currencyCode;
+      supportedCurrencies =
+          availableCurrencies
+              .where((currency) => currency.code == 'USD')
+              .toList();
       _currency = supportedCurrencies.firstOrNullWhere(
-        (currency) => currency.code == selectedCurrencyCode,
+        (currency) => currency.code == 'USD',
       );
+      LocalStorageService.prefs?.setString(selectedCurrencyCodeKey, 'USD');
     } catch (error) {
       debugPrint("Exchange rates failed:: $error");
     }

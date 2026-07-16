@@ -53,7 +53,7 @@ class AuthServices {
 
   //Locale
   static String getLocale() {
-    return LocalStorageService.prefs?.getString(AppStrings.appLocale) ?? "en";
+    return "es";
   }
 
   static Future<bool> setLocale(language) async {

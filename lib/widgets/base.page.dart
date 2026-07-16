@@ -13,6 +13,7 @@ class BasePage extends StatefulWidget {
   final bool showAppBar;
   final bool showLeadingAction;
   final bool? extendBodyBehindAppBar;
+  final bool extendBody;
   final Function? onBackPressed;
   final bool showCart;
   final dynamic title;
@@ -51,6 +52,7 @@ class BasePage extends StatefulWidget {
     this.backgroundColor,
     this.elevation,
     this.extendBodyBehindAppBar,
+    this.extendBody = false,
     this.showCartView = false,
     this.customAppbar,
     this.allowTopSafeArea = false,
@@ -79,6 +81,7 @@ class _BasePageState extends State<BasePage> {
             // backgroundColor: widget.backgroundColor ?? AppColor.faintBgColor,
             backgroundColor: widget.backgroundColor ?? context.backgroundColor,
             extendBodyBehindAppBar: widget.extendBodyBehindAppBar ?? false,
+            extendBody: widget.extendBody,
             appBar:
                 widget.customAppbar != null
                     ? widget.customAppbar

@@ -33,6 +33,7 @@ void main() async {
 
       await translator.init(
         localeType: LocalizationDefaultType.asDefined,
+        language: "es",
         languagesList: AppLanguages.codes,
         assetsDirectory: 'assets/lang/',
       );
