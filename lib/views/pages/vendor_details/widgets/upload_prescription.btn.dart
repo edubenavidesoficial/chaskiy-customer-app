@@ -16,20 +16,22 @@ class UploadPrescriptionFab extends StatelessWidget {
   Widget build(BuildContext context) {
     return model.vendor!.isPharmacyType && AppStrings.enableUploadPrescription
         ? FloatingActionButton.extended(
-            onPressed: model.uploadPrescription,
-            backgroundColor: AppColor.primaryColor,
-            label: "Upload Prescription"
-                .tr()
-                .text
-                .color(Utils.textColorByPrimaryColor())
-                .make(),
-            icon: Icon(
-              FlutterIcons.pills_faw5s,
-              color: Utils.textColorByPrimaryColor(),
-              size: 22,
-            ),
-            extendedIconLabelSpacing: 20,
-          )
+          onPressed: model.uploadPrescription,
+          backgroundColor: AppColor.primaryColor,
+          label:
+              "Upload Prescription"
+                  .tr()
+                  .tr()
+                  .text
+                  .color(Utils.textColorByPrimaryColor())
+                  .make(),
+          icon: Icon(
+            FlutterIcons.pills_faw5s,
+            color: Utils.textColorByPrimaryColor(),
+            size: 22,
+          ),
+          extendedIconLabelSpacing: 20,
+        )
         : UiSpacer.emptySpace();
   }
 }

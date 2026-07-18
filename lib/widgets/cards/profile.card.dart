@@ -72,29 +72,6 @@ class ProfileCard extends StatelessWidget {
               subtitle: 'Administra tus direcciones guardadas',
               onTap: model.openDeliveryAddresses,
             ),
-            SettingsTile(
-              icon: HugeIcons.strokeRoundedFavourite,
-              title: 'Favourites'.tr(),
-              onTap: model.openFavourites,
-            ),
-          ],
-        ),
-        const SizedBox(height: 22),
-        SettingsSection(
-          children: [
-            SettingsTile(
-              icon: HugeIcons.strokeRoundedLogout01,
-              title: 'Logout'.tr(),
-              onTap: model.logoutPressed,
-              showChevron: false,
-            ),
-            SettingsTile(
-              icon: HugeIcons.strokeRoundedDelete01,
-              title: 'Delete Account'.tr(),
-              onTap: model.deleteAccount,
-              showChevron: false,
-              isDestructive: true,
-            ),
           ],
         ),
       ],
@@ -352,6 +329,8 @@ class SettingsTile extends StatelessWidget {
     this.trailing,
     this.showChevron = true,
     this.isDestructive = false,
+    this.iconColor,
+    this.iconBackgroundColor,
     super.key,
   });
 
@@ -362,6 +341,8 @@ class SettingsTile extends StatelessWidget {
   final Widget? trailing;
   final bool showChevron;
   final bool isDestructive;
+  final Color? iconColor;
+  final Color? iconBackgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -386,15 +367,19 @@ class SettingsTile extends StatelessWidget {
                           ? theme.colorScheme.errorContainer.withValues(
                             alpha: .55,
                           )
-                          : theme.colorScheme.primaryContainer.withValues(
-                            alpha: .55,
-                          ),
+                          : iconBackgroundColor ??
+                              theme.colorScheme.primaryContainer.withValues(
+                                alpha: .55,
+                              ),
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Icon(
                   icon,
                   size: 23,
-                  color: isDestructive ? color : theme.colorScheme.primary,
+                  color:
+                      isDestructive
+                          ? color
+                          : iconColor ?? theme.colorScheme.primary,
                 ),
               ),
               const SizedBox(width: 14),

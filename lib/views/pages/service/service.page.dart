@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/models/vendor_type.dart';
 import 'package:chaskiy/view_models/service.vm.dart';
@@ -76,7 +77,7 @@ class _ServicePageState extends State<ServicePage>
                 //categories
                 VendorTypeCategories(
                   widget.vendorType,
-                  title: "Categories",
+                  title: "Categories".tr(),
                   childAspectRatio: 1.4,
                   crossAxisCount: 4,
                 ),

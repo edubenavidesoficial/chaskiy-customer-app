@@ -16,14 +16,23 @@ class EmptyDeliveryAddress extends StatelessWidget {
   Widget build(BuildContext context) {
     return EmptyState(
       imageUrl: AppImages.addressPin,
-      title: selection
-          ? "No ${!isBooking ? 'Delivery' : 'Booking'} Address Selected".tr()
-          : "No ${!isBooking ? 'Delivery' : 'Booking'} Address Found".tr(),
-      description: selection
-          ? "Please select a ${!isBooking ? 'delivery' : 'booking'} address"
-              .tr()
-          : "When you add ${!isBooking ? 'delivery' : 'booking'} addresses, they will appear here"
-              .tr(),
+      title:
+          selection
+              ? (isBooking
+                  ? "No Booking Address Selected".tr()
+                  : "No Delivery Address Selected".tr())
+              : (isBooking
+                  ? "No Booking Address Found".tr()
+                  : "No Delivery Address Found".tr()),
+      description:
+          selection
+              ? (isBooking
+                  ? "Please select a booking address".tr()
+                  : "Please select a delivery address".tr())
+              : (isBooking
+                  ? "When you add booking addresses, they will appear here".tr()
+                  : "When you add delivery addresses, they will appear here"
+                      .tr()),
     );
   }
 }

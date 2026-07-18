@@ -91,10 +91,14 @@ class _ProfilePageState extends State<ProfilePage>
                       ),
                       const SizedBox(height: 28),
                       ProfileCard(model),
-                      const SizedBox(height: 22),
+                      const SizedBox(height: 18),
+                      _SecuritySection(model: model),
+                      const SizedBox(height: 18),
                       _PreferencesSection(model: model),
-                      const SizedBox(height: 22),
+                      const SizedBox(height: 18),
                       _HelpSection(model: model),
+                      const SizedBox(height: 18),
+                      _AccountActionsSection(model: model),
                       const SizedBox(height: 20),
                       Center(
                         child: Container(
@@ -127,6 +131,28 @@ class _ProfilePageState extends State<ProfilePage>
 
   @override
   bool get wantKeepAlive => true;
+}
+
+class _SecuritySection extends StatelessWidget {
+  const _SecuritySection({required this.model});
+
+  final ProfileViewModel model;
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsSection(
+      children: [
+        SettingsTile(
+          icon: HugeIcons.strokeRoundedShield01,
+          iconColor: const Color(0xFF12B8A6),
+          iconBackgroundColor: const Color(0xFFE2FAF6),
+          title: 'Seguridad y privacidad',
+          subtitle: 'Controla tu privacidad y permisos',
+          onTap: model.openPrivacyPolicy,
+        ),
+      ],
+    );
+  }
 }
 
 class _PreferencesSection extends StatelessWidget {
@@ -167,30 +193,106 @@ class _HelpSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: theme.colorScheme.primary.withValues(alpha: .06),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: .045),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Theme(
+        data: theme.copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          initiallyExpanded: false,
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+          childrenPadding: const EdgeInsets.only(bottom: 6),
+          leading: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primaryContainer.withValues(alpha: .55),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Icon(
+              HugeIcons.strokeRoundedHelpCircle,
+              color: theme.colorScheme.primary,
+              size: 23,
+            ),
+          ),
+          title: Text(
+            'Ayuda e información',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          subtitle: Text(
+            'Soporte, preguntas frecuentes y políticas',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          children: [
+            const Divider(height: 1, indent: 74),
+            SettingsTile(
+              icon: HugeIcons.strokeRoundedQuestion,
+              title: 'Faqs'.tr(),
+              onTap: model.openFaqs,
+            ),
+            SettingsTile(
+              icon: HugeIcons.strokeRoundedBubbleChat,
+              title: 'Live Support'.tr(),
+              onTap: model.openLearnMoreSupport,
+            ),
+            SettingsTile(
+              icon: HugeIcons.strokeRoundedMail01,
+              title: 'Contact Us'.tr(),
+              onTap: model.openContactUs,
+            ),
+            SettingsTile(
+              icon: HugeIcons.strokeRoundedStar,
+              title: 'Rate & Review'.tr(),
+              onTap: model.openReviewApp,
+            ),
+            _LegalExpansion(model: model),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AccountActionsSection extends StatelessWidget {
+  const _AccountActionsSection({required this.model});
+
+  final ProfileViewModel model;
+
+  @override
+  Widget build(BuildContext context) {
     return SettingsSection(
-      title: 'Ayuda e información',
       children: [
         SettingsTile(
-          icon: HugeIcons.strokeRoundedQuestion,
-          title: 'Faqs'.tr(),
-          onTap: model.openFaqs,
+          icon: HugeIcons.strokeRoundedLogout01,
+          title: 'Logout'.tr(),
+          onTap: model.logoutPressed,
+          showChevron: false,
         ),
         SettingsTile(
-          icon: HugeIcons.strokeRoundedBubbleChat,
-          title: 'Live Support'.tr(),
-          onTap: model.openLearnMoreSupport,
+          icon: HugeIcons.strokeRoundedDelete01,
+          title: 'Delete Account'.tr(),
+          onTap: model.deleteAccount,
+          showChevron: false,
+          isDestructive: true,
         ),
-        SettingsTile(
-          icon: HugeIcons.strokeRoundedMail01,
-          title: 'Contact Us'.tr(),
-          onTap: model.openContactUs,
-        ),
-        SettingsTile(
-          icon: HugeIcons.strokeRoundedStar,
-          title: 'Rate & Review'.tr(),
-          onTap: model.openReviewApp,
-        ),
-        _LegalExpansion(model: model),
       ],
     );
   }

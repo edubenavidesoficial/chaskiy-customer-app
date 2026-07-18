@@ -32,7 +32,7 @@ class CustomOutlineButton extends StatelessWidget {
     this.isFixedHeight = false,
     this.height,
     this.loading = false,
-    this.shapeRadius = Vx.dp4,
+    this.shapeRadius = 16,
     this.color,
     this.titleStyle,
     Key? key,
@@ -44,41 +44,42 @@ class CustomOutlineButton extends StatelessWidget {
       padding: EdgeInsets.all(0),
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            backgroundColor: this.color ?? AppColor.primaryColor,
-            disabledBackgroundColor:
-                this.loading ? AppColor.primaryColor : null,
-            shape: this.shape ??
-                RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(this.shapeRadius ?? Vx.dp4),
-                ),
-            side: BorderSide(
-              color: this.color ?? AppColor.primaryColor,
-            )),
-        onPressed: (this.loading || this.onPressed == null)
-            ? null
-            : () => this.onPressed!(),
-        child: this.loading
-            ? BusyIndicator(color: Colors.white)
-            : Container(
-                width: null, //double.infinity,
-                height: this.isFixedHeight ? Vx.dp48 : (this.height ?? Vx.dp48),
-                child: this.child ??
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        this.icon != null
-                            ? Icon(this.icon,
-                                    color: this.iconColor ?? Colors.white,
-                                    size: this.iconSize ?? 20,
-                                    textDirection:
-                                        translator.activeLocale.languageCode ==
-                                                "ar"
-                                            ? TextDirection.rtl
-                                            : TextDirection.ltr)
-                                .pOnly(
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          backgroundColor: this.color ?? AppColor.primaryColor,
+          disabledBackgroundColor: this.loading ? AppColor.primaryColor : null,
+          shape:
+              this.shape ??
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(this.shapeRadius ?? 16),
+              ),
+          side: BorderSide(color: this.color ?? AppColor.primaryColor),
+        ),
+        onPressed:
+            (this.loading || this.onPressed == null)
+                ? null
+                : () => this.onPressed!(),
+        child:
+            this.loading
+                ? BusyIndicator(color: Colors.white)
+                : Container(
+                  width: null, //double.infinity,
+                  height: this.isFixedHeight ? 52 : (this.height ?? 52),
+                  child:
+                      this.child ??
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          this.icon != null
+                              ? Icon(
+                                this.icon,
+                                color: this.iconColor ?? Colors.white,
+                                size: this.iconSize ?? 20,
+                                textDirection:
+                                    translator.activeLocale.languageCode == "ar"
+                                        ? TextDirection.rtl
+                                        : TextDirection.ltr,
+                              ).pOnly(
                                 right:
                                     translator.activeLocale.languageCode == "ar"
                                         ? Vx.dp0
@@ -88,20 +89,21 @@ class CustomOutlineButton extends StatelessWidget {
                                         ? Vx.dp0
                                         : Vx.dp5,
                               )
-                            : UiSpacer.emptySpace(),
-                        this.title != null
-                            ? Text(
+                              : UiSpacer.emptySpace(),
+                          this.title != null
+                              ? Text(
                                 this.title!,
                                 textAlign: TextAlign.center,
-                                style: this.titleStyle ??
+                                style:
+                                    this.titleStyle ??
                                     AppTextStyle.h3TitleTextStyle(
                                       color: Colors.white,
                                     ),
                               ).centered()
-                            : UiSpacer.emptySpace(),
-                      ],
-                    ),
-              ),
+                              : UiSpacer.emptySpace(),
+                        ],
+                      ),
+                ),
       ),
     );
   }

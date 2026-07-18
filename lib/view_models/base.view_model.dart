@@ -373,14 +373,27 @@ class MyBaseViewModel extends BaseViewModel
   // NEW LOCATION PICKER
   Future<dynamic> newPlacePicker() async {
     //
-    LatLng initialPosition = LatLng(0.00, 0.00);
-    double initialZoom = 0;
-    if (LocationService.currenctAddress != null) {
+    LatLng? initialPosition;
+    double initialZoom = 15;
+
+    final currentCoordinates = LocationService.currenctAddress?.coordinates;
+    if (currentCoordinates != null &&
+        currentCoordinates.latitude != 0 &&
+        currentCoordinates.longitude != 0) {
       initialPosition = LatLng(
-        LocationService.currenctAddress?.coordinates?.latitude ?? 0.00,
-        LocationService.currenctAddress?.coordinates?.longitude ?? 0.00,
+        currentCoordinates.latitude,
+        currentCoordinates.longitude,
       );
-      initialZoom = 15;
+    } else {
+      final savedAddress = LocationService.deliveryaddress;
+      final savedLat = savedAddress?.latitude;
+      final savedLng = savedAddress?.longitude;
+      if (savedLat != null &&
+          savedLng != null &&
+          savedLat != 0 &&
+          savedLng != 0) {
+        initialPosition = LatLng(savedLat, savedLng);
+      }
     }
     String? mapRegion;
     try {
@@ -398,12 +411,21 @@ class MyBaseViewModel extends BaseViewModel
           },
         );
 
+    // Nunca iniciar el mapa en (0, 0), que muestra África mientras llega el
+    // GPS. Si aún no existe ubicación, usamos una vista general del país.
+    initialPosition ??= const LatLng(-1.8312, -78.1834);
+    final resolvedInitialPosition = initialPosition;
+    if (LocationService.currenctAddress == null &&
+        LocationService.deliveryaddress == null) {
+      initialZoom = 6;
+    }
+
     //
     if (!AppMapSettings.useGoogleOnApp) {
       return await viewContext.push(
         (context) => OPSMapPage(
           region: mapRegion,
-          initialPosition: initialPosition,
+          initialPosition: resolvedInitialPosition,
           useCurrentLocation: true,
           initialZoom: initialZoom,
         ),
@@ -421,7 +443,7 @@ class MyBaseViewModel extends BaseViewModel
               onPlacePicked: (result) {
                 Navigator.of(context).pop(result);
               },
-              initialPosition: initialPosition,
+              initialPosition: resolvedInitialPosition,
             ),
       ),
     );

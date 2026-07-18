@@ -54,8 +54,8 @@ class _GojekWalletCardState extends State<GojekWalletCard>
             builder: (_, snapshot) {
               if (snapshot.data == false) return const SizedBox.shrink();
               return Container(
-                margin: const EdgeInsets.fromLTRB(18, 4, 18, 16),
-                padding: const EdgeInsets.fromLTRB(20, 22, 20, 16),
+                margin: const EdgeInsets.fromLTRB(18, 4, 18, 14),
+                padding: const EdgeInsets.fromLTRB(18, 15, 18, 11),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Color(0xFF052B75), Color(0xFF0874F9)],
@@ -83,11 +83,11 @@ class _GojekWalletCardState extends State<GojekWalletCard>
                                 'Tu saldo Chaskiy',
                                 style: TextStyle(
                                   color: Colors.white.withValues(alpha: .86),
-                                  fontSize: 14,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 2),
                               Row(
                                 children: [
                                   if (vm.isBusy)
@@ -98,20 +98,20 @@ class _GojekWalletCardState extends State<GojekWalletCard>
                                           .currencyFormat(),
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontSize: 33,
+                                        fontSize: 29,
                                         fontWeight: FontWeight.w800,
                                         letterSpacing: -1,
                                       ),
                                     ),
-                                  const SizedBox(width: 10),
+                                  const SizedBox(width: 7),
                                   const Icon(
                                     HugeIcons.strokeRoundedView,
                                     color: Colors.white,
-                                    size: 23,
+                                    size: 21,
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 14),
+                              const SizedBox(height: 8),
                               FilledButton.icon(
                                 onPressed:
                                     () => context.nextPage(const WalletPage()),
@@ -119,10 +119,14 @@ class _GojekWalletCardState extends State<GojekWalletCard>
                                   foregroundColor: const Color(0xFF06347F),
                                   backgroundColor: Colors.white,
                                   visualDensity: VisualDensity.compact,
+                                  minimumSize: const Size(0, 34),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                  ),
                                 ),
                                 icon: const Icon(
                                   HugeIcons.strokeRoundedUser,
-                                  size: 18,
+                                  size: 17,
                                 ),
                                 label: const Text(
                                   'Mi cuenta',
@@ -138,7 +142,7 @@ class _GojekWalletCardState extends State<GojekWalletCard>
                             label: 'Send'.tr(),
                             onTap: vm.showWalletTransferEntry,
                           ),
-                        const SizedBox(width: 14),
+                        const SizedBox(width: 10),
                         _WalletAction(
                           icon:
                               AppUISettings.allowWalletTransfer
@@ -155,7 +159,7 @@ class _GojekWalletCardState extends State<GojekWalletCard>
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
                     Divider(
                       color: Colors.white.withValues(alpha: .22),
                       height: 1,
@@ -163,7 +167,7 @@ class _GojekWalletCardState extends State<GojekWalletCard>
                     InkWell(
                       onTap: () => AppService().homePageIndex.add(3),
                       child: const Padding(
-                        padding: EdgeInsets.only(top: 13),
+                        padding: EdgeInsets.only(top: 9),
                         child: Row(
                           children: [
                             Expanded(
@@ -172,6 +176,7 @@ class _GojekWalletCardState extends State<GojekWalletCard>
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
+                                  fontSize: 13,
                                 ),
                               ),
                             ),
@@ -210,8 +215,8 @@ class _WalletAction extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            width: 58,
-            height: 58,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -222,15 +227,15 @@ class _WalletAction extends StatelessWidget {
               borderRadius: BorderRadius.circular(19),
               border: Border.all(color: Colors.white.withValues(alpha: .18)),
             ),
-            child: Icon(icon, color: Colors.white, size: 32),
+            child: Icon(icon, color: Colors.white, size: 27),
           ),
-          const SizedBox(height: 7),
+          const SizedBox(height: 4),
           Text(
             label,
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w600,
-              fontSize: 13,
+              fontSize: 12,
             ),
           ),
         ],

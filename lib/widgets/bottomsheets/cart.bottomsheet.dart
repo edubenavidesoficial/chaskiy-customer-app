@@ -64,7 +64,7 @@ class CartViewBottomSheet extends StatelessWidget {
 
             // view cart button
             CustomButton(
-              title: "View Cart",
+              title: "View Cart".tr(),
               onPressed: () {
                 Navigator.of(
                   context,

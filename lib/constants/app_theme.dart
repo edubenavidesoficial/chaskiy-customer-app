@@ -23,11 +23,25 @@ class AppTheme {
       ),
       cardColor: Colors.grey[50],
       textTheme: blackTextTheme,
-      bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.white),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: Colors.white,
+        modalBackgroundColor: Colors.white,
+        showDragHandle: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        clipBehavior: Clip.antiAlias,
+      ),
       // brightness: Brightness.light,
       // CUSTOMIZE showDatePicker Colors
       dialogBackgroundColor: Colors.white,
-      dialogTheme: DialogThemeData(backgroundColor: Colors.white),
+      dialogTheme: const DialogThemeData(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(24)),
+        ),
+      ),
       buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
       highlightColor: Colors.grey[400],
       colorScheme: ColorScheme.light(
@@ -37,6 +51,13 @@ class AppTheme {
       ).copyWith(primary: AppColor.primaryMaterialColor, surface: Colors.white),
       //
       tabBarTheme: tabBarTheme,
+      elevatedButtonTheme: _elevatedButtonTheme,
+      filledButtonTheme: _filledButtonTheme,
+      outlinedButtonTheme: _outlinedButtonTheme,
+      textButtonTheme: _textButtonTheme,
+      inputDecorationTheme: _inputDecorationTheme(Colors.white),
+      cardTheme: _cardTheme,
+      chipTheme: _chipTheme(Brightness.light),
       useMaterial3: true,
     );
   }
@@ -59,9 +80,23 @@ class AppTheme {
       // backgroundColor: Colors.grey[850],
       cardColor: Colors.grey[700],
       textTheme: whiteTextTheme,
-      bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.black),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: Colors.grey.shade900,
+        modalBackgroundColor: Colors.grey.shade900,
+        showDragHandle: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        clipBehavior: Clip.antiAlias,
+      ),
       dialogBackgroundColor: Colors.grey.shade600,
-      dialogTheme: DialogThemeData(backgroundColor: Colors.grey.shade600),
+      dialogTheme: DialogThemeData(
+        backgroundColor: const Color(0xFF252525),
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(24)),
+        ),
+      ),
       buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
       highlightColor: Colors.grey[700],
       colorScheme: ColorScheme.fromSwatch()
@@ -77,9 +112,86 @@ class AppTheme {
 
       //
       tabBarTheme: tabBarTheme,
+      elevatedButtonTheme: _elevatedButtonTheme,
+      filledButtonTheme: _filledButtonTheme,
+      outlinedButtonTheme: _outlinedButtonTheme,
+      textButtonTheme: _textButtonTheme,
+      inputDecorationTheme: _inputDecorationTheme(const Color(0xFF252525)),
+      cardTheme: _cardTheme,
+      chipTheme: _chipTheme(Brightness.dark),
       useMaterial3: true,
     );
   }
+
+  ElevatedButtonThemeData get _elevatedButtonTheme => ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(
+      minimumSize: const Size(0, 52),
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+    ),
+  );
+
+  FilledButtonThemeData get _filledButtonTheme => FilledButtonThemeData(
+    style: FilledButton.styleFrom(
+      minimumSize: const Size(0, 52),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+    ),
+  );
+
+  OutlinedButtonThemeData get _outlinedButtonTheme => OutlinedButtonThemeData(
+    style: OutlinedButton.styleFrom(
+      minimumSize: const Size(0, 52),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+    ),
+  );
+
+  TextButtonThemeData get _textButtonTheme => TextButtonThemeData(
+    style: TextButton.styleFrom(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      textStyle: const TextStyle(fontWeight: FontWeight.w700),
+    ),
+  );
+
+  InputDecorationTheme _inputDecorationTheme(Color fillColor) {
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(16),
+      borderSide: BorderSide(color: Colors.grey.withValues(alpha: .25)),
+    );
+    return InputDecorationTheme(
+      filled: true,
+      fillColor: fillColor,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+      border: border,
+      enabledBorder: border,
+      focusedBorder: border.copyWith(
+        borderSide: BorderSide(color: AppColor.primaryColor, width: 1.5),
+      ),
+      errorBorder: border.copyWith(
+        borderSide: const BorderSide(color: Colors.redAccent),
+      ),
+    );
+  }
+
+  CardThemeData get _cardTheme => const CardThemeData(
+    elevation: 0,
+    surfaceTintColor: Colors.transparent,
+    margin: EdgeInsets.zero,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(20)),
+    ),
+  );
+
+  ChipThemeData _chipTheme(Brightness brightness) => ChipThemeData(
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+    side: BorderSide(color: Colors.grey.withValues(alpha: .24)),
+    labelStyle: TextStyle(
+      color: brightness == Brightness.light ? Colors.black87 : Colors.white,
+      fontWeight: FontWeight.w600,
+    ),
+  );
 
   //MISC
   final TextTheme blackTextTheme = TextTheme(

@@ -16,8 +16,6 @@ class SearchFilterViewModel extends MyBaseViewModel {
   SearchFilterViewModel(BuildContext context, this.search) {
     this.viewContext = context;
     this.vendorType = this.search?.vendorType;
-    //
-    fetchSearchData();
   }
 
   fetchSearchData() async {

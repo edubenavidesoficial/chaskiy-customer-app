@@ -47,7 +47,7 @@ class _ParcelVendorDetailsPageState extends State<ParcelVendorDetailsPage> {
             extendBody: true,
             floatingActionButton: FloatingActionButton.extended(
               onPressed: _newParcelBookingPressed,
-              label: "New Order".text.make(),
+              label: "New Order".tr().text.make(),
               icon: Icon(FlutterIcons.package_fea),
             ),
             body: NestedScrollView(
