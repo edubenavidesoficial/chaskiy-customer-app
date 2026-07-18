@@ -88,10 +88,13 @@ class _HomePageState extends State<HomePage>
               child: Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(
+                    color: AppColor.primaryColor.withValues(alpha: .06),
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.12),
+                      color: AppColor.primaryColor.withValues(alpha: 0.13),
                       offset: const Offset(0, 8),
                       blurRadius: 28,
                       spreadRadius: 1,
@@ -183,7 +186,25 @@ class _HomeNavItem extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(isActive ? activeIcon : icon, size: 24, color: color),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 13,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color:
+                      isActive
+                          ? AppColor.primaryColor.withValues(alpha: .10)
+                          : Colors.transparent,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  isActive ? activeIcon : icon,
+                  size: 23,
+                  color: color,
+                ),
+              ),
               const SizedBox(height: 3),
               Text(
                 label,

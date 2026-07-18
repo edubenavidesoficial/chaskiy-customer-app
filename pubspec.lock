@@ -33,14 +33,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "13.0.0"
-  animated_bottom_navigation_bar:
-    dependency: "direct main"
-    description:
-      name: animated_bottom_navigation_bar
-      sha256: "94971fdfd53acd443acd0d17ce1cb5219ad833f20c75b50c55b205e54a5d6117"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.4.0"
   ansicolor:
     dependency: transitive
     description:
@@ -506,14 +498,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-  dropdown_search:
-    dependency: transitive
-    description:
-      name: dropdown_search
-      sha256: c29b3e5147a82a06a4a08b3b574c51cb48cc17ad89893d53ee72a6f86643622e
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.0.2"
   dynamic_height_grid_view:
     dependency: "direct main"
     description:
@@ -539,7 +523,7 @@ packages:
     source: hosted
     version: "2.2.1"
   equatable:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: equatable
       sha256: "3bce007a596ff8b3119c45d68aaef631272537c03d30e5d4534dd24bf4c5eaa2"
@@ -553,14 +537,6 @@ packages:
       relative: true
     source: path
     version: "3.1.0"
-  expand_widget:
-    dependency: "direct main"
-    description:
-      name: expand_widget
-      sha256: a6cfafe8e22da868bd208951a7d6cf21d3468ce650c65367138b5308963fa86b
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
   facebook_auth_desktop:
     dependency: transitive
     description:
@@ -782,14 +758,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.4.1"
-  flutter_colorpicker:
-    dependency: transitive
-    description:
-      name: flutter_colorpicker
-      sha256: "969de5f6f9e2a570ac660fb7b501551451ea2a1ab9e2097e89475f60e07816ea"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
   flutter_dropdown_alert:
     dependency: "direct main"
     description:
@@ -838,14 +806,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
-  flutter_hooks:
-    dependency: transitive
-    description:
-      name: flutter_hooks
-      sha256: "8ae1f090e5f4ef5cfa6670ce1ab5dddadd33f3533a7f9ba19d9f958aa2a89f42"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.21.3+1"
   flutter_icons:
     dependency: "direct main"
     description:
@@ -1196,14 +1156,6 @@ packages:
       relative: true
     source: path
     version: "10.10.0"
-  form_builder_extra_fields:
-    dependency: "direct main"
-    description:
-      name: form_builder_extra_fields
-      sha256: "8f5d876ad6cf6984f2853fe5d46b826aebe0a637054d31e89f7803ac6c44fef4"
-      url: "https://pub.dev"
-    source: hosted
-    version: "12.2.0"
   fwfh_cached_network_image:
     dependency: transitive
     description:
@@ -1332,14 +1284,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "8.3.0"
-  glass:
-    dependency: "direct main"
-    description:
-      name: glass
-      sha256: "444684d73df51782d3d9e0dec7cb37fbe1f4a1456e1dc591663966ab37c4cd0e"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0+2"
   glass_kit:
     dependency: "direct main"
     description:
@@ -1428,14 +1372,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
-  google_nav_bar:
-    dependency: "direct main"
-    description:
-      name: google_nav_bar
-      sha256: bb12dd21514ee1b041ab3127673e2fd85e693337df308f7f2b75cd1e8e92eaf4
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.7"
   google_places_flutter:
     dependency: "direct main"
     description:
@@ -1820,14 +1756,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.0"
-  lottie:
-    dependency: "direct main"
-    description:
-      name: lottie
-      sha256: "58dda9eee3f1b1fb9d490b0161635cffe93022b3b8ca0687e3df33a53620ead2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.5.1"
   map_launcher:
     dependency: "direct main"
     description:
@@ -2252,14 +2180,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.8.2"
-  quickalert:
-    dependency: "direct main"
-    description:
-      name: quickalert
-      sha256: b5d62b1e20b08cc0ff5f40b6da519bdc7a5de6082f13d90572cf4e72eea56c5e
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
   quiver:
     dependency: transitive
     description:
@@ -2412,14 +2332,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
-  signature:
-    dependency: transitive
-    description:
-      name: signature
-      sha256: f3d14bd6dae46d3b4802c6a091d6d39c9c6080d999e8c5380581d3725c30e360
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.3.0"
   sim_card_code:
     dependency: "direct main"
     description:
@@ -2465,14 +2377,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0+1"
-  sliver_snap:
-    dependency: "direct main"
-    description:
-      name: sliver_snap
-      sha256: c021c6f60a9cf00a09a04b29b8e8e1b1de9302e46033ec4e3b7309e1d876bea2
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.1"
   smooth_page_indicator:
     dependency: "direct main"
     description:
@@ -2601,14 +2505,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.2"
-  sticky_headers:
-    dependency: "direct main"
-    description:
-      name: sticky_headers
-      sha256: "9b3dd2cb0fd6a7038170af3261f855660cbb241cb56c501452cb8deed7023ede"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.0+2"
   stream_channel:
     dependency: transitive
     description:

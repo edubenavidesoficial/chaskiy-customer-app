@@ -36,34 +36,40 @@ class ProfileCard extends StatelessWidget {
             SettingsTile(
               icon: HugeIcons.strokeRoundedUserEdit01,
               title: 'Edit Profile'.tr(),
+              subtitle: 'Actualiza tu información personal',
               onTap: model.openEditProfile,
             ),
             SettingsTile(
               icon: HugeIcons.strokeRoundedResetPassword,
               title: 'Change Password'.tr(),
+              subtitle: 'Mantén tu cuenta segura',
               onTap: model.openChangePassword,
             ),
             if (AppStrings.enableReferSystem)
               SettingsTile(
                 icon: HugeIcons.strokeRoundedShare01,
                 title: 'Refer & Earn'.tr(),
+                subtitle: 'Realiza acciones y gana beneficios',
                 onTap: model.openRefer,
               ),
             if (AppFinanceSettings.enableLoyalty)
               SettingsTile(
                 icon: HugeIcons.strokeRoundedGift,
                 title: 'Loyalty Points'.tr(),
+                subtitle: 'Consulta tus puntos y recompensas',
                 onTap: model.openLoyaltyPoint,
               ),
             if (AppUISettings.allowWallet)
               SettingsTile(
                 icon: HugeIcons.strokeRoundedWallet01,
                 title: 'Wallet'.tr(),
+                subtitle: 'Gestiona tus métodos de pago',
                 onTap: model.openWallet,
               ),
             SettingsTile(
               icon: HugeIcons.strokeRoundedPinLocation01,
               title: 'Delivery Addresses'.tr(),
+              subtitle: 'Administra tus direcciones guardadas',
               onTap: model.openDeliveryAddresses,
             ),
             SettingsTile(
@@ -107,11 +113,13 @@ class _ProfileHeader extends StatelessWidget {
     final user = model.currentUser!;
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: theme.colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(
+          color: theme.colorScheme.primary.withValues(alpha: .08),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: .06),
@@ -120,77 +128,157 @@ class _ProfileHeader extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: theme.colorScheme.primaryContainer,
-              border: Border.all(
-                color: theme.colorScheme.primary.withValues(alpha: .18),
-                width: 3,
-              ),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: CachedNetworkImage(
-              imageUrl: user.photo,
-              fit: BoxFit.cover,
-              progressIndicatorBuilder: (_, __, ___) => const BusyIndicator(),
-              errorWidget:
-                  (_, __, ___) =>
-                      Image.asset(AppImages.user, fit: BoxFit.cover),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  user.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  user.email,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                if (AppStrings.enableReferSystem) ...[
-                  const SizedBox(height: 10),
-                  ActionChip(
-                    avatar: Icon(
-                      HugeIcons.strokeRoundedShare08,
-                      size: 16,
-                      color: theme.colorScheme.primary,
+          Row(
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: 82,
+                    height: 82,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: theme.colorScheme.primaryContainer,
+                      border: Border.all(
+                        color: theme.colorScheme.primary.withValues(alpha: .35),
+                        width: 3,
+                      ),
                     ),
-                    label: Text('Share referral code'.tr()),
-                    onPressed: model.shareReferralCode,
-                    visualDensity: VisualDensity.compact,
-                    side: BorderSide(
-                      color: theme.colorScheme.primary.withValues(alpha: .22),
+                    clipBehavior: Clip.antiAlias,
+                    child: CachedNetworkImage(
+                      imageUrl: user.photo,
+                      fit: BoxFit.cover,
+                      progressIndicatorBuilder:
+                          (_, __, ___) => const BusyIndicator(),
+                      errorWidget:
+                          (_, __, ___) =>
+                              Image.asset(AppImages.user, fit: BoxFit.cover),
                     ),
-                    backgroundColor: theme.colorScheme.primaryContainer
-                        .withValues(alpha: .35),
+                  ),
+                  Positioned(
+                    right: 2,
+                    bottom: 3,
+                    child: Container(
+                      width: 17,
+                      height: 17,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF16C784),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: theme.colorScheme.surface,
+                          width: 2,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
-              ],
+              ),
+              const SizedBox(width: 18),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      user.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -.5,
+                      ),
+                    ),
+                    const SizedBox(height: 7),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withValues(alpha: .10),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Text(
+                        user.role,
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      user.email,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: theme.colorScheme.primary.withValues(alpha: .18),
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: IconButton(
+                  tooltip: 'Edit Profile'.tr(),
+                  onPressed: model.openEditProfile,
+                  color: theme.colorScheme.primary,
+                  icon: const Icon(HugeIcons.strokeRoundedEdit02),
+                ),
+              ),
+            ],
+          ),
+          if (AppStrings.enableReferSystem) ...[
+            const SizedBox(height: 18),
+            Material(
+              color: theme.colorScheme.primary.withValues(alpha: .055),
+              borderRadius: BorderRadius.circular(14),
+              child: InkWell(
+                onTap: model.shareReferralCode,
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  height: 50,
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withValues(alpha: .20),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        HugeIcons.strokeRoundedShare08,
+                        size: 21,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Compartir mi código',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const Spacer(),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-          IconButton(
-            tooltip: 'Edit Profile'.tr(),
-            onPressed: model.openEditProfile,
-            icon: const Icon(HugeIcons.strokeRoundedEdit02),
-          ),
+          ],
         ],
       ),
     );
@@ -223,8 +311,17 @@ class SettingsSection extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: theme.colorScheme.outlineVariant),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: theme.colorScheme.primary.withValues(alpha: .06),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: .045),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           clipBehavior: Clip.antiAlias,
           child: Column(
@@ -251,6 +348,7 @@ class SettingsTile extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.onTap,
+    this.subtitle,
     this.trailing,
     this.showChevron = true,
     this.isDestructive = false,
@@ -260,6 +358,7 @@ class SettingsTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final VoidCallback onTap;
+  final String? subtitle;
   final Widget? trailing;
   final bool showChevron;
   final bool isDestructive;
@@ -275,12 +374,12 @@ class SettingsTile extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
           child: Row(
             children: [
               Container(
-                width: 38,
-                height: 38,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   color:
                       isDestructive
@@ -290,18 +389,38 @@ class SettingsTile extends StatelessWidget {
                           : theme.colorScheme.primaryContainer.withValues(
                             alpha: .55,
                           ),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(15),
                 ),
-                child: Icon(icon, size: 21, color: color),
+                child: Icon(
+                  icon,
+                  size: 23,
+                  color: isDestructive ? color : theme.colorScheme.primary,
+                ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               Expanded(
-                child: Text(
-                  title,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: color,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
               if (trailing != null) trailing!,

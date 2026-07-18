@@ -22,7 +22,6 @@ environment:
 
 dependencies:
   adaptive_theme: ^3.7.2
-  animated_bottom_navigation_bar: ^1.4.0
   app_links: ^6.4.1
   awesome_notifications: ^0.11.0
   banner_carousel: ^1.2.1
@@ -49,9 +48,7 @@ dependencies:
   double_back_to_close: ^2.0.0
   dynamic_height_grid_view: ^0.0.3
   easy_refresh: ^3.4.0
-  equatable: ^2.0.3
   eva_icons_flutter: ^3.1.0
-  expand_widget: ^2.1.0
   firebase_auth: ^6.2.0
   firebase_core: ^4.5.0
   firebase_crashlytics: ^5.0.8
@@ -78,15 +75,12 @@ dependencies:
   flutter_staggered_animations: ^1.1.1
   flutter_svg: ^2.2.4
   flutter_typeahead: ^5.2.0
-  form_builder_extra_fields: ^12.1.0
   geohash_plus: ^1.1.1
   geolocator: ^14.0.2
-  glass: ^2.0.0+2
   glass_kit: ^4.0.2
   google_fonts: ^8.0.2
   google_maps_flutter: ^2.14.2
   google_maps_place_picker_mb_v2: ^1.0.1
-  google_nav_bar: ^5.0.7
   google_places_flutter: ^2.1.1
   google_sign_in: ^5.3.3
   group_radio_button: 1.2.0
@@ -99,7 +93,6 @@ dependencies:
   laravel_echo_null: ^0.2.0
   localize_and_translate: ^4.1.1
   location: ^8.0.1
-  lottie: ^3.3.2
   map_launcher: ^4.5.0
   maps_toolkit: ^3.1.0
   masonry_grid: ^1.0.0
@@ -113,7 +106,6 @@ dependencies:
   # 2.2.0 omits the Kotlin Android plugin and fails native compilation.
   qr_code_scanner_plus: 2.1.1
   qr_flutter: ^4.1.0
-  quickalert: ^1.1.0
   rx_shared_preferences: ^4.0.0
   rxdart: ^0.28.0
   share_plus: ^12.0.1
@@ -124,10 +116,8 @@ dependencies:
   singleton: ^0.0.3-nullsafety
   slide_countdown: ^0.2.8
   sliding_up_panel: ^2.0.0+1
-  sliver_snap: ^2.1.1
   smooth_page_indicator: ^2.0.1
   stacked: ^3.5.0
-  sticky_headers: ^0.3.0+2
   supercharged: ^2.1.1
   synchronized: ^3.4.0
   timelines_plus: ^2.0.0
@@ -179,4 +169,3 @@ flutter:
     - assets/images/icons/
     - assets/json/
     - assets/lang/
-    - assets/

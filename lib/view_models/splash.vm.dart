@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:adaptive_theme/adaptive_theme.dart';
 
@@ -9,10 +10,10 @@ import 'package:chaskiy/constants/app_routes.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/constants/app_theme.dart';
 import 'package:chaskiy/requests/settings.request.dart';
-import 'package:chaskiy/services/alert.service.dart';
 import 'package:chaskiy/services/app_currency_system.service.dart';
 import 'package:chaskiy/services/auth.service.dart';
 import 'package:chaskiy/services/firebase.service.dart';
+import 'package:chaskiy/services/local_storage.service.dart';
 import 'package:chaskiy/services/websocket.service.dart';
 import 'package:chaskiy/utils/utils.dart';
 //import 'package:chaskiy/widgets/cards/language_selector.view.dart';
@@ -27,14 +28,21 @@ class SplashViewModel extends MyBaseViewModel {
 
   //
   SettingsRequest settingsRequest = SettingsRequest();
+  Timer? _retryTimer;
 
   //
   initialise() async {
     super.initialise();
     await loadAppSettings();
-    if (AuthServices.authenticated()) {
+    if (await AuthServices.authenticated()) {
       await AuthServices.getCurrentUser(force: true);
     }
+  }
+
+  @override
+  void dispose() {
+    _retryTimer?.cancel();
+    super.dispose();
   }
 
   //
@@ -64,21 +72,33 @@ class SplashViewModel extends MyBaseViewModel {
       await AppCurrencySystemService().init(
         appSettingsObject.body["exchange_rates"],
       );
+      _retryTimer?.cancel();
       loadNextPage();
     } catch (error) {
       setError(error);
       print("Error loading app settings ==> $error");
-      //show a dialog
-      AlertService.error(
-        title: "An error occurred".tr(),
-        text: "$error",
-        confirmBtnText: "Retry".tr(),
-        onConfirm: () {
-          initialise();
-        },
-      );
+      if (_hasSavedSettings) {
+        // La app puede iniciar con la última configuración válida. Las
+        // siguientes lecturas intentarán red y usarán caché si sigue offline.
+        loadNextPage();
+      } else {
+        // En la primera instalación todavía no existe contenido local. Se
+        // reintenta silenciosamente sin encerrar al usuario en un diálogo.
+        _retryTimer?.cancel();
+        _retryTimer = Timer(const Duration(seconds: 8), loadAppSettings);
+      }
     }
     setBusy(false);
+  }
+
+  bool get _hasSavedSettings {
+    final saved = AppStrings.appSettingsObject;
+    if (saved != null) return true;
+
+    final raw = LocalStorageService.prefs?.getString(
+      AppStrings.appRemoteSettings,
+    );
+    return raw != null && raw.isNotEmpty;
   }
 
   //
@@ -106,15 +126,15 @@ class SplashViewModel extends MyBaseViewModel {
     //
     await Utils.setJiffyLocale();
     //
-   if (AuthServices.firstTimeOnApp()) {
-     await AuthServices.setLocale("es");
-     await translator.setNewLanguage(
-       viewContext,
-       newLanguage: "es",
-       remember: true,
-     );
-     await Utils.setJiffyLocale();
-   }
+    if (AuthServices.firstTimeOnApp()) {
+      await AuthServices.setLocale("es");
+      await translator.setNewLanguage(
+        viewContext,
+        newLanguage: "es",
+        remember: true,
+      );
+      await Utils.setJiffyLocale();
+    }
     //
     if (AuthServices.firstTimeOnApp()) {
       Navigator.of(viewContext).pushNamedAndRemoveUntil(

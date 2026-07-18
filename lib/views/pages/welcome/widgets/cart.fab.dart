@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/sizes.dart';
 import 'package:chaskiy/services/cart.service.dart';
 import 'package:chaskiy/utils/utils.dart';
@@ -20,7 +19,7 @@ class CartHomeFab extends StatelessWidget {
         elevation: 7,
         highlightElevation: 4,
         shape: const CircleBorder(),
-        backgroundColor: AppColor.primaryColor,
+        backgroundColor: const Color(0xFFFF7A00),
         foregroundColor: Colors.white,
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         onPressed: model.openCart,
@@ -45,7 +44,7 @@ class CartHomeFab extends StatelessWidget {
                     count: snapshot.data,
                     color: Colors.white,
                     textStyle: context.textTheme.bodyLarge?.copyWith(
-                      color: AppColor.primaryColor,
+                      color: const Color(0xFFFF7A00),
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
                     ),

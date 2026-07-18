@@ -77,9 +77,6 @@ class HttpService {
       "X-App-Platform": Platform.operatingSystem,
       "lang": translator.activeLocale.languageCode,
       //
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache',
-      'Expires': '0',
       'App-Version': packageInfo.buildNumber,
       'App-Type': 'customer',
       'c-lat': "$cLat",
@@ -103,7 +100,11 @@ class HttpService {
 
   DioCacheManager getCacheManager() {
     return DioCacheManager(
-      CacheConfig(baseUrl: host, defaultMaxAge: Duration(hours: 1)),
+      CacheConfig(
+        baseUrl: host,
+        defaultMaxAge: const Duration(minutes: 5),
+        defaultMaxStale: const Duration(days: 30),
+      ),
     );
   }
 
@@ -117,8 +118,12 @@ class HttpService {
     String uri = "$host$url";
 
     //preparing the post options if header is required
-    final mOptions =
-        !includeHeaders ? null : Options(headers: await getHeaders());
+    final headers = includeHeaders ? await getHeaders() : null;
+    final mOptions = buildCacheOptions(
+      const Duration(minutes: 5),
+      maxStale: const Duration(days: 30),
+      options: Options(headers: headers),
+    );
 
     Response response;
 
@@ -227,10 +232,12 @@ class HttpService {
                 .tr();
       } else if (ex.type == DioErrorType.sendTimeout) {
         msg =
-            "Tiempo de espera agotado. Revisa tu conexión a internet e inténtalo nuevamente".tr();
+            "Tiempo de espera agotado. Revisa tu conexión a internet e inténtalo nuevamente"
+                .tr();
       } else if (ex.type == DioErrorType.receiveTimeout) {
         msg =
-            "Tiempo de espera agotado. Revisa tu conexión a internet e inténtalo nuevamente".tr();
+            "Tiempo de espera agotado. Revisa tu conexión a internet e inténtalo nuevamente"
+                .tr();
       } else if (ex.type == DioErrorType.connectionTimeout) {
         msg =
             "Tiempo de conexión agotado. Revisa tu conexión a internet e inténtalo nuevamente"

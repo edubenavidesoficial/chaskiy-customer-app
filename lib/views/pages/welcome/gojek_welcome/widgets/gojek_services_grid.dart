@@ -3,6 +3,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:chaskiy/services/navigation.service.dart';
 import 'package:chaskiy/view_models/welcome.vm.dart';
 import 'package:chaskiy/widgets/custom_image.view.dart';
+import 'package:chaskiy/constants/app_colors.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class GojekServicesGrid extends StatelessWidget {
@@ -16,7 +17,7 @@ class GojekServicesGrid extends StatelessWidget {
 
     return AnimationLimiter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 18),
         child: Column(
           children: [
             Row(
@@ -24,25 +25,35 @@ class GojekServicesGrid extends StatelessWidget {
                 const Expanded(
                   child: Text(
                     'Servicios',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -.4,
+                    ),
                   ),
                 ),
                 TextButton(
                   onPressed: vm.openFeaturedVendors,
-                  child: const Text('Ver todos'),
+                  child: const Text(
+                    'Explorar',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
                 ),
               ],
             ),
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 20),
+              padding: const EdgeInsets.fromLTRB(8, 20, 8, 18),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(26),
+                border: Border.all(
+                  color: AppColor.primaryColor.withValues(alpha: .06),
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: .05),
-                    blurRadius: 18,
-                    offset: const Offset(0, 8),
+                    color: AppColor.primaryColor.withValues(alpha: .07),
+                    blurRadius: 24,
+                    offset: const Offset(0, 10),
                   ),
                 ],
               ),
@@ -60,7 +71,7 @@ class GojekServicesGrid extends StatelessWidget {
                       child: FadeInAnimation(
                         child: SizedBox(
                           // strictly 4 items per row
-                          width: (MediaQuery.of(context).size.width - 40) / 4,
+                          width: (MediaQuery.of(context).size.width - 52) / 4,
                           child: _ServiceCircleItem(
                             vendorType: vt,
                             onTap:
@@ -104,29 +115,38 @@ class _ServiceCircleItem extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            width: 54,
-            height: 54,
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            width: 58,
+            height: 58,
             decoration: BoxDecoration(
-              color: tint.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(17),
+              gradient: LinearGradient(
+                colors: [
+                  tint.withValues(alpha: .18),
+                  tint.withValues(alpha: .07),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: tint.withValues(alpha: .12)),
             ),
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(9),
             child: CustomImage(
               imageUrl: vendorType.logo,
               boxFit: BoxFit.contain,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 9),
           Text(
             vendorType.name ?? '',
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              height: 1.1,
+              fontSize: 12.5,
+              fontWeight: FontWeight.w600,
+              height: 1.12,
             ),
           ).px(2),
         ],

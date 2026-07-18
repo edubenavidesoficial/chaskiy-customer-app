@@ -20,20 +20,49 @@ class GojekHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return ColoredBox(
-      color: colors.surface,
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            colors.surface,
+            AppColor.primaryColor.withValues(alpha: .055),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
           child: Column(
             children: [
               Row(
                 children: [
-                  Icon(
-                    HugeIcons.strokeRoundedLocation01,
-                    color: AppColor.primaryColor,
-                    size: 34,
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColor.primaryColor,
+                          AppColor.primaryColor.withValues(alpha: .78),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColor.primaryColor.withValues(alpha: .22),
+                          blurRadius: 14,
+                          offset: const Offset(0, 7),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      HugeIcons.strokeRoundedLocation01,
+                      color: Colors.white,
+                      size: 26,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -72,10 +101,20 @@ class GojekHeader extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 4),
-                                      const Icon(
-                                        Icons.keyboard_arrow_down_rounded,
-                                        size: 22,
+                                      const SizedBox(width: 7),
+                                      Container(
+                                        width: 22,
+                                        height: 22,
+                                        decoration: BoxDecoration(
+                                          color: AppColor.primaryColor
+                                              .withValues(alpha: .10),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.keyboard_arrow_down_rounded,
+                                          size: 18,
+                                          color: AppColor.primaryColor,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -123,25 +162,37 @@ class GojekHeader extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 20),
               Material(
                 color: colors.surface,
-                elevation: 2,
-                shadowColor: Colors.black.withValues(alpha: .12),
-                borderRadius: BorderRadius.circular(18),
+                elevation: 0,
+                borderRadius: BorderRadius.circular(20),
                 child: InkWell(
                   onTap: () => AppService().homePageIndex.add(2),
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(20),
                   child: Container(
-                    height: 58,
+                    height: 60,
                     padding: const EdgeInsets.symmetric(horizontal: 18),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: colors.outlineVariant),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: AppColor.primaryColor.withValues(alpha: .14),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColor.primaryColor.withValues(alpha: .08),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
                     ),
                     child: Row(
                       children: [
-                        const Icon(HugeIcons.strokeRoundedSearch01, size: 27),
+                        Icon(
+                          HugeIcons.strokeRoundedSearch01,
+                          size: 27,
+                          color: AppColor.primaryColor,
+                        ),
                         const SizedBox(width: 14),
                         Expanded(
                           child: Text(
@@ -154,9 +205,20 @@ class GojekHeader extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const Icon(
-                          HugeIcons.strokeRoundedFilterHorizontal,
-                          size: 25,
+                        Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: const Color(
+                              0xFFFF7A00,
+                            ).withValues(alpha: .12),
+                            borderRadius: BorderRadius.circular(13),
+                          ),
+                          child: const Icon(
+                            HugeIcons.strokeRoundedFilterHorizontal,
+                            size: 21,
+                            color: Color(0xFFFF7A00),
+                          ),
                         ),
                       ],
                     ),

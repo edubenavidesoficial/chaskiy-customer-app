@@ -38,24 +38,58 @@ class _ProfilePageState extends State<ProfilePage>
               physics: const BouncingScrollPhysics(),
               slivers: [
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 130),
+                  padding: const EdgeInsets.fromLTRB(22, 20, 22, 130),
                   sliver: SliverList.list(
                     children: [
-                      Text(
-                        'Settings'.tr(),
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -.5,
-                        ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Settings'.tr(),
+                                  style: theme.textTheme.displaySmall?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -1.2,
+                                    color: theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  'Profile & App Settings'.tr(),
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surface,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: .08),
+                                  blurRadius: 18,
+                                  offset: const Offset(0, 7),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.settings_outlined,
+                              color: theme.colorScheme.primary,
+                              size: 27,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Profile & App Settings'.tr(),
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 22),
+                      const SizedBox(height: 28),
                       ProfileCard(model),
                       const SizedBox(height: 22),
                       _PreferencesSection(model: model),

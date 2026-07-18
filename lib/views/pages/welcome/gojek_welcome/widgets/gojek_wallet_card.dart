@@ -54,20 +54,20 @@ class _GojekWalletCardState extends State<GojekWalletCard>
             builder: (_, snapshot) {
               if (snapshot.data == false) return const SizedBox.shrink();
               return Container(
-                margin: const EdgeInsets.fromLTRB(20, 8, 20, 14),
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 14),
+                margin: const EdgeInsets.fromLTRB(18, 4, 18, 16),
+                padding: const EdgeInsets.fromLTRB(20, 22, 20, 16),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF0753C7), Color(0xFF0866E6)],
+                    colors: [Color(0xFF052B75), Color(0xFF0874F9)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(22),
+                  borderRadius: BorderRadius.circular(28),
                   boxShadow: const [
                     BoxShadow(
-                      color: Color(0x330052BD),
-                      blurRadius: 22,
-                      offset: Offset(0, 10),
+                      color: Color(0x440052BD),
+                      blurRadius: 28,
+                      offset: Offset(0, 13),
                     ),
                   ],
                 ),
@@ -80,10 +80,11 @@ class _GojekWalletCardState extends State<GojekWalletCard>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Saldo disponible',
+                                'Tu saldo Chaskiy',
                                 style: TextStyle(
                                   color: Colors.white.withValues(alpha: .86),
                                   fontSize: 14,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -97,8 +98,9 @@ class _GojekWalletCardState extends State<GojekWalletCard>
                                           .currencyFormat(),
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontSize: 31,
-                                        fontWeight: FontWeight.w700,
+                                        fontSize: 33,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: -1,
                                       ),
                                     ),
                                   const SizedBox(width: 10),
@@ -110,21 +112,22 @@ class _GojekWalletCardState extends State<GojekWalletCard>
                                 ],
                               ),
                               const SizedBox(height: 14),
-                              OutlinedButton.icon(
+                              FilledButton.icon(
                                 onPressed:
                                     () => context.nextPage(const WalletPage()),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  side: const BorderSide(
-                                    color: Color(0x88FFFFFF),
-                                  ),
+                                style: FilledButton.styleFrom(
+                                  foregroundColor: const Color(0xFF06347F),
+                                  backgroundColor: Colors.white,
                                   visualDensity: VisualDensity.compact,
                                 ),
                                 icon: const Icon(
                                   HugeIcons.strokeRoundedUser,
                                   size: 18,
                                 ),
-                                label: const Text('Mi cuenta'),
+                                label: const Text(
+                                  'Mi cuenta',
+                                  style: TextStyle(fontWeight: FontWeight.w700),
+                                ),
                               ),
                             ],
                           ),
@@ -203,15 +206,21 @@ class _WalletAction extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(19),
       child: Column(
         children: [
           Container(
             width: 58,
             height: 58,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: .18),
-              borderRadius: BorderRadius.circular(18),
+              gradient: LinearGradient(
+                colors: [
+                  Colors.white.withValues(alpha: .24),
+                  Colors.white.withValues(alpha: .12),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(19),
+              border: Border.all(color: Colors.white.withValues(alpha: .18)),
             ),
             child: Icon(icon, color: Colors.white, size: 32),
           ),
