@@ -2,13 +2,13 @@ import 'dart:developer';
 
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/models/api_response.dart';
 import 'package:chaskiy/requests/auth.request.dart';
 import 'package:chaskiy/services/alert.service.dart';
 import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/services/companion_app_download.service.dart';
 import 'package:chaskiy/services/phone_util.service.dart';
 import 'package:chaskiy/services/social_media_login.service.dart';
 import 'package:chaskiy/traits/qrcode_scanner.trait.dart';
@@ -30,6 +30,8 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
   //
   AuthRequest authRequest = AuthRequest();
   SocialMediaLoginService socialMediaLoginService = SocialMediaLoginService();
+  CompanionAppDownloadService companionAppDownloadService =
+      CompanionAppDownloadService();
   bool otpLogin = AppStrings.enableOTPLogin;
   Country? selectedCountry;
   String? accountPhoneNumber;
@@ -39,10 +41,6 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
   }
 
   void initialise() async {
-    //
-    emailTEC.text = kReleaseMode ? "" : "client@demo.com";
-    passwordTEC.text = kReleaseMode ? "" : "password";
-
     //phone login
     String countryCode = PhoneUtilService.countryCode ?? "us";
     this.selectedCountry = Country.parse(countryCode);
@@ -51,6 +49,21 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
   toggleLoginType() {
     otpLogin = !otpLogin;
     notifyListeners();
+  }
+
+  Future<void> downloadCompanionApp(CompanionApp app) async {
+    setBusyForObject(app, true);
+    try {
+      final opened = await companionAppDownloadService.openLatestDownload(app);
+      if (!opened) {
+        AlertService.error(
+          title: "Descarga no disponible",
+          text: "No pudimos abrir la descarga. Inténtalo nuevamente más tarde.",
+        );
+      }
+    } finally {
+      setBusyForObject(app, false);
+    }
   }
 
   showCountryDialPicker() {

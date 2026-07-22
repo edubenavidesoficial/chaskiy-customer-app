@@ -20,7 +20,7 @@ class AppCurrencySystemService {
   /// Private constructor
   AppCurrencySystemService._() {}
 
-  static late Map<String, dynamic> appExchangeRatesObject;
+  static Map<String, dynamic> appExchangeRatesObject = {};
 
   init(Map<String, dynamic> exchangeRates) {
     //

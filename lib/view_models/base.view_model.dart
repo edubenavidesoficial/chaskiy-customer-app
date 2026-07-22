@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:chaskiy/constants/api.dart';
-import 'package:chaskiy/constants/app_map_settings.dart';
 import 'package:chaskiy/constants/app_routes.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/models/cart.dart';
@@ -32,7 +31,6 @@ import 'package:chaskiy/views/shared/ops_map.page.dart';
 import 'package:chaskiy/widgets/bottomsheets/delivery_address_picker.bottomsheet.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_place_picker_mb_v2/google_maps_place_picker.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 import 'package:share_plus/share_plus.dart';
@@ -420,31 +418,14 @@ class MyBaseViewModel extends BaseViewModel
       initialZoom = 6;
     }
 
-    //
-    if (!AppMapSettings.useGoogleOnApp) {
-      return await viewContext.push(
-        (context) => OPSMapPage(
-          region: mapRegion,
-          initialPosition: resolvedInitialPosition,
-          useCurrentLocation: true,
-          initialZoom: initialZoom,
-        ),
-      );
-    }
-    //google maps
-    return await Navigator.push(
-      viewContext,
-      MaterialPageRoute(
-        builder:
-            (context) => PlacePicker(
-              apiKey: AppStrings.googleMapApiKey,
-              autocompleteLanguage: translator.activeLocale.languageCode,
-              region: mapRegion,
-              onPlacePicked: (result) {
-                Navigator.of(context).pop(result);
-              },
-              initialPosition: resolvedInitialPosition,
-            ),
+    // Un solo selector evita la interfaz antigua del paquete externo y el
+    // salto inicial a (0, 0). Todas las entradas usan la experiencia Chaskiy.
+    return await viewContext.push(
+      (context) => OPSMapPage(
+        region: mapRegion,
+        initialPosition: resolvedInitialPosition,
+        useCurrentLocation: true,
+        initialZoom: initialZoom,
       ),
     );
   }

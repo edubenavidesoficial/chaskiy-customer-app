@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:chaskiy/services/geocoder.service.dart';
 import 'package:chaskiy/view_models/base.view_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:chaskiy/extensions/context.dart';
 
 class OPSMapViewModel extends MyBaseViewModel {
@@ -40,6 +41,25 @@ class OPSMapViewModel extends MyBaseViewModel {
     notifyListeners();
   }
 
+  Future<void> moveToCurrentLocation() async {
+    try {
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 8),
+        ),
+      );
+      await gMapController?.animateCamera(
+        CameraUpdate.newLatLngZoom(
+          LatLng(position.latitude, position.longitude),
+          16,
+        ),
+      );
+    } catch (error) {
+      toastError('No se pudo obtener tu ubicación actual');
+    }
+  }
+
   addressSelected(Address address, {bool moveCamera = true}) async {
     setBusyForObject(selectedAddress, true);
     selectedAddress = address;
@@ -52,21 +72,17 @@ class OPSMapViewModel extends MyBaseViewModel {
     searchTEC.clear();
     if (moveCamera) {
       if (address.coordinates != null || selectedAddress?.coordinates != null) {
-        double lat = address.coordinates?.latitude ??
+        double lat =
+            address.coordinates?.latitude ??
             selectedAddress?.coordinates?.latitude ??
             0.0;
-        double lng = address.coordinates?.longitude ??
+        double lng =
+            address.coordinates?.longitude ??
             selectedAddress?.coordinates?.longitude ??
             0.0;
         gMapController?.moveCamera(
           CameraUpdate.newCameraPosition(
-            CameraPosition(
-              zoom: 16,
-              target: LatLng(
-                lat,
-                lng,
-              ),
-            ),
+            CameraPosition(zoom: 16, target: LatLng(lat, lng)),
           ),
         );
       }
@@ -86,9 +102,7 @@ class OPSMapViewModel extends MyBaseViewModel {
         draggable: true,
       );
     } else {
-      centerMarker = centerMarker?.copyWith(
-        positionParam: position.target,
-      );
+      centerMarker = centerMarker?.copyWith(positionParam: position.target);
     }
 
     //
@@ -102,13 +116,10 @@ class OPSMapViewModel extends MyBaseViewModel {
       selectedAddress = null;
       setBusyForObject(selectedAddress, true);
       try {
-        final address = (await geocoderService.findAddressesFromCoordinates(
-          Coordinates(
-            position.target.latitude,
-            position.target.longitude,
-          ),
-        ))
-            .first;
+        final address =
+            (await geocoderService.findAddressesFromCoordinates(
+              Coordinates(position.target.latitude, position.target.longitude),
+            )).first;
 
         addressSelected(address, moveCamera: false);
       } catch (error) {

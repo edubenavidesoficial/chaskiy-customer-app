@@ -6,6 +6,7 @@ import 'package:chaskiy/models/vendor.dart';
 import 'package:chaskiy/models/product.dart';
 import 'package:chaskiy/models/vendor_type.dart';
 import 'package:chaskiy/models/search.dart';
+import 'package:chaskiy/models/api_response.dart';
 import 'package:chaskiy/requests/search.request.dart';
 import 'package:chaskiy/requests/vendor_type.request.dart';
 import 'package:chaskiy/services/navigation.service.dart';
@@ -40,6 +41,7 @@ class MainSearchViewModel extends SearchViewModel {
   List<Product> products = [];
   List<Service> services = [];
   int selectedIndex = 0;
+  bool _searchErrorShown = false;
 
   MainSearchViewModel(BuildContext context) : super(context, Search());
 
@@ -80,7 +82,7 @@ class MainSearchViewModel extends SearchViewModel {
 
       showVendors = showServices || showProducts;
     } catch (error) {
-      toastError("$error");
+      _showSearchError(error);
     }
     setBusy(false);
   }
@@ -99,6 +101,7 @@ class MainSearchViewModel extends SearchViewModel {
 
   //
   startSearch({bool initialLoaoding = true}) async {
+    _searchErrorShown = false;
     if (showProducts) {
       searchProducts(initial: initialLoaoding);
     }
@@ -147,7 +150,7 @@ class MainSearchViewModel extends SearchViewModel {
     } catch (error) {
       print("Error ==> $error");
       setError(error);
-      toastError("$error");
+      _showSearchError(error);
     }
 
     if (!initial) {
@@ -187,7 +190,7 @@ class MainSearchViewModel extends SearchViewModel {
     } catch (error) {
       print("Error ==> $error");
       setError(error);
-      toastError("$error");
+      _showSearchError(error);
     }
 
     if (!initial) {
@@ -227,7 +230,7 @@ class MainSearchViewModel extends SearchViewModel {
     } catch (error) {
       print("Error ==> $error");
       setError(error);
-      toastError("$error");
+      _showSearchError(error);
     }
 
     if (!initial) {
@@ -235,6 +238,22 @@ class MainSearchViewModel extends SearchViewModel {
     }
     //done loading data
     setBusyForObject(services, false);
+  }
+
+  void _showSearchError(Object error) {
+    if (_searchErrorShown) return;
+    _searchErrorShown = true;
+
+    final rawMessage = error.toString();
+    final isTechnicalError =
+        rawMessage.contains("is not a subtype") ||
+        rawMessage.contains("NoSuchMethodError") ||
+        rawMessage.contains("type '") ||
+        rawMessage.contains("Exception:");
+
+    toastError(
+      isTechnicalError ? ApiResponse.unavailableMessage : rawMessage,
+    );
   }
 
   //

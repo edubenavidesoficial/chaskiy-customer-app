@@ -27,13 +27,14 @@ class OPSMapPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initialTarget = initialPosition ?? const LatLng(0, 0);
+    final initialTarget = initialPosition ?? const LatLng(-1.8312, -78.1834);
+    final resolvedZoom = initialPosition == null ? 6.0 : initialZoom;
     return BasePage(
       body: ViewModelBuilder<OPSMapViewModel>.reactive(
         viewModelBuilder: () => OPSMapViewModel(context),
         onViewModelReady:
             (vm) => vm.mapCameraMove(
-              CameraPosition(target: initialTarget, zoom: initialZoom),
+              CameraPosition(target: initialTarget, zoom: resolvedZoom),
             ),
         builder:
             (_, vm, __) => Stack(
@@ -45,7 +46,7 @@ class OPSMapPage extends StatelessWidget {
                   mapToolbarEnabled: false,
                   initialCameraPosition: CameraPosition(
                     target: initialTarget,
-                    zoom: initialZoom,
+                    zoom: resolvedZoom,
                   ),
                   padding: vm.googleMapPadding,
                   onMapCreated: vm.onMapCreated,
@@ -58,13 +59,7 @@ class OPSMapPage extends StatelessWidget {
                   bottom: vm.selectedAddress == null ? 36 : 224,
                   child: _FloatingMapButton(
                     icon: HugeIcons.strokeRoundedLocation01,
-                    onTap: () {
-                      if (initialPosition != null) {
-                        vm.gMapController?.animateCamera(
-                          CameraUpdate.newLatLngZoom(initialPosition!, 16),
-                        );
-                      }
-                    },
+                    onTap: vm.moveToCurrentLocation,
                   ),
                 ),
                 if (vm.busy(vm.selectedAddress))

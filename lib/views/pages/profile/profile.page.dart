@@ -38,7 +38,7 @@ class _ProfilePageState extends State<ProfilePage>
               physics: const BouncingScrollPhysics(),
               slivers: [
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(22, 20, 22, 130),
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 130),
                   sliver: SliverList.list(
                     children: [
                       Row(
@@ -50,16 +50,19 @@ class _ProfilePageState extends State<ProfilePage>
                               children: [
                                 Text(
                                   'Settings'.tr(),
-                                  style: theme.textTheme.displaySmall?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: -1.2,
-                                    color: theme.colorScheme.onSurface,
-                                  ),
+                                  style: theme.textTheme.headlineLarge
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: -.8,
+                                        color: theme.colorScheme.onSurface,
+                                      ),
                                 ),
-                                const SizedBox(height: 5),
+                                const SizedBox(height: 2),
                                 Text(
                                   'Profile & App Settings'.tr(),
-                                  style: theme.textTheme.titleMedium?.copyWith(
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.bodyLarge?.copyWith(
                                     color: theme.colorScheme.onSurfaceVariant,
                                     fontWeight: FontWeight.w400,
                                   ),
@@ -68,8 +71,8 @@ class _ProfilePageState extends State<ProfilePage>
                             ),
                           ),
                           Container(
-                            width: 48,
-                            height: 48,
+                            width: 42,
+                            height: 42,
                             decoration: BoxDecoration(
                               color: theme.colorScheme.surface,
                               shape: BoxShape.circle,
@@ -84,12 +87,12 @@ class _ProfilePageState extends State<ProfilePage>
                             child: Icon(
                               Icons.settings_outlined,
                               color: theme.colorScheme.primary,
-                              size: 27,
+                              size: 24,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 18),
                       ProfileCard(model),
                       const SizedBox(height: 18),
                       _SecuritySection(model: model),

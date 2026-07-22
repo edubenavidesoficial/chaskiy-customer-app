@@ -1,7 +1,27 @@
 class ApiResponse {
-  int get totalDataCount => body["meta"]["total"];
-  int get totalPageCount => body["pagination"]["total_pages"];
-  List get data => body["data"] ?? [];
+  static const String unavailableMessage =
+      "El servicio no está disponible temporalmente. Inténtalo nuevamente en unos minutos.";
+
+  int get totalDataCount {
+    if (body is! Map) return 0;
+    final meta = (body as Map)["meta"];
+    if (meta is! Map) return 0;
+    return int.tryParse("${meta["total"] ?? 0}") ?? 0;
+  }
+
+  int get totalPageCount {
+    if (body is! Map) return 0;
+    final pagination = (body as Map)["pagination"];
+    if (pagination is! Map) return 0;
+    return int.tryParse("${pagination["total_pages"] ?? 0}") ?? 0;
+  }
+
+  List get data {
+    if (body is List) return body as List;
+    if (body is! Map) return const [];
+    final responseData = (body as Map)["data"];
+    return responseData is List ? responseData : const [];
+  }
   // Just a way of saying there was no error with the request and response return
   bool get allGood => errors == null || errors?.length == 0;
   bool hasError() => errors != null && ((errors?.length ?? 0) > 0);
@@ -19,26 +39,24 @@ class ApiResponse {
   });
 
   factory ApiResponse.fromResponse(dynamic response) {
-    //
-    int code = response.statusCode;
-    dynamic body = response.data ?? null; // Would mostly be a Map
+    final int code = response.statusCode ?? 503;
+    final dynamic body = response.data;
     List errors = [];
     String message = "";
+    final bool successfulStatus = code >= 200 && code < 300;
+    final bool validJsonBody = body is Map || body is List;
 
-    switch (code) {
-      case 200:
-        try {
-          message = body is Map ? (body["message"] ?? "") : "";
-        } catch (error) {
-          print("Message reading error ==> $error");
-        }
-
-        break;
-      default:
-        message = body["message"] ??
-            "Whoops! Something went wrong, please contact support.";
-        errors.add(message);
-        break;
+    if (successfulStatus && validJsonBody) {
+      if (body is Map && body["message"] != null) {
+        message = body["message"].toString();
+      }
+    } else {
+      if (body is Map && body["message"] != null) {
+        message = body["message"].toString();
+      } else {
+        message = unavailableMessage;
+      }
+      errors.add(message);
     }
 
     return ApiResponse(

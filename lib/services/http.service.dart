@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 // import 'package:dartx/dartx.dart';
 import 'package:dio/dio.dart';
@@ -15,6 +16,7 @@ import 'package:velocity_x/velocity_x.dart';
 
 import 'auth.service.dart';
 import 'local_storage.service.dart';
+import 'package:chaskiy/models/api_response.dart';
 
 class HttpService {
   String host = Api.baseUrl;
@@ -69,8 +71,6 @@ class HttpService {
     final userToken = await AuthServices.getAuthBearerToken();
     return {
       HttpHeaders.acceptHeader: "application/json",
-      HttpHeaders.userAgentHeader:
-          "Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 ChaskiyCustomer/${packageInfo.version}",
       HttpHeaders.authorizationHeader: "Bearer $userToken",
       "X-Requested-With": "XMLHttpRequest",
       "X-Mobile-App": "ChaskiyCustomer",
@@ -90,11 +90,56 @@ class HttpService {
     baseOptions = new BaseOptions(
       baseUrl: host,
       validateStatus: (status) {
-        return status != null && status <= 500;
+        return status != null && status >= 200 && status < 500;
       },
       connectTimeout: 5.seconds,
+      receiveTimeout: 20.seconds,
+      sendTimeout: 20.seconds,
     );
     dio = new Dio(baseOptions);
+    // Reject hosting error pages before the cache interceptor can store them.
+    // If a previous valid response exists, the cache interceptor can still use
+    // it as a fallback while the server is temporarily unavailable.
+    dio!.interceptors.add(
+      InterceptorsWrapper(
+        onResponse: (response, handler) {
+          final statusCode = response.statusCode ?? 503;
+          final isApiRequest = response.requestOptions.uri.path.startsWith(
+            '/api/',
+          );
+
+          if (!isApiRequest || statusCode == 204) {
+            handler.next(response);
+            return;
+          }
+
+          if (response.data is String) {
+            try {
+              final decoded = jsonDecode(response.data as String);
+              if (decoded is Map || decoded is List) {
+                response.data = decoded;
+              }
+            } catch (_) {
+              // The response is not JSON (for example, a cPanel 500/509 page).
+            }
+          }
+
+          if (response.data is Map || response.data is List) {
+            handler.next(response);
+            return;
+          }
+
+          handler.reject(
+            DioException(
+              requestOptions: response.requestOptions,
+              response: response,
+              type: DioExceptionType.badResponse,
+              message: ApiResponse.unavailableMessage,
+            ),
+          );
+        },
+      ),
+    );
     dio!.interceptors.add(getCacheManager().interceptor);
   }
 
@@ -102,6 +147,9 @@ class HttpService {
     return DioCacheManager(
       CacheConfig(
         baseUrl: host,
+        // Use a new namespace so releases do not reuse HTML error pages that
+        // may have been cached by older versions of the app.
+        databaseName: "ChaskiyApiCacheV2",
         defaultMaxAge: const Duration(minutes: 5),
         defaultMaxStale: const Duration(days: 30),
       ),
@@ -133,7 +181,7 @@ class HttpService {
         options: mOptions,
         queryParameters: queryParameters,
       );
-    } on DioError catch (error) {
+    } on DioException catch (error) {
       response = formatDioExecption(error);
     }
 
@@ -152,7 +200,7 @@ class HttpService {
     Response response;
     try {
       response = await dio!.post(uri, data: body, options: mOptions);
-    } on DioError catch (error) {
+    } on DioException catch (error) {
       response = formatDioExecption(error);
     }
 
@@ -178,7 +226,7 @@ class HttpService {
         data: body is FormData ? body : FormData.fromMap(body),
         options: mOptions,
       );
-    } on DioError catch (error) {
+    } on DioException catch (error) {
       response = formatDioExecption(error);
     }
 
@@ -196,7 +244,7 @@ class HttpService {
         data: body,
         options: Options(headers: await getHeaders()),
       );
-    } on DioError catch (error) {
+    } on DioException catch (error) {
       response = formatDioExecption(error);
     }
 
@@ -213,46 +261,39 @@ class HttpService {
         uri,
         options: Options(headers: await getHeaders()),
       );
-    } on DioError catch (error) {
+    } on DioException catch (error) {
       response = formatDioExecption(error);
     }
     return response;
   }
 
-  Response formatDioExecption(DioError ex) {
-    var response = Response(requestOptions: ex.requestOptions);
-    print("type ==> ${ex.type}");
-    response.statusCode = 400;
-    String? msg = response.statusMessage;
+  Response formatDioExecption(DioException ex) {
+    final responseStatusCode = ex.response?.statusCode;
+    final statusCode =
+        responseStatusCode != null && responseStatusCode >= 400
+            ? responseStatusCode
+            : 503;
+    String message;
 
-    try {
-      if (ex.type == DioErrorType.connectionTimeout) {
-        msg =
-            "Tiempo de conexión agotado. Revisa tu conexión a internet e inténtalo nuevamente"
-                .tr();
-      } else if (ex.type == DioErrorType.sendTimeout) {
-        msg =
-            "Tiempo de espera agotado. Revisa tu conexión a internet e inténtalo nuevamente"
-                .tr();
-      } else if (ex.type == DioErrorType.receiveTimeout) {
-        msg =
-            "Tiempo de espera agotado. Revisa tu conexión a internet e inténtalo nuevamente"
-                .tr();
-      } else if (ex.type == DioErrorType.connectionTimeout) {
-        msg =
-            "Tiempo de conexión agotado. Revisa tu conexión a internet e inténtalo nuevamente"
-                .tr();
-      } else {
-        msg = "Revisa tu conexión a internet e inténtalo nuevamente".tr();
-      }
-      response.data = {"message": msg};
-    } catch (error) {
-      response.statusCode = 400;
-      msg = "Revisa tu conexión a internet e inténtalo nuevamente".tr();
-      response.data = {"message": msg};
+    if (ex.type == DioExceptionType.connectionTimeout) {
+      message =
+          "Tiempo de conexión agotado. Revisa tu conexión a internet e inténtalo nuevamente";
+    } else if (ex.type == DioExceptionType.sendTimeout ||
+        ex.type == DioExceptionType.receiveTimeout) {
+      message =
+          "Tiempo de espera agotado. Revisa tu conexión a internet e inténtalo nuevamente";
+    } else if (statusCode >= 500 || ex.type == DioExceptionType.badResponse) {
+      message = ApiResponse.unavailableMessage;
+    } else {
+      message = "Revisa tu conexión a internet e inténtalo nuevamente";
     }
 
-    throw msg;
+    return Response(
+      requestOptions: ex.requestOptions,
+      statusCode: statusCode,
+      statusMessage: message,
+      data: {"message": message},
+    );
   }
 
   //NEUTRALS

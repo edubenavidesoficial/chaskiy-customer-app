@@ -90,10 +90,10 @@ class _ProfileHeader extends StatelessWidget {
     final user = model.currentUser!;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: theme.colorScheme.primary.withValues(alpha: .08),
         ),
@@ -113,8 +113,8 @@ class _ProfileHeader extends StatelessWidget {
                 clipBehavior: Clip.none,
                 children: [
                   Container(
-                    width: 82,
-                    height: 82,
+                    width: 64,
+                    height: 64,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: theme.colorScheme.primaryContainer,
@@ -135,11 +135,11 @@ class _ProfileHeader extends StatelessWidget {
                     ),
                   ),
                   Positioned(
-                    right: 2,
-                    bottom: 3,
+                    right: 0,
+                    bottom: 2,
                     child: Container(
-                      width: 17,
-                      height: 17,
+                      width: 15,
+                      height: 15,
                       decoration: BoxDecoration(
                         color: const Color(0xFF16C784),
                         shape: BoxShape.circle,
@@ -152,7 +152,7 @@ class _ProfileHeader extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(width: 18),
+              const SizedBox(width: 13),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,37 +161,47 @@ class _ProfileHeader extends StatelessWidget {
                       user.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.headlineSmall?.copyWith(
+                      style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w800,
-                        letterSpacing: -.5,
+                        letterSpacing: -.3,
                       ),
                     ),
-                    const SizedBox(height: 7),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withValues(alpha: .10),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Text(
-                        user.role,
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w700,
+                    const SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary.withValues(
+                              alpha: .10,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            user.role.toLowerCase() == 'client'
+                                ? 'Cliente'
+                                : user.role,
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 7),
-                    Text(
-                      user.email,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            user.email,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -201,30 +211,31 @@ class _ProfileHeader extends StatelessWidget {
                   border: Border.all(
                     color: theme.colorScheme.primary.withValues(alpha: .18),
                   ),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(13),
                 ),
                 child: IconButton(
                   tooltip: 'Edit Profile'.tr(),
                   onPressed: model.openEditProfile,
                   color: theme.colorScheme.primary,
-                  icon: const Icon(HugeIcons.strokeRoundedEdit02),
+                  visualDensity: VisualDensity.compact,
+                  icon: const Icon(HugeIcons.strokeRoundedEdit02, size: 21),
                 ),
               ),
             ],
           ),
           if (AppStrings.enableReferSystem) ...[
-            const SizedBox(height: 18),
+            const SizedBox(height: 12),
             Material(
               color: theme.colorScheme.primary.withValues(alpha: .055),
               borderRadius: BorderRadius.circular(14),
               child: InkWell(
                 onTap: model.shareReferralCode,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(13),
                 child: Container(
-                  height: 50,
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  height: 44,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(13),
                     border: Border.all(
                       color: theme.colorScheme.primary.withValues(alpha: .20),
                     ),
@@ -234,13 +245,13 @@ class _ProfileHeader extends StatelessWidget {
                     children: [
                       Icon(
                         HugeIcons.strokeRoundedShare08,
-                        size: 21,
+                        size: 19,
                         color: theme.colorScheme.primary,
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 9),
                       Text(
                         'Compartir mi código',
-                        style: theme.textTheme.titleMedium?.copyWith(
+                        style: theme.textTheme.bodyLarge?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w700,
                         ),

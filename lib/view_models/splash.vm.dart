@@ -29,6 +29,8 @@ class SplashViewModel extends MyBaseViewModel {
   //
   SettingsRequest settingsRequest = SettingsRequest();
   Timer? _retryTimer;
+  bool _loadingSettings = false;
+  bool _hasNavigated = false;
 
   //
   initialise() async {
@@ -49,18 +51,37 @@ class SplashViewModel extends MyBaseViewModel {
 
   //
   loadAppSettings() async {
+    if (_loadingSettings || _hasNavigated) return;
+    _loadingSettings = true;
     setBusy(true);
     try {
       final appSettingsObject = await settingsRequest.appSettings();
+      if (!appSettingsObject.allGood) {
+        throw appSettingsObject.message ??
+            "No fue posible cargar la configuración de la aplicación";
+      }
+
+      final settings = _settingsMap(appSettingsObject.body);
+      final appGenSettings = _settingsMap(settings?["strings"]);
+      final colors = _settingsMap(settings?["colors"]);
+      final exchangeRates = _settingsMap(settings?["exchange_rates"]);
+
+      if (settings == null ||
+          appGenSettings == null ||
+          colors == null ||
+          exchangeRates == null) {
+        throw "La configuración recibida no está completa";
+      }
+
       //START: WEBSOCKET SETTINGS
-      if (appSettingsObject.body["websocket"] != null) {
+      final websocketSettings = _settingsMap(settings["websocket"]);
+      if (websocketSettings != null) {
         await WebsocketService().saveWebsocketDetails(
-          appSettingsObject.body["websocket"],
+          websocketSettings,
         );
       }
       //END: WEBSOCKET SETTINGS
 
-      Map<String, dynamic> appGenSettings = appSettingsObject.body["strings"];
       //set the app name ffrom package to the app settings
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       String appName = packageInfo.appName;
@@ -68,27 +89,37 @@ class SplashViewModel extends MyBaseViewModel {
       //app settings
       await updateAppVariables(appGenSettings);
       //colors
-      await updateAppTheme(appSettingsObject.body["colors"]);
-      await AppCurrencySystemService().init(
-        appSettingsObject.body["exchange_rates"],
+      await updateAppTheme(colors);
+      await LocalStorageService.prefs?.setString(
+        AppStrings.appExchangeRates,
+        jsonEncode(exchangeRates),
       );
+      await AppCurrencySystemService().init(exchangeRates);
       _retryTimer?.cancel();
-      loadNextPage();
+      await loadNextPage();
     } catch (error) {
       setError(error);
       print("Error loading app settings ==> $error");
       if (_hasSavedSettings) {
         // La app puede iniciar con la última configuración válida. Las
         // siguientes lecturas intentarán red y usarán caché si sigue offline.
-        loadNextPage();
+        await _restoreSavedSettings();
+        await loadNextPage();
       } else {
         // En la primera instalación todavía no existe contenido local. Se
         // reintenta silenciosamente sin encerrar al usuario en un diálogo.
         _retryTimer?.cancel();
         _retryTimer = Timer(const Duration(seconds: 8), loadAppSettings);
       }
+    } finally {
+      _loadingSettings = false;
+      setBusy(false);
     }
-    setBusy(false);
+  }
+
+  Map<String, dynamic>? _settingsMap(dynamic value) {
+    if (value is! Map) return null;
+    return Map<String, dynamic>.from(value);
   }
 
   bool get _hasSavedSettings {
@@ -99,6 +130,26 @@ class SplashViewModel extends MyBaseViewModel {
       AppStrings.appRemoteSettings,
     );
     return raw != null && raw.isNotEmpty;
+  }
+
+  Future<void> _restoreSavedSettings() async {
+    await AppStrings.getAppSettingsFromLocalStorage();
+    await AppColor.getColorsFromLocalStorage();
+
+    final rawExchangeRates = LocalStorageService.prefs?.getString(
+      AppStrings.appExchangeRates,
+    );
+    if (rawExchangeRates == null || rawExchangeRates.isEmpty) return;
+
+    try {
+      final exchangeRates = _settingsMap(jsonDecode(rawExchangeRates));
+      if (exchangeRates != null) {
+        await AppCurrencySystemService().init(exchangeRates);
+      }
+    } catch (_) {
+      // La moneda base de la app sigue disponible aunque este dato local sea
+      // de una versión antigua o esté incompleto.
+    }
   }
 
   //
@@ -123,6 +174,9 @@ class SplashViewModel extends MyBaseViewModel {
 
   //
   loadNextPage() async {
+    if (_hasNavigated) return;
+    _hasNavigated = true;
+    _retryTimer?.cancel();
     //
     await Utils.setJiffyLocale();
     //

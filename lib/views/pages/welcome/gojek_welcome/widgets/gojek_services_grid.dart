@@ -15,7 +15,9 @@ class GojekServicesGrid extends StatelessWidget {
     if (vm.vendorTypes.isEmpty) return const SizedBox.shrink();
 
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final cardWidth = (screenWidth * .43).clamp(144.0, 178.0);
+    const horizontalPadding = 36.0;
+    const totalSpacing = 24.0;
+    final cardWidth = (screenWidth - horizontalPadding - totalSpacing) / 4;
 
     return AnimationLimiter(
       child: Column(
@@ -46,14 +48,14 @@ class GojekServicesGrid extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: 238,
+            height: 158,
             width: double.infinity,
             child: ListView.separated(
-              padding: const EdgeInsets.fromLTRB(18, 6, 18, 18),
+              padding: const EdgeInsets.fromLTRB(18, 6, 18, 12),
               physics: const BouncingScrollPhysics(),
               scrollDirection: Axis.horizontal,
               itemCount: vm.vendorTypes.take(8).length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final vendorType = vm.vendorTypes[index];
                 return AnimationConfiguration.staggeredList(
@@ -93,45 +95,44 @@ class _ServiceIdentityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     final Color tint = Vx.hexToColor(vendorType.color ?? '#0874F9');
 
     return Material(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(26),
+      borderRadius: BorderRadius.circular(20),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(20),
         child: Ink(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
                 tint.withValues(alpha: .24),
                 tint.withValues(alpha: .07),
-                colors.surface,
+                Theme.of(context).colorScheme.surface,
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               stops: const [0, .53, 1],
             ),
-            borderRadius: BorderRadius.circular(26),
+            borderRadius: BorderRadius.circular(20),
             border: Border.all(color: tint.withValues(alpha: .10)),
             boxShadow: [
               BoxShadow(
                 color: tint.withValues(alpha: .12),
-                blurRadius: 18,
-                offset: const Offset(0, 9),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
+            padding: const EdgeInsets.fromLTRB(5, 10, 5, 8),
             child: Column(
               children: [
                 Container(
-                  width: 82,
-                  height: 82,
-                  padding: const EdgeInsets.all(9),
+                  width: 54,
+                  height: 54,
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: .78),
                     shape: BoxShape.circle,
@@ -142,8 +143,8 @@ class _ServiceIdentityCard extends StatelessWidget {
                     boxShadow: [
                       BoxShadow(
                         color: tint.withValues(alpha: .16),
-                        blurRadius: 14,
-                        offset: const Offset(0, 6),
+                        blurRadius: 9,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
@@ -152,30 +153,16 @@ class _ServiceIdentityCard extends StatelessWidget {
                     boxFit: BoxFit.contain,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
                 Text(
                   vendorType.name ?? '',
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    height: 1.05,
-                  ),
-                ),
-                const SizedBox(height: 7),
-                Expanded(
-                  child: Text(
-                    _descriptionFor(vendorType),
-                    textAlign: TextAlign.center,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: colors.onSurfaceVariant,
-                      fontSize: 11.5,
-                      height: 1.2,
-                    ),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    height: 1.08,
                   ),
                 ),
               ],
@@ -184,17 +171,5 @@ class _ServiceIdentityCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _descriptionFor(dynamic vendorType) {
-    final description = '${vendorType.description ?? ''}'.trim();
-    if (description.isNotEmpty) return description;
-
-    final slug = '${vendorType.slug ?? ''}'.toLowerCase();
-    if (slug.contains('taxi'))
-      return 'Viajes seguros y confiables cerca de ti.';
-    if (slug.contains('parcel')) return 'Envíos rápidos, simples y seguros.';
-    if (slug.contains('food')) return 'Tus sabores favoritos a domicilio.';
-    return 'Todo lo que necesitas, en un solo lugar.';
   }
 }

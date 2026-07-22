@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/app_images.dart';
@@ -6,6 +8,7 @@ import 'package:chaskiy/constants/sizes.dart';
 import 'package:chaskiy/utils/ui_spacer.dart';
 import 'package:chaskiy/view_models/login.view_model.dart';
 import 'package:chaskiy/views/pages/auth/login/compain_login_type.view.dart';
+import 'package:chaskiy/views/pages/auth/login/companion_apps_download.view.dart';
 import 'package:chaskiy/views/pages/auth/login/email_login.view.dart';
 import 'package:chaskiy/views/pages/auth/login/otp_login.view.dart';
 import 'package:chaskiy/views/pages/auth/login/social_media.view.dart';
@@ -110,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                           "OR".tr().text.light.make().px8(),
                           UiSpacer.divider().expand(),
                         ]).py8().px20(),
-                        "New user?".richText
+                        "New user?".tr().richText
                             .withTextSpanChildren([
                               " ".textSpan.make(),
                               "Create An Account"
@@ -125,6 +128,8 @@ class _LoginPageState extends State<LoginPage> {
                             .onInkTap(model.openRegister),
                         SocialMediaView(model, bottomPadding: 10),
                         ScanLoginView(model),
+                        if (Platform.isAndroid)
+                          CompanionAppsDownloadView(model),
                       ]).scrollVertical(),
                 ),
               ),
