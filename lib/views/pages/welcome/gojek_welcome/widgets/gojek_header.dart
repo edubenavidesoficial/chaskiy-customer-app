@@ -5,17 +5,29 @@ import 'package:chaskiy/models/delivery_address.dart';
 import 'package:chaskiy/services/app.service.dart';
 import 'package:chaskiy/services/auth.service.dart';
 import 'package:chaskiy/services/location.service.dart';
+import 'package:chaskiy/services/notification.service.dart';
 import 'package:chaskiy/view_models/welcome.vm.dart';
 import 'package:chaskiy/views/pages/notification/notifications.page.dart';
 import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class GojekHeader extends StatelessWidget {
+class GojekHeader extends StatefulWidget {
   const GojekHeader({required this.vm, required this.onLocationTap, super.key});
 
   final WelcomeViewModel vm;
   final Future<void> Function() onLocationTap;
+
+  @override
+  State<GojekHeader> createState() => _GojekHeaderState();
+}
+
+class _GojekHeaderState extends State<GojekHeader> {
+  @override
+  void initState() {
+    super.initState();
+    NotificationService.getNotifications();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +79,7 @@ class GojekHeader extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: InkWell(
-                      onTap: onLocationTap,
+                      onTap: widget.onLocationTap,
                       borderRadius: BorderRadius.circular(12),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4),
@@ -85,7 +97,7 @@ class GojekHeader extends StatelessWidget {
                               stream:
                                   LocationService
                                       .currenctDeliveryAddressSubject,
-                              initialData: vm.deliveryaddress,
+                              initialData: widget.vm.deliveryaddress,
                               builder:
                                   (_, snapshot) => Row(
                                     children: [
@@ -124,10 +136,15 @@ class GojekHeader extends StatelessWidget {
                       ),
                     ),
                   ),
-                  _HeaderAction(
-                    icon: HugeIcons.strokeRoundedNotification02,
-                    showBadge: true,
-                    onTap: () => context.nextPage(const NotificationsPage()),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: NotificationService.hasUnreadNotifications,
+                    builder:
+                        (_, hasUnreadNotifications, __) => _HeaderAction(
+                          icon: HugeIcons.strokeRoundedNotification02,
+                          showBadge: hasUnreadNotifications,
+                          onTap:
+                              () => context.nextPage(const NotificationsPage()),
+                        ),
                   ),
                   const SizedBox(width: 8),
                   StreamBuilder<dynamic>(

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart'
     hide NotificationModel;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/models/notification.dart';
@@ -15,6 +16,9 @@ class NotificationService {
   static const platform = MethodChannel('notifications.manage');
   static String? _cachedNotificationsString;
   static List<NotificationModel>? _cachedNotifications;
+  static final ValueNotifier<bool> hasUnreadNotifications = ValueNotifier<bool>(
+    false,
+  );
 
   //
   static initializeAwesomeNotification() async {
@@ -108,6 +112,7 @@ class NotificationService {
 
     if (notificationsStringList == _cachedNotificationsString &&
         _cachedNotifications != null) {
+      _updateUnreadState(_cachedNotifications!);
       return _cachedNotifications!;
     }
 
@@ -115,26 +120,28 @@ class NotificationService {
 
     if (notificationsStringList == null || notificationsStringList.isEmpty) {
       _cachedNotifications = [];
+      _updateUnreadState(_cachedNotifications!);
       return [];
     }
 
     _cachedNotifications =
         (jsonDecode(notificationsStringList) as List).asMap().entries.map((
-      notificationObject,
-    ) {
-      //
-      return NotificationModel(
-        index: notificationObject.key,
-        title: notificationObject.value["title"],
-        body: notificationObject.value["body"],
-        image: notificationObject.value["image"],
-        read:
-            notificationObject.value["read"] is bool
-                ? notificationObject.value["read"]
-                : false,
-        timeStamp: notificationObject.value["timeStamp"],
-      );
-    }).toList();
+          notificationObject,
+        ) {
+          //
+          return NotificationModel(
+            index: notificationObject.key,
+            title: notificationObject.value["title"],
+            body: notificationObject.value["body"],
+            image: notificationObject.value["image"],
+            read:
+                notificationObject.value["read"] is bool
+                    ? notificationObject.value["read"]
+                    : false,
+            timeStamp: notificationObject.value["timeStamp"],
+          );
+        }).toList();
+    _updateUnreadState(_cachedNotifications!);
     return _cachedNotifications!;
   }
 
@@ -163,12 +170,19 @@ class NotificationService {
     }
   }
 
+  static void _updateUnreadState(List<NotificationModel> notifications) {
+    hasUnreadNotifications.value = notifications.any(
+      (notification) => notification.read != true,
+    );
+  }
+
   static Future<void> _saveNotifications(
     List<NotificationModel> notifications,
   ) async {
     final rawNotifications = jsonEncode(notifications);
     _cachedNotificationsString = rawNotifications;
     _cachedNotifications = notifications;
+    _updateUnreadState(notifications);
     await LocalStorageService.prefs?.setString(
       AppStrings.notificationsKey,
       rawNotifications,

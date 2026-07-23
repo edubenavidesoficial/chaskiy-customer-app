@@ -64,59 +64,91 @@ class AppTheme {
 
   //
   ThemeData darkTheme() {
+    const background = Color(0xFF07111F);
+    const surface = Color(0xFF111D2E);
+    const surfaceHigh = Color(0xFF18273B);
+    const outline = Color(0xFF52627A);
+    const colorScheme = ColorScheme.dark(
+      primary: Color(0xFF5BA2FF),
+      onPrimary: Color(0xFF001B3F),
+      primaryContainer: Color(0xFF153E70),
+      onPrimaryContainer: Color(0xFFD7E8FF),
+      secondary: Color(0xFFFFA143),
+      onSecondary: Color(0xFF321300),
+      secondaryContainer: Color(0xFF5B2D00),
+      onSecondaryContainer: Color(0xFFFFDCC2),
+      surface: surface,
+      onSurface: Color(0xFFF4F7FC),
+      surfaceContainerLowest: background,
+      surfaceContainerLow: Color(0xFF0C1727),
+      surfaceContainer: surface,
+      surfaceContainerHigh: surfaceHigh,
+      surfaceContainerHighest: Color(0xFF22334A),
+      onSurfaceVariant: Color(0xFFB8C4D5),
+      outline: outline,
+      outlineVariant: Color(0xFF2B3B51),
+      error: Color(0xFFFFB4AB),
+      onError: Color(0xFF690005),
+      errorContainer: Color(0xFF4A2027),
+      onErrorContainer: Color(0xFFFFDAD6),
+    );
+
     return ThemeData(
-      // fontFamily: GoogleFonts.iBMPlexSerif().fontFamily,
-      // fontFamily: GoogleFonts.krub().fontFamily,
+      brightness: Brightness.dark,
       fontFamily: GoogleFonts.roboto().fontFamily,
-      // fontFamily: GoogleFonts.nunito().fontFamily,
-      // fontFamily: GoogleFonts.jetBrainsMono().fontFamily,
-      // fontFamily: GoogleFonts.montserrat().fontFamily,
       primaryColor: AppColor.primaryColor,
       primaryColorDark: AppColor.primaryColorDark,
+      scaffoldBackgroundColor: background,
+      canvasColor: background,
       textSelectionTheme: TextSelectionThemeData(
-        selectionColor: Colors.grey,
+        selectionColor: colorScheme.primary.withValues(alpha: .35),
         cursorColor: AppColor.cursorColor,
       ),
-      // backgroundColor: Colors.grey[850],
-      cardColor: Colors.grey[700],
-      textTheme: whiteTextTheme,
-      bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: Colors.grey.shade900,
-        modalBackgroundColor: Colors.grey.shade900,
+      cardColor: surface,
+      textTheme: GoogleFonts.robotoTextTheme(ThemeData.dark().textTheme).apply(
+        bodyColor: colorScheme.onSurface,
+        displayColor: colorScheme.onSurface,
+      ),
+      iconTheme: const IconThemeData(color: Color(0xFFDCE6F5)),
+      dividerTheme: const DividerThemeData(
+        color: Color(0xFF2B3B51),
+        thickness: 1,
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: background,
+        foregroundColor: Color(0xFFF4F7FC),
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: surface,
+        modalBackgroundColor: surface,
+        dragHandleColor: outline,
         showDragHandle: true,
-        shape: const RoundedRectangleBorder(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         clipBehavior: Clip.antiAlias,
       ),
-      dialogBackgroundColor: Colors.grey.shade600,
-      dialogTheme: DialogThemeData(
-        backgroundColor: const Color(0xFF252525),
+      dialogBackgroundColor: surfaceHigh,
+      dialogTheme: const DialogThemeData(
+        backgroundColor: surfaceHigh,
         surfaceTintColor: Colors.transparent,
-        shape: const RoundedRectangleBorder(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(24)),
         ),
       ),
       buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
-      highlightColor: Colors.grey[700],
-      colorScheme: ColorScheme.fromSwatch()
-          .copyWith(
-            primary: AppColor.primaryColor,
-            secondary: AppColor.accentColor,
-            brightness: Brightness.dark,
-          )
-          .copyWith(
-            primary: AppColor.primaryMaterialColor,
-            surface: Colors.grey[850],
-          ),
-
+      highlightColor: colorScheme.primary.withValues(alpha: .12),
+      splashColor: colorScheme.primary.withValues(alpha: .10),
+      colorScheme: colorScheme,
       //
       tabBarTheme: tabBarTheme,
       elevatedButtonTheme: _elevatedButtonTheme,
       filledButtonTheme: _filledButtonTheme,
       outlinedButtonTheme: _outlinedButtonTheme,
       textButtonTheme: _textButtonTheme,
-      inputDecorationTheme: _inputDecorationTheme(const Color(0xFF252525)),
+      inputDecorationTheme: _inputDecorationTheme(surfaceHigh),
       cardTheme: _cardTheme,
       chipTheme: _chipTheme(Brightness.dark),
       useMaterial3: true,

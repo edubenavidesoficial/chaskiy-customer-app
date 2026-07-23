@@ -87,19 +87,34 @@ class _ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final user = model.currentUser!;
 
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        gradient:
+            isDark
+                ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    theme.colorScheme.surfaceContainerHigh,
+                    theme.colorScheme.surface,
+                  ],
+                )
+                : null,
+        color: isDark ? null : theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: theme.colorScheme.primary.withValues(alpha: .08),
+          color:
+              isDark
+                  ? theme.colorScheme.outlineVariant
+                  : theme.colorScheme.primary.withValues(alpha: .08),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: .06),
+            color: Colors.black.withValues(alpha: isDark ? .24 : .06),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -282,6 +297,7 @@ class SettingsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -301,11 +317,14 @@ class SettingsSection extends StatelessWidget {
             color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: theme.colorScheme.primary.withValues(alpha: .06),
+              color:
+                  isDark
+                      ? theme.colorScheme.outlineVariant
+                      : theme.colorScheme.primary.withValues(alpha: .06),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: .045),
+                color: Colors.black.withValues(alpha: isDark ? .20 : .045),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -358,6 +377,7 @@ class SettingsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final color =
         isDestructive ? theme.colorScheme.error : theme.colorScheme.onSurface;
 
@@ -380,7 +400,7 @@ class SettingsTile extends StatelessWidget {
                           )
                           : iconBackgroundColor ??
                               theme.colorScheme.primaryContainer.withValues(
-                                alpha: .55,
+                                alpha: isDark ? .46 : .55,
                               ),
                   borderRadius: BorderRadius.circular(15),
                 ),

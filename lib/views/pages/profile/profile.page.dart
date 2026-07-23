@@ -143,12 +143,16 @@ class _SecuritySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return SettingsSection(
       children: [
         SettingsTile(
           icon: HugeIcons.strokeRoundedShield01,
-          iconColor: const Color(0xFF12B8A6),
-          iconBackgroundColor: const Color(0xFFE2FAF6),
+          iconColor: isDark ? const Color(0xFF50D9CB) : const Color(0xFF12B8A6),
+          iconBackgroundColor:
+              isDark ? const Color(0xFF123B3A) : const Color(0xFFE2FAF6),
           title: 'Seguridad y privacidad',
           subtitle: 'Controla tu privacidad y permisos',
           onTap: model.openPrivacyPolicy,
@@ -197,16 +201,20 @@ class _HelpSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: theme.colorScheme.primary.withValues(alpha: .06),
+          color:
+              isDark
+                  ? theme.colorScheme.outlineVariant
+                  : theme.colorScheme.primary.withValues(alpha: .06),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: .045),
+            color: Colors.black.withValues(alpha: isDark ? .20 : .045),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -223,7 +231,9 @@ class _HelpSection extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: theme.colorScheme.primaryContainer.withValues(alpha: .55),
+              color: theme.colorScheme.primaryContainer.withValues(
+                alpha: isDark ? .46 : .55,
+              ),
               borderRadius: BorderRadius.circular(15),
             ),
             child: Icon(
