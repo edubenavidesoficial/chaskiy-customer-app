@@ -11,6 +11,7 @@ class VendorRequest extends HttpService {
   Future<List<Vendor>> vendorsRequest({
     int page = 1,
     bool byLocation = true,
+    bool forceRefresh = true,
     Map? params,
   }) async {
     Map<String, dynamic> queryParameters = {
@@ -18,33 +19,34 @@ class VendorRequest extends HttpService {
       "page": "$page",
     };
     //
-    if (byLocation && LocationService.cLat != null) {
-      queryParameters["latitude"] =
-          LocationService.currenctAddress?.coordinates?.latitude;
-      queryParameters["longitude"] =
-          LocationService.currenctAddress?.coordinates?.longitude;
+    if (byLocation) {
+      final latitude = await LocationService.getFetchByLocationLat();
+      final longitude = await LocationService.getFetchByLocationLng();
+      if (latitude != null && longitude != null) {
+        queryParameters["latitude"] = latitude;
+        queryParameters["longitude"] = longitude;
+      }
     }
     //
     final apiResult = await get(
       Api.vendors,
       queryParameters: queryParameters,
+      forceRefresh: forceRefresh,
     );
 
     final apiResponse = ApiResponse.fromResponse(apiResult);
     if (apiResponse.allGood) {
       List<Vendor> vendors = [];
-      apiResponse.data.forEach(
-        (jsonObject) {
-          try {
-            vendors.add(Vendor.fromJson(jsonObject));
-          } catch (error) {
-            print("===============================");
-            print("Fetching Vendor error ==> $error");
-            print("Vendor Id ==> ${jsonObject['id']}");
-            print("===============================");
-          }
-        },
-      );
+      apiResponse.data.forEach((jsonObject) {
+        try {
+          vendors.add(Vendor.fromJson(jsonObject));
+        } catch (error) {
+          print("===============================");
+          print("Fetching Vendor error ==> $error");
+          print("Vendor Id ==> ${jsonObject['id']}");
+          print("===============================");
+        }
+      });
       return vendors;
     }
 
@@ -72,9 +74,10 @@ class VendorRequest extends HttpService {
     final apiResponse = ApiResponse.fromResponse(apiResult);
     if (apiResponse.allGood) {
       List<Vendor> vendors = [];
-      vendors = apiResponse.data
-          .map((jsonObject) => Vendor.fromJson(jsonObject))
-          .toList();
+      vendors =
+          apiResponse.data
+              .map((jsonObject) => Vendor.fromJson(jsonObject))
+              .toList();
       return vendors;
     }
 
@@ -108,21 +111,12 @@ class VendorRequest extends HttpService {
     throw apiResponse.message!;
   }
 
-  Future<Vendor> vendorDetails(
-    int id, {
-    Map<String, String>? params,
-  }) async {
+  Future<Vendor> vendorDetails(int id, {Map<String, String>? params}) async {
     //
-    final apiResult = await get(
-      "${Api.vendors}/$id",
-      queryParameters: params,
-    );
+    final apiResult = await get("${Api.vendors}/$id", queryParameters: params);
     final apiResponse = ApiResponse.fromResponse(apiResult);
     if (apiResponse.allGood) {
-      return Vendor.fromJson(
-        apiResponse.body,
-        rawDescription: false,
-      );
+      return Vendor.fromJson(apiResponse.body, rawDescription: false);
     }
 
     throw apiResponse.message!;
@@ -133,13 +127,11 @@ class VendorRequest extends HttpService {
     int? vendorTypeId,
     required List<OrderStop> stops,
   }) async {
-    final apiResult = await post(
-      Api.packageVendors,
-      {
-        "vendor_type_id": vendorTypeId,
-        "package_type_id": "$packageTypeId",
-        "locations": stops.map(
-          (stop) {
+    final apiResult = await post(Api.packageVendors, {
+      "vendor_type_id": vendorTypeId,
+      "package_type_id": "$packageTypeId",
+      "locations":
+          stops.map((stop) {
             return {
               "lat": stop.deliveryAddress?.latitude,
               "long": stop.deliveryAddress?.longitude,
@@ -148,16 +140,15 @@ class VendorRequest extends HttpService {
               "state": stop.deliveryAddress?.state,
               "country": stop.deliveryAddress?.country,
             };
-          },
-        ).toList(),
-      },
-    );
+          }).toList(),
+    });
 
     final apiResponse = ApiResponse.fromResponse(apiResult);
     if (apiResponse.allGood) {
-      List<Vendor> vendors = (apiResponse.body['vendors'] as List)
-          .map((jsonObject) => Vendor.fromJson(jsonObject))
-          .toList();
+      List<Vendor> vendors =
+          (apiResponse.body['vendors'] as List)
+              .map((jsonObject) => Vendor.fromJson(jsonObject))
+              .toList();
       return vendors;
     }
 
@@ -172,15 +163,12 @@ class VendorRequest extends HttpService {
     required int vendorId,
   }) async {
     //
-    final apiResult = await post(
-      Api.rating,
-      {
-        "order_id": orderId,
-        "vendor_id": vendorId,
-        "rating": rating,
-        "review": review,
-      },
-    );
+    final apiResult = await post(Api.rating, {
+      "order_id": orderId,
+      "vendor_id": vendorId,
+      "rating": rating,
+      "review": review,
+    });
     return ApiResponse.fromResponse(apiResult);
   }
 
@@ -191,37 +179,27 @@ class VendorRequest extends HttpService {
     required int driverId,
   }) async {
     //
-    final apiResult = await post(
-      Api.rating,
-      {
-        "order_id": orderId,
-        "driver_id": driverId,
-        "rating": rating,
-        "review": review,
-      },
-    );
+    final apiResult = await post(Api.rating, {
+      "order_id": orderId,
+      "driver_id": driverId,
+      "rating": rating,
+      "review": review,
+    });
     return ApiResponse.fromResponse(apiResult);
   }
 
-  Future<List<Review>> getReviews({
-    int? page,
-    int? vendorId,
-  }) async {
+  Future<List<Review>> getReviews({int? page, int? vendorId}) async {
     final apiResult = await get(
       Api.vendorReviews,
-      queryParameters: {
-        "vendor_id": vendorId,
-        "page": "$page",
-      },
+      queryParameters: {"vendor_id": vendorId, "page": "$page"},
     );
 
     final apiResponse = ApiResponse.fromResponse(apiResult);
     if (apiResponse.allGood) {
-      List<Review> reviews = apiResponse.data.map(
-        (jsonObject) {
-          return Review.fromJson(jsonObject);
-        },
-      ).toList();
+      List<Review> reviews =
+          apiResponse.data.map((jsonObject) {
+            return Review.fromJson(jsonObject);
+          }).toList();
 
       return reviews;
     }

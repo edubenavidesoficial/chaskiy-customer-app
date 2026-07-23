@@ -42,21 +42,13 @@ class WelcomeViewModel extends MyBaseViewModel {
   }
 
   StreamSubscription? currentLocSub;
-  StreamSubscription? currentLoc2Sub;
   handleLocationStream() async {
     await currentLocSub?.cancel();
-    currentLocSub = LocationService.currenctDeliveryAddressSubject
-        .skipWhile((_) => true)
-        .listen((event) {
-          initialise(initial: false);
-        });
-
-    await currentLoc2Sub?.cancel();
-    currentLoc2Sub = LocationService.currenctDeliveryAddressSubject.stream
-        .skipWhile((_) => true)
-        .listen((event) {
-          initialise(initial: false);
-        });
+    currentLocSub = LocationService.currenctDeliveryAddressSubject.listen((
+      event,
+    ) {
+      initialise(initial: false);
+    });
   }
 
   listenToAuth() {
@@ -71,7 +63,6 @@ class WelcomeViewModel extends MyBaseViewModel {
   void dispose() {
     authStateSub?.cancel();
     currentLocSub?.cancel();
-    currentLoc2Sub?.cancel();
     super.dispose();
   }
 

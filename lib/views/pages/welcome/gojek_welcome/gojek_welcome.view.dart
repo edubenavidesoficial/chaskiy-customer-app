@@ -97,6 +97,7 @@ class _GojekWelcomeViewState extends State<GojekWelcomeView> {
           itemWidth: context.percentWidth * 44,
           byLocation: AppStrings.enableFatchByLocation,
           hideEmpty: true,
+          onSeeAllPressed: widget.vm.openFeaturedVendors,
           titlePadding: const EdgeInsets.symmetric(
             horizontal: Sizes.paddingSizeDefault,
             vertical: 8,

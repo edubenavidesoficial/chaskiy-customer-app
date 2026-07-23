@@ -161,6 +161,7 @@ class HttpService {
     String url, {
     Map<String, dynamic>? queryParameters,
     bool includeHeaders = true,
+    bool forceRefresh = false,
   }) async {
     //preparing the api uri/url
     String uri = "$host$url";
@@ -170,6 +171,7 @@ class HttpService {
     final mOptions = buildCacheOptions(
       const Duration(minutes: 5),
       maxStale: const Duration(days: 30),
+      forceRefresh: forceRefresh,
       options: Options(headers: headers),
     );
 

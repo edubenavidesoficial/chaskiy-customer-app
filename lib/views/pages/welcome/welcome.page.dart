@@ -7,25 +7,48 @@ import 'package:chaskiy/widgets/custom_easy_refresh_view.dart';
 import 'package:stacked/stacked.dart';
 
 class WelcomePage extends StatefulWidget {
-  WelcomePage({
-    Key? key,
-  }) : super(key: key);
+  WelcomePage({Key? key}) : super(key: key);
 
   @override
   _WelcomePageState createState() => _WelcomePageState();
 }
 
 class _WelcomePageState extends State<WelcomePage>
-    with AutomaticKeepAliveClientMixin<WelcomePage> {
+    with AutomaticKeepAliveClientMixin<WelcomePage>, WidgetsBindingObserver {
+  WelcomeViewModel? _viewModel;
+
   @override
   bool get wantKeepAlive => true;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _viewModel?.initialise(initial: false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
     return BasePage(
       body: ViewModelBuilder<WelcomeViewModel>.reactive(
         viewModelBuilder: () => WelcomeViewModel(context),
-        onViewModelReady: (vm) => vm.initialise(),
+        onViewModelReady: (vm) {
+          _viewModel = vm;
+          vm.initialise();
+        },
         disposeViewModel: false,
         builder: (context, vm, child) {
           return CustomEasyRefreshView(

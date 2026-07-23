@@ -207,6 +207,7 @@ class LocationService {
         subAdminArea: mDeliveryaddress.city,
         countryName: mDeliveryaddress.country,
       );
+      currenctAddress = mAddress;
       currenctAddressSubject.add(mAddress);
     }
   }
@@ -221,15 +222,36 @@ class LocationService {
     return null;
   }
 
+  static Future<DeliveryAddress?> restoreSelectedAddress() async {
+    final savedAddress = deliveryaddress ?? await getLocallySaveAddress();
+    if (savedAddress == null) {
+      return null;
+    }
+
+    deliveryaddress = savedAddress;
+    currenctAddress = Address(
+      coordinates: Coordinates(
+        savedAddress.latLng.latitude,
+        savedAddress.latLng.longitude,
+      ),
+      addressLine: savedAddress.address,
+      featureName: savedAddress.name,
+      adminArea: savedAddress.state,
+      subAdminArea: savedAddress.city,
+      countryName: savedAddress.country,
+    );
+    return savedAddress;
+  }
+
   //MISC.
   static Future<double?> getFetchByLocationLat() async {
-    final address = await getLocallySaveAddress();
+    final address = await restoreSelectedAddress();
     return address?.latitude ??
         LocationService.currenctAddress?.coordinates?.latitude;
   }
 
   static Future<double?> getFetchByLocationLng() async {
-    final address = await getLocallySaveAddress();
+    final address = await restoreSelectedAddress();
     return address?.longitude ??
         LocationService.currenctAddress?.coordinates?.longitude;
   }

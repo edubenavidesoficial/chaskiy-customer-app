@@ -32,12 +32,7 @@ class FeaturedVendorsPageViewModel extends MyBaseViewModel {
     //
     try {
       //filter by location if user selects delivery address
-      final mVndors = await _vendorRequest.vendorsRequest(
-        page: page,
-        params: {
-          "type": "featured",
-        },
-      );
+      final mVndors = await _vendorRequest.vendorsRequest(page: page);
 
       if (initial) {
         vendors = mVndors;
@@ -52,9 +47,8 @@ class FeaturedVendorsPageViewModel extends MyBaseViewModel {
   }
 
   vendorSelected(Vendor vendor) async {
-    Navigator.of(viewContext).pushNamed(
-      AppRoutes.vendorDetails,
-      arguments: vendor,
-    );
+    Navigator.of(
+      viewContext,
+    ).pushNamed(AppRoutes.vendorDetails, arguments: vendor);
   }
 }

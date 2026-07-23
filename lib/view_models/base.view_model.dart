@@ -357,11 +357,7 @@ class MyBaseViewModel extends BaseViewModel
   //handle fetch delivery address
   preloadDeliveryLocation() async {
     try {
-      //fetch saved location from local storage
-      deliveryaddress = LocationService.deliveryaddress;
-      if (deliveryaddress == null) {
-        deliveryaddress = await LocationService.getLocallySaveAddress();
-      }
+      deliveryaddress = await LocationService.restoreSelectedAddress();
       notifyListeners();
     } catch (error) {
       print("Error getting delivery address => $error");
