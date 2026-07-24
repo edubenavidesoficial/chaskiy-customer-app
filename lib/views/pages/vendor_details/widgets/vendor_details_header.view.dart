@@ -1,25 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:chaskiy/constants/app_ui_settings.dart';
-import 'package:chaskiy/constants/sizes.dart';
 import 'package:chaskiy/models/vendor.dart';
-import 'package:chaskiy/utils/ui_spacer.dart';
-import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/view_models/vendor_details.vm.dart';
 import 'package:chaskiy/views/pages/vendor/vendor_reviews.page.dart';
 import 'package:chaskiy/views/pages/vendor_details/widgets/bottomsheets/vendor_full_profie.bottomsheet.dart';
 import 'package:chaskiy/views/pages/vendor_details/widgets/upload_prescription.btn.dart';
-import 'package:chaskiy/widgets/cards/custom.visibility.dart';
 import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:chaskiy/widgets/inputs/search_bar.input.dart';
-import 'package:chaskiy/widgets/tags/close.tag.dart';
-import 'package:chaskiy/widgets/tags/delivery.tag.dart';
 import 'package:chaskiy/widgets/tags/fav_vendor.tag.dart';
-import 'package:chaskiy/widgets/tags/open.tag.dart';
-import 'package:chaskiy/widgets/tags/pickup.tag.dart';
-import 'package:chaskiy/widgets/tags/time.tag.dart';
-import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class VendorDetailsHeader extends StatelessWidget {
@@ -29,185 +17,272 @@ class VendorDetailsHeader extends StatelessWidget {
     this.featureImageHeight = 220,
     this.showPrescription = false,
     this.showSearch = true,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final VendorDetailsViewModel model;
   final bool showFeatureImage;
   final double featureImageHeight;
   final bool showPrescription;
   final bool showSearch;
+
   @override
   Widget build(BuildContext context) {
-    return VStack([
-      VStack([
-        //vendor image
-        CustomVisibilty(
-          visible: showFeatureImage,
-          child: CustomImage(
-            imageUrl: model.vendor!.featureImage,
-            height: featureImageHeight,
-            canZoom: true,
-          ).wFull(context),
-        ),
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final vendor = model.vendor!;
 
-        //vendor header
-        VStack([
-          //vendor important details
-          HStack([
-            //logo
+    return ColoredBox(
+      color: colors.surfaceContainerLowest,
+      child: Column(
+        children: [
+          if (showFeatureImage)
             CustomImage(
-              imageUrl: model.vendor!.logo,
-              width: Vx.dp56,
-              height: Vx.dp56,
+              imageUrl: vendor.featureImage,
+              height: featureImageHeight,
               canZoom: true,
-            ).box.clip(Clip.antiAlias).withRounded(value: 5).make(),
-            //
-            VStack([
-              model.vendor!.name.text.semiBold.lg.make(),
-              CustomVisibilty(
-                visible:
-                    model.vendor!.address.isNotEmptyAndNotNull &&
-                    AppUISettings.showVendorAddress,
-                child:
-                    "${model.vendor!.address}".text.light.sm.maxLines(1).make(),
-              ),
-              Visibility(
-                visible: AppUISettings.showVendorPhone,
-                child: model.vendor!.phone.text.light.sm.make(),
-              ),
-
-              //rating
-              HStack([
-                RatingBar(
-                  itemSize: 12,
-                  initialRating: model.vendor!.rating.toDouble(),
-                  ignoreGestures: true,
-                  ratingWidget: RatingWidget(
-                    full: Icon(
-                      FlutterIcons.ios_star_ion,
-                      size: 12,
-                      color: Colors.yellow[800],
+            ).wFull(context),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: colors.outlineVariant),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                      alpha: theme.brightness == Brightness.dark ? .22 : .07,
                     ),
-                    half: Icon(
-                      FlutterIcons.ios_star_half_ion,
-                      size: 12,
-                      color: Colors.yellow[800],
+                    blurRadius: 24,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 70,
+                    height: 70,
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: colors.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: colors.outlineVariant),
                     ),
-                    empty: Icon(
-                      FlutterIcons.ios_star_ion,
-                      size: 12,
-                      color: Colors.grey.shade400,
+                    clipBehavior: Clip.antiAlias,
+                    child: CustomImage(
+                      imageUrl: vendor.logo,
+                      boxFit: BoxFit.cover,
+                      canZoom: true,
                     ),
                   ),
-                  onRatingUpdate: (value) {},
-                ).pOnly(right: 2),
-                "(${model.vendor!.reviews_count} ${'Reviews'.tr()})"
-                    .text
-                    .sm
-                    .thin
-                    .make(),
-              ]).py2().onTap(() {
-                context.nextPage(VendorReviewsPage(model.vendor!));
-              }),
-            ]).pOnly(left: Vx.dp12).expand(),
-            //icons
-            HStack([
-              //
-              FavVendorTag(model.vendor!),
-
-              // details icon
-              Icon(
-                FlutterIcons.info_circle_faw,
-                size: 22,
-                color: context.theme.primaryColor,
-              ).p(Sizes.paddingSizeSmall).onTap(() {
-                //open vendor details bottom sheet
-                openVendorDetailsBottomSheet(context, model.vendor!);
-              }),
-
-              // //
-              // CustomVisibilty(
-              //   visible:
-              //       (model.vendor!.longitude.isNotEmptyAndNotNull) &&
-              //           AppUISettings.showVendorAddress,
-              //   //location routing
-              //   child: RouteButton(model.vendor!, size: 10),
-              // ),
-              // UiSpacer.verticalSpace(space: 5),
-              // //call button
-              // if (model.vendor!.phone.isNotEmptyAndNotNull)
-              //   Visibility(
-              //     visible: AppUISettings.showVendorPhone,
-              //     child: CallButton(model.vendor, size: 10),
-              //   )
-              // else
-              //   UiSpacer.emptySpace(),
-            ], spacing: 5).pOnly(left: Vx.dp12),
-          ]),
-        ]).p8().card.color(Utils.systemGreyColor()).make().p12(),
-      ]),
-
-      //
-      //
-      VStack([
-        //tags
-        Wrap(
-          children: [
-            //is open
-            model.vendor!.isOpen ? OpenTag() : CloseTag(),
-
-            //can deliveree
-            if (model.vendor!.delivery == 1) DeliveryTag(),
-
-            //can pickup
-            if (model.vendor!.pickup == 1) PickupTag(),
-
-            //prepare time
-            TimeTag(
-              "${model.vendor!.prepareTime} ${model.vendor!.prepareTimeUnit}",
-              iconData: FlutterIcons.clock_outline_mco,
+                  const SizedBox(width: 13),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          vendor.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -.3,
+                          ),
+                        ),
+                        if (vendor.address.isNotEmptyAndNotNull &&
+                            AppUISettings.showVendorAddress) ...[
+                          const SizedBox(height: 3),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_on_outlined,
+                                size: 16,
+                                color: colors.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 3),
+                              Expanded(
+                                child: Text(
+                                  vendor.address,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: colors.onSurfaceVariant,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                        const SizedBox(height: 8),
+                        InkWell(
+                          onTap:
+                              () => context.nextPage(VendorReviewsPage(vendor)),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.star_rounded,
+                                color: Color(0xFFFFB000),
+                                size: 20,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                vendor.rating.toStringAsFixed(1),
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                '(${vendor.reviews_count} reseñas)',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Column(
+                    children: [
+                      FavVendorTag(vendor),
+                      const SizedBox(height: 4),
+                      IconButton(
+                        tooltip: 'Información',
+                        visualDensity: VisualDensity.compact,
+                        onPressed:
+                            () => openVendorDetailsBottomSheet(context, vendor),
+                        icon: Icon(
+                          Icons.info_outline_rounded,
+                          color: colors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            //delivery time
-            TimeTag(
-              "${model.vendor!.deliveryTime} ${model.vendor!.deliveryTimeUnit}",
-              iconData: FlutterIcons.ios_bicycle_ion,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _VendorMetaChip(
+                  icon:
+                      vendor.isOpen
+                          ? Icons.check_circle_outline_rounded
+                          : Icons.schedule_rounded,
+                  label: vendor.isOpen ? 'Abierto' : 'Cerrado',
+                  foreground:
+                      vendor.isOpen ? const Color(0xFF087F5B) : colors.error,
+                  background:
+                      vendor.isOpen
+                          ? const Color(0xFFDDF8ED)
+                          : colors.errorContainer,
+                ),
+                if (vendor.delivery == 1)
+                  const _VendorMetaChip(
+                    icon: Icons.delivery_dining_outlined,
+                    label: 'Entrega',
+                    foreground: Color(0xFF9A5B00),
+                    background: Color(0xFFFFF0C2),
+                  ),
+                if (vendor.pickup == 1)
+                  _VendorMetaChip(
+                    icon: Icons.shopping_bag_outlined,
+                    label: 'Recoger',
+                    foreground: colors.primary,
+                    background: colors.primaryContainer,
+                  ),
+                _VendorMetaChip(
+                  icon: Icons.schedule_rounded,
+                  label: '${vendor.prepareTime} ${vendor.prepareTimeUnit}',
+                ),
+                _VendorMetaChip(
+                  icon: Icons.directions_bike_outlined,
+                  label: '${vendor.deliveryTime} ${vendor.deliveryTimeUnit}',
+                ),
+              ],
+            ),
+          ),
+          if (showSearch) ...[
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SearchBarInput(
+                hintText: 'Buscar en ${vendor.name}',
+                onTap: model.openVendorSearch,
+                showFilter: false,
+              ),
             ),
           ],
-          spacing: 12,
-          runSpacing: 12,
-          crossAxisAlignment: WrapCrossAlignment.center,
-        ),
-        UiSpacer.verticalSpace(space: 10),
-
-        // //description
-        // "Description".tr().text.sm.bold.uppercase.make(),
-        // HtmlTextView(
-        //   model.vendor!.description,
-        //   padding: EdgeInsets.zero,
-        // ),
-        // UiSpacer.verticalSpace(space: 10),
-      ]).px20().py(0),
-      UiSpacer.divider(),
-      10.heightBox,
-      //search bar
-      if (showSearch)
-        SearchBarInput(onTap: model.openVendorSearch, showFilter: false).px20(),
-      10.heightBox,
-      if (showPrescription) UploadPrescriptionFab(model).centered(),
-      10.heightBox,
-      if (showPrescription || showSearch) UiSpacer.divider(),
-    ]);
+          if (showPrescription) ...[
+            const SizedBox(height: 14),
+            UploadPrescriptionFab(model),
+          ],
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
   }
 
-  //
-  openVendorDetailsBottomSheet(BuildContext context, Vendor vendor) {
+  void openVendorDetailsBottomSheet(BuildContext context, Vendor vendor) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) {
-        return VendorFullProfileBottomSheet(vendor);
-      },
+      builder: (_) => VendorFullProfileBottomSheet(vendor),
+    );
+  }
+}
+
+class _VendorMetaChip extends StatelessWidget {
+  const _VendorMetaChip({
+    required this.icon,
+    required this.label,
+    this.foreground,
+    this.background,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color? foreground;
+  final Color? background;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final effectiveForeground = foreground ?? colors.onSurfaceVariant;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+      decoration: BoxDecoration(
+        color: background ?? colors.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 17, color: effectiveForeground),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: effectiveForeground,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

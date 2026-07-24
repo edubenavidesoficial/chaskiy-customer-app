@@ -1,140 +1,156 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/extensions/string.dart';
 import 'package:chaskiy/models/product.dart';
-import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/services/app_currency_system.service.dart';
-import 'package:chaskiy/widgets/currency_hstack.dart';
 import 'package:chaskiy/widgets/custom_image.view.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 class VendorMenuProductListItem extends StatelessWidget {
-  //
   const VendorMenuProductListItem(
     this.product, {
     this.onPressed,
     required this.qtyUpdated,
     this.height,
     this.padding,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
-  //
   final Product product;
   final Function(Product)? onPressed;
   final Function(Product, int)? qtyUpdated;
   final double? height;
   final double? padding;
+
   @override
   Widget build(BuildContext context) {
-    //
-    final currencySymbol = AppStrings.currentCurrencySymbol;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final currentPrice =
+        product.showDiscount ? product.discountPrice : product.price;
 
-    //
-    Widget widget = HStack([
-      //
-      Hero(
-        tag: product.heroTag ?? product.id,
-        child: CustomImage(
-          imageUrl: product.photo,
-          width: context.screenWidth * 0.15,
-          height: context.screenWidth * 0.15,
-          boxFit: BoxFit.cover,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: padding ?? 16, vertical: 5),
+      child: Material(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(20),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onPressed == null ? null : () => onPressed!(product),
+          child: Container(
+            height: height ?? 112,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: colors.outlineVariant),
+            ),
+            child: Row(
+              children: [
+                Hero(
+                  tag: product.heroTag ?? product.id,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: CustomImage(
+                      imageUrl: product.photo,
+                      width: 88,
+                      height: 88,
+                      boxFit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        product.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.star_rounded,
+                            size: 17,
+                            color: Color(0xFFFFB000),
+                          ),
+                          const SizedBox(width: 3),
+                          Text(
+                            '${(product.rating ?? 0).toStringAsFixed(1)}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Text(
+                            ' (${product.reviewsCount})',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colors.onSurfaceVariant,
+                            ),
+                          ),
+                          if (product.unit != null) ...[
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                '${product.unit}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '${AppStrings.currentCurrencySymbol}${currentPrice.convertCurrency.currencyValueFormat()}',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colors.primary,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    if (product.showDiscount)
+                      Text(
+                        '${AppStrings.currentCurrencySymbol}${product.price.convertCurrency.currencyValueFormat()}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: colors.primaryContainer,
+                        borderRadius: BorderRadius.circular(11),
+                      ),
+                      child: Icon(
+                        Icons.arrow_forward_rounded,
+                        color: colors.primary,
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-
-      //Details
-      VStack([
-        //name
-        product.name.text.semiBold.maxLines(2).ellipsis.make(),
-        product.vendor.name.text.gray300.sm.ellipsis.make(),
-        // ratings
-        HStack(
-          [
-            // ratings
-            RatingBar(
-              itemSize: 11,
-              initialRating: product.rating ?? 0,
-              ignoreGestures: true,
-              ratingWidget: RatingWidget(
-                full: Icon(
-                  FlutterIcons.ios_star_ion,
-                  size: 12,
-                  color: Colors.yellow[800],
-                ),
-                half: Icon(
-                  FlutterIcons.ios_star_half_ion,
-                  size: 12,
-                  color: Colors.yellow[800],
-                ),
-                empty: Icon(
-                  FlutterIcons.ios_star_ion,
-                  size: 12,
-                  color: Colors.grey.shade400,
-                ),
-              ),
-              onRatingUpdate: (value) {},
-            ),
-            //review count
-            "(${product.reviewsCount})".text.gray400.sm.make(),
-          ],
-          crossAlignment: CrossAxisAlignment.center,
-          alignment: MainAxisAlignment.start,
-          spacing: 5,
-        ),
-        // capacity
-        if (product.unit != null) "(${product.unit})".text.gray400.sm.make(),
-      ]).expand(),
-      // pricing
-      VStack([
-        //price
-        CurrencyHStack([
-          currencySymbol.text.sm.make(),
-          (product.showDiscount
-                  ? product.discountPrice.convertCurrency.currencyValueFormat()
-                  : product.price.convertCurrency.currencyValueFormat())
-              .text
-              .lg
-              .semiBold
-              .make(),
-        ], crossAlignment: CrossAxisAlignment.end),
-        //discount
-        if (product.showDiscount)
-          CurrencyHStack([
-            currencySymbol.text.lineThrough.xs.make(),
-            product.price.convertCurrency
-                .currencyValueFormat()
-                .text
-                .lineThrough
-                .lg
-                .medium
-                .make(),
-          ]),
-      ]),
-    ], spacing: 14).onInkTap(
-      onPressed == null ? null : () => onPressed!(product),
     );
-
-    //height set
-    if (height != null) {
-      widget = widget.h(height!);
-    }
-
-    //
-    return widget.box.p4
-        .withRounded(value: 5)
-        .color(context.cardColor)
-        .withShadow([
-          BoxShadow(
-            color: AppColor.primaryColor.withOpacity(0.3),
-            blurRadius: 4,
-            spreadRadius: 0.4,
-            offset: Offset(0, 2),
-          ),
-        ])
-        .makeCentered()
-        .p(padding ?? 8);
   }
 }

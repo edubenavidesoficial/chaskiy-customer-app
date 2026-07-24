@@ -32,6 +32,7 @@ class SearchBarInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return HStack([
       //
       TextFormField(
@@ -58,15 +59,19 @@ class SearchBarInput extends StatelessWidget {
               border: InputBorder.none,
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,
-              prefixIcon: Icon(FlutterIcons.search_fea, size: 20),
-              contentPadding: EdgeInsets.symmetric(vertical: 15),
+              prefixIcon: Icon(
+                FlutterIcons.search_fea,
+                size: 21,
+                color: colors.primary,
+              ),
+              contentPadding: const EdgeInsets.symmetric(vertical: 16),
               filled: true,
-              fillColor: context.theme.colorScheme.surface,
+              fillColor: colors.surface,
             ),
           ).box
-          .color(context.theme.colorScheme.surface)
-          .outerShadowSm
-          .roundedSM
+          .color(colors.surface)
+          .border(color: colors.outlineVariant)
+          .withRounded(value: 18)
           .clip(Clip.antiAlias)
           .make()
           .expand(),

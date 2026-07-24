@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:chaskiy/models/vendor.dart';
 import 'package:chaskiy/utils/ui_spacer.dart';
-import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/view_models/vendor_menu_details.vm.dart';
 import 'package:chaskiy/views/pages/vendor_details/widgets/vendor_details_header.view.dart';
 import 'package:chaskiy/widgets/bottomsheets/cart.bottomsheet.dart';
@@ -16,10 +15,7 @@ import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class VendorDetailsWithMenuPage extends StatefulWidget {
-  VendorDetailsWithMenuPage({
-    required this.vendor,
-    Key? key,
-  }) : super(key: key);
+  VendorDetailsWithMenuPage({required this.vendor, Key? key}) : super(key: key);
 
   final Vendor vendor;
 
@@ -33,11 +29,12 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<VendorDetailsWithMenuViewModel>.reactive(
-      viewModelBuilder: () => VendorDetailsWithMenuViewModel(
-        context,
-        widget.vendor,
-        tickerProvider: this,
-      ),
+      viewModelBuilder:
+          () => VendorDetailsWithMenuViewModel(
+            context,
+            widget.vendor,
+            tickerProvider: this,
+          ),
       onViewModelReady: (model) {
         model.tabBarController = TabController(
           length: model.vendor?.menus.length ?? 0,
@@ -46,15 +43,14 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
         model.getVendorDetails();
       },
       builder: (context, model, child) {
-        //feature image height
-        double featureImageHeight = context.percentHeight * 20;
-        //limit to 250 for most
-        if (featureImageHeight > 250) {
-          featureImageHeight = 250;
-        }
+        final colors = Theme.of(context).colorScheme;
+        final featureImageHeight = (context.percentHeight * 24).clamp(
+          210.0,
+          280.0,
+        );
         //
         return Scaffold(
-          backgroundColor: context.theme.colorScheme.surface,
+          backgroundColor: colors.surfaceContainerLowest,
           // floatingActionButton: UploadPrescriptionFab(model),
           body: NestedScrollView(
             headerSliverBuilder: (BuildContext context, bool scrolled) {
@@ -64,32 +60,45 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
                   floating: false,
                   pinned: true,
                   leading: CustomRoundedLeading(),
-                  backgroundColor: context.backgroundColor,
+                  backgroundColor: colors.surfaceContainerLowest,
+                  surfaceTintColor: Colors.transparent,
                   actions: [
                     SizedBox(
                       width: 50,
                       height: 50,
-                      child: FittedBox(
-                        child: ShareButton(
-                          model: model,
-                        ),
-                      ),
+                      child: FittedBox(child: ShareButton(model: model)),
                     ),
                     UiSpacer.hSpace(10),
                     Container(
                       margin: EdgeInsets.symmetric(vertical: 2),
                       child: PageCartAction(),
-                    )
+                    ),
                   ],
                   flexibleSpace: FlexibleSpaceBar(
                     centerTitle: true,
-                    // title: Text(""),
-                    //vendor image
-                    background: CustomImage(
-                      imageUrl: model.vendor!.featureImage,
-                      height: featureImageHeight,
-                      canZoom: true,
-                    ).wFull(context),
+                    background: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        CustomImage(
+                          imageUrl: model.vendor!.featureImage,
+                          height: featureImageHeight,
+                          canZoom: true,
+                        ),
+                        const DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Color(0x66000000),
+                                Colors.transparent,
+                                Color(0x33000000),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SliverToBoxAdapter(
@@ -101,77 +110,88 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
                   ),
                 ),
                 SliverAppBar(
-                  // backgroundColor: context.theme.primaryColor,
-                  // backgroundColor: Colors.transparent,
-                  title: "".text.make(),
+                  backgroundColor: colors.surfaceContainerLowest,
+                  surfaceTintColor: Colors.transparent,
+                  toolbarHeight: 62,
                   floating: false,
                   pinned: true,
                   snap: false,
                   primary: false,
                   automaticallyImplyLeading: false,
-                  // toolbarHeight: kToolbarHeight * 0.85,
-                  flexibleSpace: TabBar(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    isScrollable: true,
-                    labelColor: Utils.primaryOrTheme,
-                    unselectedLabelColor: Utils.textColorByBrightness(),
-                    indicatorWeight: 4,
-                    indicator: BoxDecoration(
-                      // color: Colors.red,
-                      border: Border(
-                        bottom: BorderSide(
-                          color: context.theme.primaryColor,
-                          width: 3,
+                  flexibleSpace: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: colors.surface,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: colors.outlineVariant),
+                      ),
+                      child: TabBar(
+                        padding: const EdgeInsets.all(4),
+                        isScrollable: true,
+                        labelColor: colors.onPrimaryContainer,
+                        unselectedLabelColor: colors.onSurfaceVariant,
+                        labelStyle: const TextStyle(
+                          fontWeight: FontWeight.w800,
                         ),
+                        indicator: BoxDecoration(
+                          color: colors.primaryContainer,
+                          borderRadius: BorderRadius.circular(13),
+                        ),
+                        controller: model.tabBarController,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        tabAlignment: TabAlignment.start,
+                        dividerHeight: 0,
+                        tabs:
+                            model.vendor!.menus
+                                .map(
+                                  (menu) => Tab(
+                                    text: menu.id == 0 ? 'Todos' : menu.name,
+                                    iconMargin: EdgeInsets.zero,
+                                  ),
+                                )
+                                .toList(),
                       ),
                     ),
-                    controller: model.tabBarController,
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    tabAlignment: TabAlignment.start,
-                    dividerHeight: 0,
-                    tabs: model.vendor!.menus.map(
-                      (menu) {
-                        return Tab(
-                          text: menu.name,
-                          iconMargin: EdgeInsets.zero,
-                        );
-                      },
-                    ).toList(),
                   ),
                 ),
               ];
             },
-            body: Container(
-              child: model.isBusy
-                  ? BusyIndicator().p20().centered()
-                  : TabBarView(
-                      controller: model.tabBarController,
-                      children: model.vendor!.menus.map(
-                        (menu) {
-                          final mProducts = model.menuProducts[menu.id] ?? [];
-                          //
-                          return CustomEasyRefreshView(
-                            // headerView: MaterialHeader(),
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            onRefresh: () => model.loadMoreProducts(menu.id),
-                            onLoad: () => model.loadMoreProducts(
-                              menu.id,
-                              initialLoad: false,
-                            ),
-                            loading: model.busy(menu.id),
-                            dataset: mProducts,
-                            separator: 5.heightBox,
-                            listView: mProducts.map(
-                              (product) {
-                                return VendorMenuProductListItem(
-                                  product,
-                                  onPressed: model.productSelected,
-                                  qtyUpdated: model.addToCartDirectly,
-                                );
-                              },
-                            ).toList(),
-                          );
-                          /*
+            body: ColoredBox(
+              color: colors.surfaceContainerLowest,
+              child:
+                  model.isBusy
+                      ? BusyIndicator().p20().centered()
+                      : TabBarView(
+                        controller: model.tabBarController,
+                        children:
+                            model.vendor!.menus.map((menu) {
+                              final mProducts =
+                                  model.menuProducts[menu.id] ?? [];
+                              //
+                              return CustomEasyRefreshView(
+                                // headerView: MaterialHeader(),
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                onRefresh:
+                                    () => model.loadMoreProducts(menu.id),
+                                onLoad:
+                                    () => model.loadMoreProducts(
+                                      menu.id,
+                                      initialLoad: false,
+                                    ),
+                                loading: model.busy(menu.id),
+                                dataset: mProducts,
+                                separator: 5.heightBox,
+                                listView:
+                                    mProducts.map((product) {
+                                      return VendorMenuProductListItem(
+                                        product,
+                                        onPressed: model.productSelected,
+                                        qtyUpdated: model.addToCartDirectly,
+                                      );
+                                    }).toList(),
+                              );
+                              /*
                           return CustomListView(
                             noScrollPhysics: true,
                             refreshController:
@@ -199,9 +219,8 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
                             separatorBuilder: (context, index) => 5.heightBox,
                           );
                           */
-                        },
-                      ).toList(),
-                    ),
+                            }).toList(),
+                      ),
             ),
           ),
           bottomSheet: CartViewBottomSheet(),
