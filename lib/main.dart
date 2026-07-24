@@ -27,32 +27,29 @@ void main() async {
   await runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
-      //setting up firebase notifications
-      await Firebase.initializeApp();
-      await PhoneUtilService.init();
-
-      await translator.init(
-        localeType: LocalizationDefaultType.asDefined,
-        language: "es",
-        languagesList: AppLanguages.codes,
-        assetsDirectory: 'assets/lang/',
-      );
-
-      //
-      await LocalStorageService.getPrefs();
-      await CartServices.getCartItems();
-
       if (kDebugMode) {
         HttpOverrides.global = DevHttpOverrides();
       }
-      //setting up crashlytics only for production
+
+      // Solo bloquean el primer fotograma los servicios imprescindibles.
+      await Future.wait([
+        Firebase.initializeApp(),
+        translator.init(
+          localeType: LocalizationDefaultType.asDefined,
+          language: "es",
+          languagesList: AppLanguages.codes,
+          assetsDirectory: 'assets/lang/',
+        ),
+        LocalStorageService.getPrefs(),
+      ]);
+      await CartServices.getCartItems();
+
       FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
-
-      // Initialize deep link handling
-      DeepLinkService().initialize();
-
-      // Run app!
       runApp(LocalizedApp(child: MyApp()));
+
+      // Estos servicios no deben retrasar la primera pantalla.
+      unawaited(PhoneUtilService.init());
+      DeepLinkService().initialize();
     },
     (error, stackTrace) {
       FirebaseCrashlytics.instance.recordError(error, stackTrace);

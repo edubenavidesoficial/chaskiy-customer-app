@@ -43,20 +43,19 @@ class VendorDetailsHeader extends StatelessWidget {
               canZoom: true,
             ).wFull(context),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
             child: Container(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: colors.surface,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: colors.outlineVariant),
+                borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(
-                      alpha: theme.brightness == Brightness.dark ? .22 : .07,
+                      alpha: theme.brightness == Brightness.dark ? .16 : .045,
                     ),
-                    blurRadius: 24,
-                    offset: const Offset(0, 10),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
                   ),
                 ],
               ),
@@ -64,13 +63,11 @@ class VendorDetailsHeader extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    width: 70,
-                    height: 70,
-                    padding: const EdgeInsets.all(3),
+                    width: 58,
+                    height: 58,
                     decoration: BoxDecoration(
                       color: colors.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: colors.outlineVariant),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: CustomImage(
@@ -79,7 +76,7 @@ class VendorDetailsHeader extends StatelessWidget {
                       canZoom: true,
                     ),
                   ),
-                  const SizedBox(width: 13),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,7 +87,7 @@ class VendorDetailsHeader extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.w800,
-                            letterSpacing: -.3,
+                            letterSpacing: -.2,
                           ),
                         ),
                         if (vendor.address.isNotEmptyAndNotNull &&
@@ -117,7 +114,7 @@ class VendorDetailsHeader extends StatelessWidget {
                             ],
                           ),
                         ],
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 6),
                         InkWell(
                           onTap:
                               () => context.nextPage(VendorReviewsPage(vendor)),
@@ -128,7 +125,7 @@ class VendorDetailsHeader extends StatelessWidget {
                               const Icon(
                                 Icons.star_rounded,
                                 color: Color(0xFFFFB000),
-                                size: 20,
+                                size: 18,
                               ),
                               const SizedBox(width: 3),
                               Text(
@@ -154,7 +151,6 @@ class VendorDetailsHeader extends StatelessWidget {
                   Column(
                     children: [
                       FavVendorTag(vendor),
-                      const SizedBox(height: 4),
                       IconButton(
                         tooltip: 'Información',
                         visualDensity: VisualDensity.compact,
@@ -173,50 +169,63 @@ class VendorDetailsHeader extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                _VendorMetaChip(
-                  icon:
-                      vendor.isOpen
-                          ? Icons.check_circle_outline_rounded
-                          : Icons.schedule_rounded,
-                  label: vendor.isOpen ? 'Abierto' : 'Cerrado',
-                  foreground:
-                      vendor.isOpen ? const Color(0xFF087F5B) : colors.error,
-                  background:
-                      vendor.isOpen
-                          ? const Color(0xFFDDF8ED)
-                          : colors.errorContainer,
-                ),
-                if (vendor.delivery == 1)
-                  const _VendorMetaChip(
-                    icon: Icons.delivery_dining_outlined,
-                    label: 'Entrega',
-                    foreground: Color(0xFF9A5B00),
-                    background: Color(0xFFFFF0C2),
-                  ),
-                if (vendor.pickup == 1)
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
                   _VendorMetaChip(
-                    icon: Icons.shopping_bag_outlined,
-                    label: 'Recoger',
-                    foreground: colors.primary,
-                    background: colors.primaryContainer,
+                    icon:
+                        vendor.isOpen
+                            ? Icons.check_circle_outline_rounded
+                            : Icons.schedule_rounded,
+                    label: vendor.isOpen ? 'Abierto' : 'Cerrado',
+                    foreground:
+                        vendor.isOpen ? const Color(0xFF087F5B) : colors.error,
+                    background:
+                        vendor.isOpen
+                            ? const Color(0xFFDDF8ED)
+                            : colors.errorContainer,
                   ),
-                _VendorMetaChip(
-                  icon: Icons.schedule_rounded,
-                  label: '${vendor.prepareTime} ${vendor.prepareTimeUnit}',
-                ),
-                _VendorMetaChip(
-                  icon: Icons.directions_bike_outlined,
-                  label: '${vendor.deliveryTime} ${vendor.deliveryTimeUnit}',
-                ),
-              ],
+                  if (vendor.delivery == 1) ...[
+                    const SizedBox(width: 8),
+                    const _VendorMetaChip(
+                      icon: Icons.delivery_dining_outlined,
+                      label: 'Entrega',
+                      foreground: Color(0xFF9A5B00),
+                      background: Color(0xFFFFF0C2),
+                    ),
+                  ],
+                  if (vendor.pickup == 1) ...[
+                    const SizedBox(width: 8),
+                    _VendorMetaChip(
+                      icon: Icons.shopping_bag_outlined,
+                      label: 'Recoger',
+                      foreground: colors.primary,
+                      background: colors.primaryContainer,
+                    ),
+                  ],
+                  const SizedBox(width: 8),
+                  _VendorMetaChip(
+                    icon: Icons.schedule_rounded,
+                    label: _timeLabel(
+                      vendor.prepareTime,
+                      vendor.prepareTimeUnit,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  _VendorMetaChip(
+                    icon: Icons.directions_bike_outlined,
+                    label: _timeLabel(
+                      vendor.deliveryTime,
+                      vendor.deliveryTimeUnit,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           if (showSearch) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: SearchBarInput(
@@ -230,10 +239,19 @@ class VendorDetailsHeader extends StatelessWidget {
             const SizedBox(height: 14),
             UploadPrescriptionFab(model),
           ],
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
         ],
       ),
     );
+  }
+
+  String _timeLabel(String? value, String? unit) {
+    final parts =
+        [value, unit]
+            .where((part) => part != null && part.trim().isNotEmpty)
+            .map((part) => part!.trim())
+            .toList();
+    return parts.isEmpty ? 'Por confirmar' : parts.join(' ');
   }
 
   void openVendorDetailsBottomSheet(BuildContext context, Vendor vendor) {
@@ -264,16 +282,16 @@ class _VendorMetaChip extends StatelessWidget {
     final effectiveForeground = foreground ?? colors.onSurfaceVariant;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
         color: background ?? colors.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 17, color: effectiveForeground),
-          const SizedBox(width: 6),
+          Icon(icon, size: 16, color: effectiveForeground),
+          const SizedBox(width: 5),
           Text(
             label,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(

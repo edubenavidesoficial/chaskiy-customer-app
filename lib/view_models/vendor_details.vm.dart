@@ -29,7 +29,7 @@ class VendorDetailsViewModel extends MyBaseViewModel {
   List<int> refreshContollerKeys = [];
 
   //
-  Map<int, List> menuProducts = {};
+  Map<int, List<Product>> menuProducts = {};
   Map<int, int> menuProductsQueryPages = {};
 
   //

@@ -6,16 +6,19 @@ import 'package:sim_card_code/sim_card_code.dart';
 class PhoneUtilService {
   static Country? _userCountry;
   static bool _isInitialized = false;
+  static Future<void>? _initialization;
   static const String _storageKey = 'USER_COUNTRY_CODE';
 
   /// Initialize the service - call this on app startup
   static Future<void> init() async {
     if (_isInitialized) return;
+    if (_initialization != null) return _initialization;
+    _initialization = _initialize();
+    return _initialization;
+  }
 
+  static Future<void> _initialize() async {
     try {
-      // Clear cached data to force fresh detection
-      await clearCachedCountry();
-      
       await getUserCountry();
       _isInitialized = true;
       print(
@@ -24,8 +27,10 @@ class PhoneUtilService {
     } catch (e) {
       print('Error initializing PhoneUtilService: $e');
       // Set fallback even if init fails
-      _userCountry = Country.tryParse('US');
+      _userCountry = Country.tryParse('EC');
       _isInitialized = true;
+    } finally {
+      _initialization = null;
     }
   }
 
@@ -49,7 +54,13 @@ class PhoneUtilService {
     }
 
     // Try SIM card first, then fallback to locale
-    _userCountry = await _getCountryFromSIM() ?? await _getCountryFromLocale();
+    _userCountry =
+        await _getCountryFromLocale() ??
+        await _getCountryFromSIM().timeout(
+          const Duration(milliseconds: 1500),
+          onTimeout: () => null,
+        ) ??
+        Country.tryParse('EC');
 
     // Cache the result
     if (_userCountry != null) {
@@ -137,8 +148,7 @@ class PhoneUtilService {
       print('Error getting country from locale: $e');
     }
 
-    // Fallback to US if unable to determine
-    return Country.tryParse('US');
+    return null;
   }
 
   /// Clear cached country (useful for testing or manual selection)

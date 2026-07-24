@@ -66,12 +66,11 @@ class SearchBarInput extends StatelessWidget {
               ),
               contentPadding: const EdgeInsets.symmetric(vertical: 16),
               filled: true,
-              fillColor: colors.surface,
+              fillColor: colors.surfaceContainerLow,
             ),
           ).box
-          .color(colors.surface)
-          .border(color: colors.outlineVariant)
-          .withRounded(value: 18)
+          .color(colors.surfaceContainerLow)
+          .withRounded(value: 16)
           .clip(Clip.antiAlias)
           .make()
           .expand(),

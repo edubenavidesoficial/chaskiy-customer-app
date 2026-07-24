@@ -62,8 +62,8 @@ class HomeViewModel extends MyBaseViewModel {
       onTabChange(index);
     });
 
-    //handle notification
-    await SetupService.init();
+    // Notificaciones y servicios secundarios se preparan sin bloquear Inicio.
+    unawaited(SetupService.init());
   }
 
   //

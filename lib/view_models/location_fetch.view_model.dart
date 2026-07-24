@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class LocationFetchViewModel extends MyBaseViewModel {
   }
 
   bool showManuallySelection = false;
-  bool showRequestPermission = false;
+  bool isLocating = true;
   Widget nextPage;
   //
   void initialise() async {
@@ -37,16 +38,31 @@ class LocationFetchViewModel extends MyBaseViewModel {
   }
 
   handleFetchCurrentLocation() async {
-    final granted = await locationPermissionGetter();
-    showManuallySelection = !granted;
-    showRequestPermission = granted;
+    isLocating = true;
+    showManuallySelection = false;
     notifyListeners();
-    if (granted) {
+
+    final granted = await locationPermissionGetter();
+    if (!granted) {
+      isLocating = false;
+      showManuallySelection = true;
+      notifyListeners();
+      return;
+    }
+
+    try {
       await fetchCurrentLocation();
       if (LocationService.deliveryaddress != null) {
-        loadNextPage();
+        await loadNextPage();
+        return;
       }
+    } catch (error) {
+      debugPrint('No fue posible obtener la ubicación actual: $error');
     }
+
+    isLocating = false;
+    showManuallySelection = true;
+    notifyListeners();
   }
 
   Future<bool> locationPermissionGetter() async {
@@ -74,7 +90,10 @@ class LocationFetchViewModel extends MyBaseViewModel {
                 .tr(),
           );
         } else {
-          granted = await LocationService.showRequestDialog();
+          // iOS ya presenta una explicación nativa clara. Evitamos encadenar
+          // dos diálogos antes de mostrar la pantalla principal.
+          granted =
+              Platform.isIOS ? true : await LocationService.showRequestDialog();
 
           if (granted) {
             try {
@@ -179,6 +198,49 @@ class LocationFetchViewModel extends MyBaseViewModel {
       viewContext.nextAndRemoveUntilPage(nextPage);
     } catch (error) {
       print("error: $error");
+    }
+  }
+
+  @override
+  Future<void> fetchCurrentLocation() async {
+    Position? currentLocation;
+    try {
+      currentLocation = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 8),
+        ),
+      );
+    } on TimeoutException {
+      currentLocation = await Geolocator.getLastKnownPosition();
+    } catch (_) {
+      currentLocation = await Geolocator.getLastKnownPosition();
+    }
+
+    if (currentLocation == null) {
+      throw StateError('No existe una ubicación disponible');
+    }
+
+    final address = await LocationService.addressFromCoordinates(
+      lat: currentLocation.latitude,
+      lng: currentLocation.longitude,
+    ).timeout(const Duration(seconds: 8), onTimeout: () => null);
+
+    final deliveryAddress = DeliveryAddress(
+      name: 'Ubicación actual',
+      address: address?.addressLine,
+      latitude: currentLocation.latitude,
+      longitude: currentLocation.longitude,
+      city: address?.locality,
+      state: address?.adminArea,
+      country: address?.countryName,
+    );
+
+    LocationService.currenctAddress = address;
+    LocationService.deliveryaddress = deliveryAddress;
+    LocationService.currenctDeliveryAddressSubject.add(deliveryAddress);
+    if (address != null) {
+      LocationService.currenctAddressSubject.add(address);
     }
   }
 

@@ -8,7 +8,6 @@ import 'package:chaskiy/requests/vendor.request.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/views/pages/pharmacy/pharmacy_upload_prescription.page.dart';
 import 'package:chaskiy/views/pages/vendor_search/vendor_search.page.dart';
-import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 import 'package:chaskiy/extensions/context.dart';
 
@@ -39,29 +38,29 @@ class VendorDetailsWithMenuViewModel extends VendorDetailsViewModel {
   List<int> refreshContollerKeys = [];
 
   //
-  Map<int, List> menuProducts = {};
+  Map<int, List<Product>> menuProducts = {};
   Map<int, int> menuProductsQueryPages = {};
 
   //
   void getVendorDetails() async {
-    //
     setBusy(true);
 
     try {
-      vendor = await _vendorRequest.vendorDetails(
+      final updatedVendor = await _vendorRequest.vendorDetails(
         vendor!.id,
         params: {"type": "small"},
       );
 
-      print("vendor menus ==> ${vendor!.menus.length}");
-      //empty menu
-      vendor!.menus.insert(0, Menu.fromJson({"id": 0, "name": "All".tr()}));
+      vendor = updatedVendor;
+      if (!vendor!.menus.any((menu) => menu.id == 0)) {
+        vendor!.menus.insert(0, Menu.fromJson({"id": 0, "name": "Todos"}));
+      }
       generateRefreshController();
       updateUiComponents();
       clearErrors();
     } catch (error) {
       setError(error);
-      print("error ==> ${error}");
+      debugPrint("Error cargando proveedor ${vendor?.id}: $error");
     }
     setBusy(false);
   }
@@ -109,14 +108,12 @@ class VendorDetailsWithMenuViewModel extends VendorDetailsViewModel {
 
   //
   loadMenuProduts() {
-    //
     generateRefreshController();
 
-    //
-    vendor!.menus.forEach((element) {
-      loadMoreProducts(element.id);
+    for (final element in vendor!.menus) {
       menuProductsQueryPages[element.id] = 1;
-    });
+      loadMoreProducts(element.id);
+    }
   }
 
   generateRefreshController() {
@@ -143,25 +140,32 @@ class VendorDetailsWithMenuViewModel extends VendorDetailsViewModel {
       menuProductsQueryPages[id] = ++queryPage;
     }
 
-    //load the products by subcategory id
     try {
+      final queryParams = <String, dynamic>{"vendor_id": vendor!.id};
+      // El menú 0 representa "Todos". Algunos servidores interpretan
+      // menu_id=0 como un menú inexistente y devuelven una lista vacía.
+      if (id > 0) {
+        queryParams["menu_id"] = id;
+      }
       final mProducts = await _productRequest.getProdcuts(
         page: queryPage,
-        queryParams: {"menu_id": id, "vendor_id": vendor!.id},
+        queryParams: queryParams,
       );
 
       //
       if (initialLoad) {
         menuProducts[id] = mProducts;
       } else {
-        menuProducts[id]!.addAll(mProducts);
+        menuProducts.putIfAbsent(id, () => <Product>[]).addAll(mProducts);
       }
 
       if (mProducts.isEmpty) {
         getRefreshController(id).loadNoData();
       }
     } catch (error) {
-      print("load more error ==> $error");
+      debugPrint(
+        "Error cargando productos del proveedor ${vendor?.id}, menú $id: $error",
+      );
     }
 
     //

@@ -35,19 +35,18 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
             widget.vendor,
             tickerProvider: this,
           ),
-      onViewModelReady: (model) {
-        model.tabBarController = TabController(
-          length: model.vendor?.menus.length ?? 0,
-          vsync: this,
-        );
-        model.getVendorDetails();
-      },
+      onViewModelReady: (model) => model.getVendorDetails(),
       builder: (context, model, child) {
         final colors = Theme.of(context).colorScheme;
-        final featureImageHeight = (context.percentHeight * 24).clamp(
-          210.0,
-          280.0,
+        final featureImageHeight = (context.percentHeight * 22).clamp(
+          190.0,
+          245.0,
         );
+        final menus = model.vendor?.menus ?? [];
+        final tabsReady =
+            model.tabBarController != null &&
+            model.tabBarController!.length == menus.length &&
+            menus.isNotEmpty;
         //
         return Scaffold(
           backgroundColor: colors.surfaceContainerLowest,
@@ -109,52 +108,52 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
                     showPrescription: true,
                   ),
                 ),
-                SliverAppBar(
-                  backgroundColor: colors.surfaceContainerLowest,
-                  surfaceTintColor: Colors.transparent,
-                  toolbarHeight: 62,
-                  floating: false,
-                  pinned: true,
-                  snap: false,
-                  primary: false,
-                  automaticallyImplyLeading: false,
-                  flexibleSpace: Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: colors.surface,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: colors.outlineVariant),
-                      ),
-                      child: TabBar(
-                        padding: const EdgeInsets.all(4),
-                        isScrollable: true,
-                        labelColor: colors.onPrimaryContainer,
-                        unselectedLabelColor: colors.onSurfaceVariant,
-                        labelStyle: const TextStyle(
-                          fontWeight: FontWeight.w800,
+                if (tabsReady)
+                  SliverAppBar(
+                    backgroundColor: colors.surfaceContainerLowest,
+                    surfaceTintColor: Colors.transparent,
+                    toolbarHeight: 54,
+                    floating: false,
+                    pinned: true,
+                    snap: false,
+                    primary: false,
+                    automaticallyImplyLeading: false,
+                    flexibleSpace: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 5, 16, 5),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: colors.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        indicator: BoxDecoration(
-                          color: colors.primaryContainer,
-                          borderRadius: BorderRadius.circular(13),
+                        child: TabBar(
+                          padding: const EdgeInsets.all(3),
+                          isScrollable: true,
+                          unselectedLabelColor: colors.onSurfaceVariant,
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                          indicator: BoxDecoration(
+                            color: colors.primary,
+                            borderRadius: BorderRadius.circular(13),
+                          ),
+                          labelColor: colors.onPrimary,
+                          controller: model.tabBarController,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          tabAlignment: TabAlignment.start,
+                          dividerHeight: 0,
+                          tabs:
+                              model.vendor!.menus
+                                  .map(
+                                    (menu) => Tab(
+                                      text: menu.id == 0 ? 'Todos' : menu.name,
+                                      iconMargin: EdgeInsets.zero,
+                                    ),
+                                  )
+                                  .toList(),
                         ),
-                        controller: model.tabBarController,
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        tabAlignment: TabAlignment.start,
-                        dividerHeight: 0,
-                        tabs:
-                            model.vendor!.menus
-                                .map(
-                                  (menu) => Tab(
-                                    text: menu.id == 0 ? 'Todos' : menu.name,
-                                    iconMargin: EdgeInsets.zero,
-                                  ),
-                                )
-                                .toList(),
                       ),
                     ),
                   ),
-                ),
               ];
             },
             body: ColoredBox(
@@ -162,6 +161,20 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
               child:
                   model.isBusy
                       ? BusyIndicator().p20().centered()
+                      : model.hasError
+                      ? _VendorLoadState(
+                        icon: Icons.cloud_off_rounded,
+                        title: 'No pudimos cargar este proveedor',
+                        message: 'Revisa tu conexión e inténtalo nuevamente.',
+                        actionLabel: 'Reintentar',
+                        onAction: model.getVendorDetails,
+                      )
+                      : !tabsReady
+                      ? const _VendorLoadState(
+                        icon: Icons.storefront_outlined,
+                        title: 'Este proveedor aún no tiene productos',
+                        message: 'Vuelve pronto para descubrir sus novedades.',
+                      )
                       : TabBarView(
                         controller: model.tabBarController,
                         children:
@@ -181,6 +194,15 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
                                     ),
                                 loading: model.busy(menu.id),
                                 dataset: mProducts,
+                                emptyView: _VendorLoadState(
+                                  icon: Icons.inventory_2_outlined,
+                                  title: 'No hay productos disponibles',
+                                  message:
+                                      'Desliza hacia abajo para actualizar.',
+                                  actionLabel: 'Actualizar',
+                                  onAction:
+                                      () => model.loadMoreProducts(menu.id),
+                                ),
                                 separator: 5.heightBox,
                                 listView:
                                     mProducts.map((product) {
@@ -226,6 +248,71 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
           bottomSheet: CartViewBottomSheet(),
         );
       },
+    );
+  }
+}
+
+class _VendorLoadState extends StatelessWidget {
+  const _VendorLoadState({
+    required this.icon,
+    required this.title,
+    required this.message,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(32, 46, 32, 120),
+      children: [
+        Container(
+          width: 58,
+          height: 58,
+          decoration: BoxDecoration(
+            color: colors.primaryContainer,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: colors.primary, size: 28),
+        ).centered(),
+        const SizedBox(height: 16),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          message,
+          textAlign: TextAlign.center,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colors.onSurfaceVariant,
+          ),
+        ),
+        if (onAction != null && actionLabel != null) ...[
+          const SizedBox(height: 18),
+          FilledButton.tonal(
+            onPressed: onAction,
+            style: FilledButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+            child: Text(actionLabel!),
+          ).centered(),
+        ],
+      ],
     );
   }
 }

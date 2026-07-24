@@ -29,19 +29,20 @@ class VendorMenuProductListItem extends StatelessWidget {
         product.showDiscount ? product.discountPrice : product.price;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: padding ?? 16, vertical: 5),
+      padding: EdgeInsets.symmetric(horizontal: padding ?? 16, vertical: 4),
       child: Material(
         color: colors.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
+        elevation: 0,
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onPressed == null ? null : () => onPressed!(product),
           child: Container(
-            height: height ?? 112,
+            height: height ?? 104,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: colors.outlineVariant),
+              borderRadius: BorderRadius.circular(18),
+              color: colors.surfaceContainerLow,
             ),
             child: Row(
               children: [
@@ -51,8 +52,8 @@ class VendorMenuProductListItem extends StatelessWidget {
                     borderRadius: BorderRadius.circular(15),
                     child: CustomImage(
                       imageUrl: product.photo,
-                      width: 88,
-                      height: 88,
+                      width: 82,
+                      height: 82,
                       boxFit: BoxFit.cover,
                     ),
                   ),
@@ -130,13 +131,13 @@ class VendorMenuProductListItem extends StatelessWidget {
                           decoration: TextDecoration.lineThrough,
                         ),
                       ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Container(
-                      width: 32,
-                      height: 32,
+                      width: 30,
+                      height: 30,
                       decoration: BoxDecoration(
                         color: colors.primaryContainer,
-                        borderRadius: BorderRadius.circular(11),
+                        shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.arrow_forward_rounded,

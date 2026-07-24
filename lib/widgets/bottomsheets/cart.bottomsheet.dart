@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/constants/app_ui_settings.dart';
-import 'package:chaskiy/extensions/dynamic.dart';
 import 'package:chaskiy/extensions/string.dart';
 import 'package:chaskiy/services/app_currency_system.service.dart';
 import 'package:chaskiy/services/cart.service.dart';
-import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/views/pages/cart/cart.page.dart';
 import 'package:chaskiy/widgets/buttons/custom_button.dart';
-import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class CartViewBottomSheet extends StatelessWidget {
@@ -31,40 +27,37 @@ class CartViewBottomSheet extends StatelessWidget {
         }
         //
         return Container(
-          //add top shadow, padding and background color
           decoration: BoxDecoration(
-            color: Utils.systemGreyColor(),
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             boxShadow: [
               BoxShadow(
-                color: Utils.systemGreyColor(true).withOpacity(0.10),
-                spreadRadius: 5,
-                blurRadius: 8,
-                offset: Offset(0, 1),
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 20,
+                offset: const Offset(0, -4),
               ),
             ],
           ),
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(20, 12, 16, 12),
           width: double.infinity,
           child: HStack([
-            // details
             VStack([
-              "Item: %s".tr().fill([snapshot.data]).text.medium.make(),
-              "Total: %s"
-                  .tr()
-                  .fill([
-                    "${AppStrings.currentCurrencySymbol} ${CartServices.totalSubtotal.convertCurrency}"
-                        .currencyFormat(),
-                  ])
+              "${snapshot.data} ${snapshot.data == 1 ? 'producto' : 'productos'}"
                   .text
-                  .semiBold
-                  .lg
-                  .color(AppColor.primaryColor)
+                  .sm
+                  .color(Theme.of(context).colorScheme.onSurfaceVariant)
+                  .make(),
+              "${AppStrings.currentCurrencySymbol} ${CartServices.totalSubtotal.convertCurrency}"
+                  .currencyFormat()
+                  .text
+                  .bold
+                  .xl
+                  .color(Theme.of(context).colorScheme.onSurface)
                   .make(),
             ]).expand(),
 
-            // view cart button
             CustomButton(
-              title: "View Cart".tr(),
+              title: "Ver carrito",
               onPressed: () {
                 Navigator.of(
                   context,

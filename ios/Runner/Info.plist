@@ -56,6 +56,12 @@
 		<string>2c8423c28ff94421ac6a86a5956449af</string>
 		<key>FacebookDisplayName</key>
 		<string>Glover</string>
+		<key>FacebookAutoInitEnabled</key>
+		<false/>
+		<key>FacebookAutoLogAppEventsEnabled</key>
+		<false/>
+		<key>FacebookAdvertiserIDCollectionEnabled</key>
+		<false/>
 		<key>LSApplicationQueriesSchemes</key>
 		<array>
 			<string>comgooglemaps</string>
@@ -92,17 +98,17 @@
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
 		<key>NSCameraUsageDescription</key>
-		<string>We need access to your camera for profile photo update.</string>
+		<string>Usamos la cámara para actualizar tu foto de perfil y adjuntar imágenes.</string>
 		<key>NSLocationAlwaysUsageDescription</key>
-		<string>We need access to your location to show nearby vendors.</string>
+		<string>Usamos tu ubicación para mostrar proveedores cercanos y calcular entregas.</string>
 		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>We need access to your location to show nearby vendors.</string>
+		<string>Usamos tu ubicación mientras utilizas la app para mostrar proveedores cercanos y calcular entregas.</string>
 		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-		<string>We need access to your location to show nearby vendors.</string>
+		<string>Usamos tu ubicación para mostrar proveedores cercanos y calcular entregas.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
-		<string>We need access to your gallery for profile photo.</string>
+		<string>Usamos tus fotos para actualizar tu perfil y adjuntar imágenes.</string>
 		<key>NSMicrophoneUsageDescription</key>
-		<string>We need permission to make audio calls</string>
+		<string>Usamos el micrófono únicamente cuando realizas una llamada de audio.</string>
 		<key>UIBackgroundModes</key>
 		<array>
 			<string>fetch</string>
@@ -133,6 +139,27 @@
 		<true/>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
+		<key>UIApplicationSceneManifest</key>
+		<dict>
+			<key>UIApplicationSupportsMultipleScenes</key>
+			<false/>
+			<key>UISceneConfigurations</key>
+			<dict>
+				<key>UIWindowSceneSessionRoleApplication</key>
+				<array>
+					<dict>
+						<key>UISceneClassName</key>
+						<string>UIWindowScene</string>
+						<key>UISceneDelegateClassName</key>
+						<string>FlutterSceneDelegate</string>
+						<key>UISceneConfigurationName</key>
+						<string>flutter</string>
+						<key>UISceneStoryboardFile</key>
+						<string>Main</string>
+					</dict>
+				</array>
+			</dict>
+		</dict>
 		<key>FlutterDeepLinkingEnabled</key>
 		<false/>
 	</dict>
