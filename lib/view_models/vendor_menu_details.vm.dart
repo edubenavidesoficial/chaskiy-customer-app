@@ -40,15 +40,20 @@ class VendorDetailsWithMenuViewModel extends VendorDetailsViewModel {
   //
   Map<int, List<Product>> menuProducts = {};
   Map<int, int> menuProductsQueryPages = {};
+  bool _loadingVendor = false;
 
   //
-  void getVendorDetails() async {
+  Future<void> getVendorDetails() async {
+    if (_loadingVendor) return;
+    _loadingVendor = true;
     setBusy(true);
 
     try {
       final updatedVendor = await _vendorRequest.vendorDetails(
         vendor!.id,
         params: {"type": "small"},
+        // Evita que Android reutilice una respuesta vacía guardada.
+        forceRefresh: true,
       );
 
       vendor = updatedVendor;
@@ -63,12 +68,14 @@ class VendorDetailsWithMenuViewModel extends VendorDetailsViewModel {
       debugPrint("Error cargando proveedor ${vendor?.id}: $error");
     }
     setBusy(false);
+    _loadingVendor = false;
   }
 
   //
   updateUiComponents() {
     //
     if (!vendor!.hasSubcategories) {
+      tabBarController?.dispose();
       tabBarController = TabController(
         length: vendor!.menus.length,
         vsync: tickerProvider!,
@@ -79,6 +86,16 @@ class VendorDetailsWithMenuViewModel extends VendorDetailsViewModel {
     } else {
       //nothing to do yet
     }
+  }
+
+  @override
+  void dispose() {
+    tabBarController?.dispose();
+    for (final controller in refreshContollers) {
+      controller.dispose();
+    }
+    refreshContoller.dispose();
+    super.dispose();
   }
 
   void productSelected(Product product) async {
@@ -117,6 +134,9 @@ class VendorDetailsWithMenuViewModel extends VendorDetailsViewModel {
   }
 
   generateRefreshController() {
+    for (final controller in refreshContollers) {
+      controller.dispose();
+    }
     refreshContollers = List.generate(
       vendor!.menus.length,
       (index) => new RefreshController(),
@@ -150,6 +170,7 @@ class VendorDetailsWithMenuViewModel extends VendorDetailsViewModel {
       final mProducts = await _productRequest.getProdcuts(
         page: queryPage,
         queryParams: queryParams,
+        forceRefresh: initialLoad,
       );
 
       //

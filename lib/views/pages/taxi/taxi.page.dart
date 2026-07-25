@@ -62,7 +62,8 @@ class _TaxiPageState extends State<TaxiPage> with WidgetsBindingObserver {
                 padding: vm.googleMapPadding,
                 zoomGesturesEnabled: true,
                 zoomControlsEnabled: false,
-                myLocationButtonEnabled: true,
+                // Usamos un único control con el estilo de la aplicación.
+                myLocationButtonEnabled: false,
                 myLocationEnabled: true,
                 markers: vm.gMapMarkers,
                 polylines: vm.gMapPolylines,

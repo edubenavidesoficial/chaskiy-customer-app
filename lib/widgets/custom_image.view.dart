@@ -74,10 +74,12 @@ class _CustomImageState extends State<CustomImage>
   }
 
   Widget get _imageView {
+    final normalizedUrl = Uri.parse(widget.imageUrl!.trim()).toString();
+
     //if is the link ends with .svg
-    if (this.widget.imageUrl!.endsWith('.svg')) {
+    if (normalizedUrl.toLowerCase().endsWith('.svg')) {
       return SvgPicture.network(
-        this.widget.imageUrl!,
+        normalizedUrl,
         fit: this.widget.boxFit ?? BoxFit.cover,
         height: this.widget.height,
         width: this.widget.width,
@@ -86,7 +88,13 @@ class _CustomImageState extends State<CustomImage>
     }
 
     return CachedNetworkImage(
-      imageUrl: this.widget.imageUrl!,
+      imageUrl: normalizedUrl,
+      // Evita decodificar fotografías enormes a resolución completa en
+      // Android; conserva suficiente detalle para la dimensión mostrada.
+      memCacheWidth: _cacheDimension(widget.width),
+      memCacheHeight: _cacheDimension(widget.height),
+      maxWidthDiskCache: 1440,
+      maxHeightDiskCache: 1440,
       errorWidget:
           (context, imageUrl, _) => Image.asset(
             imageUrl.isNotDefaultImage ? AppImages.noImage : AppImages.appLogo,
@@ -112,6 +120,14 @@ class _CustomImageState extends State<CustomImage>
       width: this.widget.width,
       color: this.widget.color,
     );
+  }
+
+  int? _cacheDimension(double? logicalSize) {
+    if (logicalSize == null || !logicalSize.isFinite || logicalSize <= 0) {
+      return null;
+    }
+    final pixels = logicalSize * MediaQuery.devicePixelRatioOf(context);
+    return pixels.round().clamp(64, 1440).toInt();
   }
 
   @override

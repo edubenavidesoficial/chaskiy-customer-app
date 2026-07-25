@@ -111,9 +111,17 @@ class VendorRequest extends HttpService {
     throw apiResponse.message!;
   }
 
-  Future<Vendor> vendorDetails(int id, {Map<String, String>? params}) async {
+  Future<Vendor> vendorDetails(
+    int id, {
+    Map<String, String>? params,
+    bool forceRefresh = false,
+  }) async {
     //
-    final apiResult = await get("${Api.vendors}/$id", queryParameters: params);
+    final apiResult = await get(
+      "${Api.vendors}/$id",
+      queryParameters: params,
+      forceRefresh: forceRefresh,
+    );
     final apiResponse = ApiResponse.fromResponse(apiResult);
     if (apiResponse.allGood) {
       return Vendor.fromJson(apiResponse.body, rawDescription: false);

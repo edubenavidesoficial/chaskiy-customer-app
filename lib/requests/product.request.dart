@@ -10,6 +10,7 @@ class ProductRequest extends HttpService {
   Future<List<Product>> getProdcuts({
     Map<String, dynamic>? queryParams,
     int page = 1,
+    bool forceRefresh = false,
   }) async {
     Map<String, dynamic> params = {
       ...(queryParams != null ? queryParams : {}),
@@ -27,6 +28,7 @@ class ProductRequest extends HttpService {
     final apiResult = await get(
       Api.products,
       queryParameters: params,
+      forceRefresh: forceRefresh,
     );
 
     final apiResponse = ApiResponse.fromResponse(apiResult);
@@ -52,8 +54,10 @@ class ProductRequest extends HttpService {
   }
 
   //
-  Future<List<Product>> bestProductsRequest(
-      {Map<String, dynamic>? queryParams, int page = 1}) async {
+  Future<List<Product>> bestProductsRequest({
+    Map<String, dynamic>? queryParams,
+    int page = 1,
+  }) async {
     final apiResult = await get(
       Api.bestProducts,
       queryParameters: {
@@ -72,8 +76,10 @@ class ProductRequest extends HttpService {
     throw apiResponse.message!;
   }
 
-  Future<List<Product>> forYouProductsRequest(
-      {Map<String, dynamic>? queryParams, int page = 1}) async {
+  Future<List<Product>> forYouProductsRequest({
+    Map<String, dynamic>? queryParams,
+    int page = 1,
+  }) async {
     final apiResult = await get(
       Api.forYouProducts,
       queryParameters: {
@@ -117,10 +123,7 @@ class ProductRequest extends HttpService {
     final apiResult = await get("${Api.products}/$id");
     final apiResponse = ApiResponse.fromResponse(apiResult);
     if (apiResponse.allGood) {
-      return Product.fromJson(
-        apiResponse.body,
-        rawDescription: false,
-      );
+      return Product.fromJson(apiResponse.body, rawDescription: false);
     }
 
     throw apiResponse.message!;
@@ -136,10 +139,7 @@ class ProductRequest extends HttpService {
       "page": "$page",
     };
 
-    final apiResult = await get(
-      Api.productReviews,
-      queryParameters: params,
-    );
+    final apiResult = await get(Api.productReviews, queryParameters: params);
 
     final apiResponse = ApiResponse.fromResponse(apiResult);
     if (apiResponse.allGood) {
@@ -152,11 +152,10 @@ class ProductRequest extends HttpService {
   }
 
   //
-  Future<ApiResponse> productReviewSummary(
-      {Map<String, dynamic>? queryParams}) async {
-    Map<String, dynamic> params = {
-      ...(queryParams != null ? queryParams : {}),
-    };
+  Future<ApiResponse> productReviewSummary({
+    Map<String, dynamic>? queryParams,
+  }) async {
+    Map<String, dynamic> params = {...(queryParams != null ? queryParams : {})};
 
     final apiResult = await get(
       Api.productReviewSummary,
@@ -189,13 +188,8 @@ class ProductRequest extends HttpService {
     throw apiResponse.message!;
   }
 
-  Future<ApiResponse> submitReview({
-    Map<String, dynamic>? params,
-  }) async {
-    final apiResult = await post(
-      Api.productReviews,
-      params,
-    );
+  Future<ApiResponse> submitReview({Map<String, dynamic>? params}) async {
+    final apiResult = await post(Api.productReviews, params);
 
     return ApiResponse.fromResponse(apiResult);
   }

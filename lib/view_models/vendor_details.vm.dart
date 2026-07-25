@@ -41,6 +41,7 @@ class VendorDetailsViewModel extends MyBaseViewModel {
       vendor = await _vendorRequest.vendorDetails(
         vendor!.id,
         params: {"type": "small"},
+        forceRefresh: true,
       );
 
       clearErrors();
