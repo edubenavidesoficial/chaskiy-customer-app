@@ -3,14 +3,11 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/view_models/taxi_new_order_location_entry.vm.dart';
-import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class NewTaxiPickOnMapButton extends StatelessWidget {
-  const NewTaxiPickOnMapButton({
-    Key? key,
-    required this.taxiNewOrderViewModel,
-  }) : super(key: key);
+  const NewTaxiPickOnMapButton({Key? key, required this.taxiNewOrderViewModel})
+    : super(key: key);
 
   final NewTaxiOrderLocationEntryViewModel taxiNewOrderViewModel;
 
@@ -18,28 +15,16 @@ class NewTaxiPickOnMapButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Visibility(
       visible: taxiNewOrderViewModel.showChooseOnMap,
-      child: HStack(
-        [
-          Icon(
-            FlutterIcons.map_ent,
-            color: AppColor.primaryColor,
-          ),
-          "Choose a place on the map"
-              .tr()
-              .text
-              .lg
-              .medium
-              .make()
-              .px16()
-              .expand(),
-          Icon(
-            Utils.isArabic
-                ? FlutterIcons.chevron_left_ent
-                : FlutterIcons.chevron_right_ent,
-            color: Colors.grey.shade300,
-          )
-        ],
-      )
+      child: HStack([
+            Icon(FlutterIcons.map_ent, color: AppColor.primaryColor),
+            "Elegir en el mapa".text.lg.medium.make().px16().expand(),
+            Icon(
+              Utils.isArabic
+                  ? FlutterIcons.chevron_left_ent
+                  : FlutterIcons.chevron_right_ent,
+              color: Colors.grey.shade300,
+            ),
+          ])
           .safeArea(top: false)
           .p12()
           .box

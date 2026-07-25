@@ -73,48 +73,103 @@ class _BookingPageState extends State<BookingPage>
             onRefresh: model.onRefresh,
             onLoading: model.onLoadMore,
             child: VStack([
-              // Intro & Search section
-              VStack([
-                "Discover your next stay"
-                    .tr()
-                    .text
-                    .xl3
-                    .bold
-                    .color(primaryThemeColor)
-                    .make()
-                    .px16(),
-                20.heightBox,
-                HStack([
-                  HStack([
-                        Icon(Icons.search, size: 20, color: Colors.grey),
-                        10.widthBox,
-                        VStack([
-                          "Where to?".tr().text.semiBold.size(14).make(),
-                          "Anywhere • Any week • Add guests"
-                              .tr()
-                              .text
-                              .gray500
-                              .size(12)
-                              .make(),
-                        ]),
-                      ])
-                      .p(12)
-                      .box
-                      .color(context.backgroundColor)
-                      .withRounded(value: 30)
-                      .shadowSm
-                      .make()
-                      .onTap(() {
-                        Navigator.pushNamed(
-                          context,
-                          AppRoutes.propertySearchRoute,
-                          arguments: widget.vendorType,
-                        );
-                      })
-                      .expand(),
-                ]).px16(),
-                20.heightBox,
-              ]).box.color(context.primaryColor).make(),
+              // Encabezado flexible: evita desbordamientos en pantallas angostas.
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                decoration: BoxDecoration(
+                  color: context.primaryColor,
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(28),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Descubre tu próxima estadía',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.headlineMedium?.copyWith(
+                        color: primaryThemeColor,
+                        fontWeight: FontWeight.w800,
+                        height: 1.08,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Material(
+                      color: context.theme.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      elevation: 3,
+                      shadowColor: Colors.black26,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(20),
+                        onTap:
+                            () => Navigator.pushNamed(
+                              context,
+                              AppRoutes.propertySearchRoute,
+                              arguments: widget.vendorType,
+                            ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 42,
+                                height: 42,
+                                decoration: BoxDecoration(
+                                  color: context.primaryColor.withOpacity(.12),
+                                  borderRadius: BorderRadius.circular(13),
+                                ),
+                                child: Icon(
+                                  Icons.search_rounded,
+                                  color: context.primaryColor,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '¿A dónde?',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Cualquier lugar · Cualquier fecha · Huéspedes',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall?.copyWith(
+                                        color:
+                                            context
+                                                .theme
+                                                .colorScheme
+                                                .onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Icon(Icons.tune_rounded),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
               // Banners
               if (showBannersView)
@@ -197,34 +252,46 @@ class _BookingPageState extends State<BookingPage>
                               !model.busy(model.propertyTypes) &&
                               !model.busy(model.properties) &&
                               model.properties.isEmpty)
-                          ? Padding(
-                            padding: const EdgeInsets.all(
-                              Sizes.paddingSizeDefault,
+                          ? Container(
+                            margin: const EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(28),
+                            decoration: BoxDecoration(
+                              color: context
+                                  .theme
+                                  .colorScheme
+                                  .surfaceContainerHighest
+                                  .withOpacity(.55),
+                              borderRadius: BorderRadius.circular(24),
                             ),
-                            child: VStack(
-                              [
-                                //img,title,description
+                            child: Column(
+                              children: [
                                 Icon(
                                   HugeIcons.strokeRoundedHouse01,
-                                  size: 50,
+                                  size: 52,
                                   color: context.primaryColor,
                                 ),
-                                10.heightBox,
-                                "No Properties Found"
-                                    .tr()
-                                    .text
-                                    .center
-                                    .xl
-                                    .semiBold
-                                    .makeCentered(),
-                                "No properties found for this property type. Please try another property type."
-                                    .tr()
-                                    .text
-                                    .center
-                                    .makeCentered(),
+                                const SizedBox(height: 14),
+                                Text(
+                                  'Aún no hay propiedades',
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.titleLarge
+                                      ?.copyWith(fontWeight: FontWeight.w800),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  'Prueba otra categoría o ajusta tu búsqueda.',
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.bodyMedium?.copyWith(
+                                    color:
+                                        context
+                                            .theme
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                  ),
+                                ),
                               ],
-                              crossAlignment: CrossAxisAlignment.center,
-                              alignment: MainAxisAlignment.center,
                             ),
                           )
                           : 0.heightBox,
