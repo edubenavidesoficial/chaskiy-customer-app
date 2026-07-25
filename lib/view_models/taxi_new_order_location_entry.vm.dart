@@ -77,8 +77,8 @@ class NewTaxiOrderLocationEntryViewModel extends MyBaseViewModel {
     setBusyForObject(previousAddresses, true);
     try {
       previousAddresses = await taxiRequest.locationHistory();
-      if (previousAddresses.length > 3) {
-        shortPreviousAddressesList = previousAddresses.sublist(0, 3);
+      if (previousAddresses.length > 2) {
+        shortPreviousAddressesList = previousAddresses.sublist(0, 2);
       } else {
         shortPreviousAddressesList = previousAddresses;
       }
@@ -162,9 +162,7 @@ class NewTaxiOrderLocationEntryViewModel extends MyBaseViewModel {
       context: viewContext,
       initialDate: selectedDate ?? DateTime.now(),
       firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(
-        AppStrings.taxiMaxScheduleDays.toInt().days,
-      ),
+      lastDate: DateTime.now().add(AppStrings.taxiMaxScheduleDays.toInt().days),
       fieldLabelText: 'Date'.tr(),
     );
 
@@ -222,21 +220,18 @@ class NewTaxiOrderLocationEntryViewModel extends MyBaseViewModel {
   void searchPlace(String keyword) async {
     clearAlreadySelected();
     if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(
-      const Duration(milliseconds: 1000),
-      () async {
-        // do something with query
-        setBusyForObject(places, true);
-        try {
-          places = await geocoderService.findAddressesFromQuery(keyword);
-        } catch (error) {
-          print("search error ==> $error");
-          places = [];
-        }
-        setBusyForObject(places, false);
-        notifyListeners();
-      },
-    );
+    _debounce = Timer(const Duration(milliseconds: 1000), () async {
+      // do something with query
+      setBusyForObject(places, true);
+      try {
+        places = await geocoderService.findAddressesFromQuery(keyword);
+      } catch (error) {
+        print("search error ==> $error");
+        places = [];
+      }
+      setBusyForObject(places, false);
+      notifyListeners();
+    });
   }
 
   onAddressSelected(Address address) async {

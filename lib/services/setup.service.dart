@@ -2,7 +2,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:chaskiy/services/general_app.service.dart';
 import 'package:chaskiy/services/notification.service.dart';
-import 'package:chaskiy/services/phone_util.service.dart';
 import 'package:chaskiy/services/permission.service.dart';
 import 'package:chaskiy/services/firebase.service.dart';
 
@@ -16,10 +15,11 @@ class SetupService {
     try {
       debugPrint('SetupService: Starting app initialization...');
 
-      // Initialize services in order
-      await _initializeNotifications();
-      await _initializePhoneUtil();
-      await _initializeFirebaseMessaging();
+      // Estos servicios pueden prepararse en paralelo y no bloquean Inicio.
+      await Future.wait([
+        _initializeNotifications(),
+        _initializeFirebaseMessaging(),
+      ]);
 
       _isInitialized = true;
       debugPrint('SetupService: App initialization completed successfully');
@@ -46,18 +46,6 @@ class SetupService {
       debugPrint('SetupService: Notifications initialized successfully');
     } catch (e) {
       debugPrint('SetupService: Error initializing notifications: $e');
-      rethrow;
-    }
-  }
-
-  /// Initialize phone utility service
-  static Future<void> _initializePhoneUtil() async {
-    try {
-      debugPrint('SetupService: Initializing phone utility...');
-      await PhoneUtilService.init();
-      debugPrint('SetupService: Phone utility initialized successfully');
-    } catch (e) {
-      debugPrint('SetupService: Error initializing phone utility: $e');
       rethrow;
     }
   }
@@ -114,9 +102,6 @@ class SetupService {
 
   /// Get initialization status for all services
   static Map<String, bool> getInitializationStatus() {
-    return {
-      'setupService': _isInitialized,
-      'phoneUtil': PhoneUtilService.isInitialized,
-    };
+    return {'setupService': _isInitialized};
   }
 }

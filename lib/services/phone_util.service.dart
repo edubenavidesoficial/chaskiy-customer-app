@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:country_picker/country_picker.dart';
 import 'package:chaskiy/services/local_storage.service.dart';
-import 'package:sim_card_code/sim_card_code.dart';
 
 class PhoneUtilService {
   static Country? _userCountry;
@@ -53,14 +52,9 @@ class PhoneUtilService {
       }
     }
 
-    // Try SIM card first, then fallback to locale
-    _userCountry =
-        await _getCountryFromLocale() ??
-        await _getCountryFromSIM().timeout(
-          const Duration(milliseconds: 1500),
-          onTimeout: () => null,
-        ) ??
-        Country.tryParse('EC');
+    // Región del dispositivo; no consultamos la SIM porque es una API
+    // obsoleta en iOS y añade trabajo innecesario al arranque.
+    _userCountry = await _getCountryFromLocale() ?? Country.tryParse('EC');
 
     // Cache the result
     if (_userCountry != null) {
@@ -111,23 +105,6 @@ class PhoneUtilService {
 
   /// Check if service is initialized
   static bool get isInitialized => _isInitialized;
-
-  /// Get country from SIM card
-  static Future<Country?> _getCountryFromSIM() async {
-    try {
-      final simCountryCode = await SimCardManager.simCountryCode;
-      if (simCountryCode != null && simCountryCode.isNotEmpty) {
-        final country = Country.tryParse(simCountryCode.toUpperCase());
-        if (country != null) {
-          print('Country detected from SIM: ${country.countryCode}');
-          return country;
-        }
-      }
-    } catch (e) {
-      print('Error getting country from SIM: $e');
-    }
-    return null;
-  }
 
   /// Get country from device locale
   static Future<Country?> _getCountryFromLocale() async {

@@ -27,7 +27,12 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
   bool ignoreMapInteraction = false;
 
   //MAp related variables
-  CameraPosition mapCameraPosition = CameraPosition(target: LatLng(0.00, 0.00));
+  // Nunca iniciar en (0, 0): mientras llega el GPS mostramos Ecuador.
+  static const LatLng ecuadorFallback = LatLng(-0.180653, -78.467834);
+  CameraPosition mapCameraPosition = const CameraPosition(
+    target: ecuadorFallback,
+    zoom: 12,
+  );
   GoogleMapController? googleMapController;
   String? mapStyle;
   EdgeInsets googleMapPadding = EdgeInsets.all(10);
@@ -76,7 +81,6 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
 
   void onMapCreated(GoogleMapController controller) {
     googleMapController = controller;
-    notifyListeners();
     setGoogleMapStyle();
     //start listening to user current location
     startUserLocationListener();
@@ -85,11 +89,15 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
 
   //
   void setGoogleMapStyle() async {
-    mapStyle = await DefaultAssetBundle.of(
-      viewContext,
-    ).loadString('assets/json/google_map_style.json');
-    //
-    notifyListeners();
+    if (mapStyle != null) return;
+    try {
+      mapStyle = await DefaultAssetBundle.of(
+        viewContext,
+      ).loadString('assets/json/google_map_style.json');
+      notifyListeners();
+    } catch (_) {
+      // El mapa nativo sigue funcionando si el estilo no está disponible.
+    }
   }
 
   //
@@ -123,31 +131,32 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
 
   //
   void startUserLocationListener() async {
-    //
     await LocationService.prepareLocationListener();
+    await zoomToCurrentLocation();
+    await currentLocationListener?.cancel();
     currentLocationListener = LocationService.currenctAddressSubject.listen((
       currentAddress,
     ) {
-      //
       if (!onTrip) {
-        zoomToLocation(
-          LatLng(
-            currentAddress.coordinates?.latitude ?? 0.00,
-            currentAddress.coordinates?.longitude ?? 0.00,
-          ),
-        );
+        final latitude = currentAddress.coordinates?.latitude;
+        final longitude = currentAddress.coordinates?.longitude;
+        if (latitude == null ||
+            longitude == null ||
+            (latitude == 0 && longitude == 0)) {
+          return;
+        }
+        zoomToLocation(LatLng(latitude, longitude));
       }
     });
   }
 
   //zoom to provided location
   void zoomToLocation(LatLng target, {double zoom = 16}) {
+    if (target.latitude == 0 && target.longitude == 0) return;
+    mapCameraPosition = CameraPosition(target: target, zoom: zoom);
     googleMapController?.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(target: target, zoom: zoom),
-      ),
+      CameraUpdate.newCameraPosition(mapCameraPosition),
     );
-    notifyListeners();
   }
 
   openLocationSelector(int step, {bool showpicker = true}) async {
@@ -415,16 +424,21 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     }
   }
 
-  zoomToCurrentLocation() async {
-    Position? currentLocation = await Geolocator.getLastKnownPosition();
-    if (currentLocation == null) {
-      currentLocation = await Geolocator.getCurrentPosition();
+  Future<void> zoomToCurrentLocation() async {
+    try {
+      Position? currentLocation = await Geolocator.getLastKnownPosition();
+      currentLocation ??= await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 8),
+        ),
+      );
+      zoomToLocation(
+        LatLng(currentLocation.latitude, currentLocation.longitude),
+      );
+    } catch (_) {
+      zoomToLocation(ecuadorFallback, zoom: 12);
     }
-
-    //
-    double lat = currentLocation.latitude;
-    double lng = currentLocation.longitude;
-    zoomToLocation(LatLng(lat, lng));
   }
 
   //

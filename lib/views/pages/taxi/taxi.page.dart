@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/models/vendor_type.dart';
-import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/view_models/taxi.vm.dart';
 import 'package:chaskiy/views/pages/taxi/widgets/new_order_step_1.dart';
 import 'package:chaskiy/views/pages/taxi/widgets/new_order_step_2.dart';
@@ -11,10 +10,8 @@ import 'package:chaskiy/views/pages/taxi/widgets/taxi_trip_ready.view.dart';
 import 'package:chaskiy/views/pages/taxi/widgets/trip_driver_search.dart';
 import 'package:chaskiy/views/pages/taxi/widgets/unsupported_taxi_location.view.dart';
 import 'package:chaskiy/widgets/base.page.dart';
-import 'package:chaskiy/widgets/buttons/custom_leading.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stacked/stacked.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 class TaxiPage extends StatefulWidget {
   const TaxiPage(this.vendorType, {Key? key}) : super(key: key);
@@ -54,39 +51,44 @@ class _TaxiPageState extends State<TaxiPage> with WidgetsBindingObserver {
           showLeadingAction: !AppStrings.isSingleVendorMode,
           elevation: 0,
           title: "${widget.vendorType.name}",
-          appBarColor: context.theme.colorScheme.surface,
+          appBarColor: Theme.of(context).colorScheme.surface,
           appBarItemColor: AppColor.primaryColor,
           body: Stack(
             children: [
               //google map
-              SafeArea(
-                child: GoogleMap(
-                  initialCameraPosition: vm.mapCameraPosition,
-                  onMapCreated: vm.onMapCreated,
-                  padding: vm.googleMapPadding,
-                  zoomGesturesEnabled: true,
-                  zoomControlsEnabled: false,
-                  myLocationButtonEnabled: true,
-                  myLocationEnabled: true,
-                  markers: vm.gMapMarkers,
-                  polylines: vm.gMapPolylines,
-                  style: vm.mapStyle,
-                ),
+              GoogleMap(
+                initialCameraPosition: vm.mapCameraPosition,
+                onMapCreated: vm.onMapCreated,
+                padding: vm.googleMapPadding,
+                zoomGesturesEnabled: true,
+                zoomControlsEnabled: false,
+                myLocationButtonEnabled: true,
+                myLocationEnabled: true,
+                markers: vm.gMapMarkers,
+                polylines: vm.gMapPolylines,
+                style: vm.mapStyle,
               ),
 
-              //custom leading appbar
-              Visibility(
-                visible: !AppStrings.isSingleVendorMode,
-                child: CustomLeading(
-                  padding: 10,
-                  size: 24,
-                  color: AppColor.primaryColor,
-                  bgColor: Utils.textColorByTheme(),
-                ).safeArea().positioned(
-                      top: 0,
-                      left: !Utils.isArabic ? 20 : null,
-                      right: Utils.isArabic ? 20 : null,
-                    ),
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (!AppStrings.isSingleVendorMode)
+                        _MapActionButton(
+                          icon: Icons.arrow_back_rounded,
+                          onPressed: () => Navigator.maybePop(context),
+                        )
+                      else
+                        const SizedBox.shrink(),
+                      _MapActionButton(
+                        icon: Icons.my_location_rounded,
+                        onPressed: vm.zoomToCurrentLocation,
+                      ),
+                    ],
+                  ),
+                ),
               ),
 
               //show when location is not supported
@@ -114,6 +116,32 @@ class _TaxiPageState extends State<TaxiPage> with WidgetsBindingObserver {
           ),
         );
       },
+    );
+  }
+}
+
+class _MapActionButton extends StatelessWidget {
+  const _MapActionButton({required this.icon, required this.onPressed});
+
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Theme.of(context).colorScheme.surface,
+      elevation: 4,
+      shadowColor: const Color(0x330F2A4D),
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onPressed,
+        child: SizedBox(
+          width: 52,
+          height: 52,
+          child: Icon(icon, color: AppColor.primaryColor),
+        ),
+      ),
     );
   }
 }

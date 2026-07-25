@@ -110,7 +110,6 @@ dependencies:
   share_plus: ^12.0.1
   shared_preferences: ^2.5.4
   sign_in_with_apple: ^7.0.1
-  sim_card_code: ^0.1.0
   simple_html_css: ^5.0.0
   singleton: ^0.0.3-nullsafety
   slide_countdown: ^0.2.8
