@@ -28,8 +28,16 @@ class EditProfileViewModel extends MyBaseViewModel {
 
   EditProfileViewModel(BuildContext context) {
     this.viewContext = context;
-    String countryCode = PhoneUtilService.countryCode ?? "us";
+    String countryCode = PhoneUtilService.countryCode ?? "EC";
     this.selectedCountry = Country.parse(countryCode);
+  }
+
+  @override
+  void dispose() {
+    nameTEC.dispose();
+    emailTEC.dispose();
+    phoneTEC.dispose();
+    super.dispose();
   }
 
   void initialise() async {

@@ -29,23 +29,15 @@ class VendorPlainDetailsView extends StatelessWidget {
         SizedBox(
           width: 50,
           height: 50,
-          child: FittedBox(
-            child: ShareButton(
-              model: model,
-            ),
-          ),
+          child: FittedBox(child: ShareButton(model: model)),
         ),
         UiSpacer.hSpace(10),
         PageCartAction(),
       ],
-      body: model.vendor!.isServiceType
-          ? ServiceVendorDetailsPage(
-              model,
-              vendor: model.vendor!,
-            )
-          : VendorDetailsWithSubcategoryPage(
-              vendor: model.vendor!,
-            ),
+      body:
+          model.vendor!.isServiceType
+              ? ServiceVendorDetailsPage(model, vendor: model.vendor!)
+              : VendorDetailsWithSubcategoryPage(model: model),
       //
       bottomSheet: CartViewBottomSheet(),
     );

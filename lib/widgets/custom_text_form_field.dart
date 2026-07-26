@@ -73,24 +73,38 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         labelText: widget.labelText,
         hintText: widget.hintText,
         errorText: widget.errorText,
-        enabledBorder: widget.underline
-            ? InputStyles.inputUnderlineEnabledBorder()
-            : InputStyles.inputEnabledBorder(),
-        errorBorder: widget.underline
-            ? InputStyles.inputUnderlineEnabledBorder()
-            : InputStyles.inputEnabledBorder(),
-        focusedErrorBorder: widget.underline
-            ? InputStyles.inputUnderlineFocusBorder()
-            : InputStyles.inputFocusBorder(),
-        focusedBorder: widget.underline
-            ? InputStyles.inputUnderlineFocusBorder()
-            : InputStyles.inputFocusBorder(),
+        enabledBorder:
+            widget.underline
+                ? InputStyles.inputUnderlineEnabledBorder()
+                : InputStyles.inputEnabledBorder(),
+        errorBorder:
+            widget.underline
+                ? InputStyles.inputUnderlineEnabledBorder()
+                : InputStyles.inputEnabledBorder(),
+        focusedErrorBorder:
+            widget.underline
+                ? InputStyles.inputUnderlineFocusBorder()
+                : InputStyles.inputFocusBorder(),
+        focusedBorder:
+            widget.underline
+                ? InputStyles.inputUnderlineFocusBorder()
+                : InputStyles.inputFocusBorder(),
         prefixIcon: widget.prefixIcon,
         suffixIcon: widget.suffixIcon ?? _getSuffixWidget(),
-        labelStyle: Theme.of(context).textTheme.bodyLarge,
-        contentPadding: EdgeInsets.all(10),
-        filled: widget.fillColor != null,
-        fillColor: widget.fillColor,
+        labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          fontWeight: FontWeight.w600,
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 17,
+        ),
+        filled: widget.filled ?? !widget.underline,
+        fillColor:
+            widget.fillColor ??
+            Theme.of(
+              context,
+            ).colorScheme.surfaceContainerHighest.withValues(alpha: .48),
       ),
       inputFormatters: widget.inputFormatters,
       cursorColor: AppColor.cursorColor,
@@ -124,9 +138,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         height: 30,
         padding: EdgeInsets.all(0),
         child: TextButton(
-          style: TextButton.styleFrom(
-            padding: EdgeInsets.all(0),
-          ),
+          style: TextButton.styleFrom(padding: EdgeInsets.all(0)),
           onPressed: () {
             setState(() {
               makePasswordVisible = !makePasswordVisible;

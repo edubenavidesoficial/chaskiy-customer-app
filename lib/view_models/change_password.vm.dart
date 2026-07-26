@@ -20,6 +20,14 @@ class ChangePasswordViewModel extends MyBaseViewModel {
     this.viewContext = context;
   }
 
+  @override
+  void dispose() {
+    currentPasswordTEC.dispose();
+    newPasswordTEC.dispose();
+    confirmNewPasswordTEC.dispose();
+    super.dispose();
+  }
+
   //
   processUpdate() async {
     //
@@ -42,11 +50,12 @@ class ChangePasswordViewModel extends MyBaseViewModel {
         type: apiResponse.allGood ? AlertType.success : AlertType.error,
         title: "Change Password".tr(),
         text: apiResponse.message,
-        onConfirm: apiResponse.allGood
-            ? () {
-                viewContext.pop(true);
-              }
-            : null,
+        onConfirm:
+            apiResponse.allGood
+                ? () {
+                  viewContext.pop(true);
+                }
+                : null,
       );
     }
   }
