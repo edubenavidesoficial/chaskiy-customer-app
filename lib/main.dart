@@ -31,7 +31,7 @@ void main() async {
         HttpOverrides.global = DevHttpOverrides();
       }
 
-      // Solo bloquean el primer fotograma los servicios imprescindibles.
+      // Solo bloquean el primer fotograma los servicios imprescindibles
       await Future.wait([
         Firebase.initializeApp(),
         translator.init(
