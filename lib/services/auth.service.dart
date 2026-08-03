@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/models/user.dart';
+import 'package:chaskiy/models/driver_vehicle.dart';
 import 'package:chaskiy/services/app.service.dart';
 import 'package:chaskiy/services/firebase.service.dart';
 import 'package:chaskiy/services/http.service.dart';
+import 'package:chaskiy/services/session.service.dart';
 import 'package:chaskiy/view_models/splash.vm.dart';
 import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 
@@ -74,6 +76,7 @@ class AuthServices {
       );
       final userObject = json.decode(userStringObject ?? "{}");
       currentUser = User.fromJson(userObject);
+      await SessionService.setUser(currentUser!);
     }
     return currentUser!;
   }
@@ -91,14 +94,17 @@ class AuthServices {
         AppStrings.userKey,
         json.encode(currentUser.toJson()),
       );
+      await SessionService.setUser(currentUser);
 
       //subscribe to firebase topic
-      List<String> roles = [
+      final audienceTopic =
+          SessionService.isDriver ? "d_${currentUser.id}" : "client";
+      final roles = <String>{
         "all",
         "${currentUser.id}",
         "${currentUser.role}",
-        "client",
-      ];
+        audienceTopic,
+      };
 
       for (var role in roles) {
         try {
@@ -121,22 +127,49 @@ class AuthServices {
     }
   }
 
+  static DriverVehicle? currentDriverVehicle;
+
+  static Future<DriverVehicle?> getDriverVehicle({bool force = false}) async {
+    if (currentDriverVehicle == null || force) {
+      final raw = LocalStorageService.prefs?.getString(
+        AppStrings.driverVehicleKey,
+      );
+      if (raw == null || raw.isEmpty) return null;
+      currentDriverVehicle = DriverVehicle.fromJson(json.decode(raw));
+    }
+    return currentDriverVehicle;
+  }
+
+  static Future<void> saveDriverVehicle(dynamic jsonObject) async {
+    final vehicle = DriverVehicle.fromJson(
+      Map<String, dynamic>.from(jsonObject),
+    );
+    currentDriverVehicle = vehicle;
+    await LocalStorageService.prefs?.setString(
+      AppStrings.driverVehicleKey,
+      json.encode(vehicle.toJson()),
+    );
+  }
+
   ///
   ///
   //
   static Future<void> logout() async {
+    final user = currentUser;
+    final wasDriver = SessionService.isDriver;
     await HttpService().getCacheManager().clearAll();
     await LocalStorageService.prefs?.clear();
     await LocalStorageService.rxPrefs?.clear();
     await LocalStorageService.prefs?.setBool(AppStrings.firstTimeOnApp, false);
 
     //
-    List<String> roles = [
-      "${currentUser?.id}",
-      "${currentUser?.role}",
+    final roles = <String>{
+      if (user != null) "${user.id}",
+      if (user != null) user.role,
       "client",
+      if (wasDriver && user != null) "d_${user.id}",
       "all",
-    ];
+    };
     for (var role in roles) {
       try {
         FirebaseService().firebaseMessaging.unsubscribeFromTopic(role);
@@ -144,6 +177,9 @@ class AuthServices {
         print("Unable to unsubscribe to:: $role");
       }
     }
+    currentUser = null;
+    currentDriverVehicle = null;
+    await SessionService.clear();
     await FirebaseAuth.instance.signOut();
   }
 }

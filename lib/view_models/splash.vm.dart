@@ -13,6 +13,7 @@ import 'package:chaskiy/requests/settings.request.dart';
 import 'package:chaskiy/services/app_currency_system.service.dart';
 import 'package:chaskiy/services/auth.service.dart';
 import 'package:chaskiy/services/firebase.service.dart';
+import 'package:chaskiy/services/session.service.dart';
 import 'package:chaskiy/services/local_storage.service.dart';
 import 'package:chaskiy/services/websocket.service.dart';
 import 'package:chaskiy/utils/utils.dart';
@@ -35,10 +36,10 @@ class SplashViewModel extends MyBaseViewModel {
   //
   initialise() async {
     super.initialise();
-    await loadAppSettings();
     if (await AuthServices.authenticated()) {
       await AuthServices.getCurrentUser(force: true);
     }
+    await loadAppSettings();
   }
 
   @override
@@ -180,7 +181,12 @@ class SplashViewModel extends MyBaseViewModel {
     //
     await Utils.setJiffyLocale();
     //
-    if (AuthServices.firstTimeOnApp()) {
+    if (AuthServices.authenticated() && SessionService.isDriver) {
+      Navigator.of(viewContext).pushNamedAndRemoveUntil(
+        AppRoutes.driverHomeRoute,
+        (Route<dynamic> route) => false,
+      );
+    } else if (AuthServices.firstTimeOnApp()) {
       await AuthServices.setLocale("es");
       await translator.setNewLanguage(
         viewContext,

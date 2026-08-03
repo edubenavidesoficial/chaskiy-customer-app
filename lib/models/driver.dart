@@ -3,7 +3,6 @@ import 'package:chaskiy/models/vehicle.dart';
 
 class Driver extends User {
   Vehicle? vehicle;
-  double? rating;
 
   Driver({
     required int id,
@@ -17,7 +16,7 @@ class Driver extends User {
     required String role,
     required String walletAddress,
     this.vehicle,
-    this.rating,
+    double rating = 3,
   }) : super(
           id: id,
           code: code,
@@ -29,6 +28,7 @@ class Driver extends User {
           photo: photo,
           role: role,
           walletAddress: walletAddress,
+          rating: rating,
         );
 
   //create fatory method to convert json to object

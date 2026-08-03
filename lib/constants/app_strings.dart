@@ -154,6 +154,8 @@ class AppStrings {
   static String authenticated = "authenticated";
   static String userAuthToken = "auth_token";
   static String userKey = "user";
+  static String activeRole = "active_role";
+  static String driverVehicleKey = "driver_vehicle";
   static String appLocale = "locale";
   static String notificationsKey = "notifications";
   static String appCurrency = "currency";

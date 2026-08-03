@@ -4,6 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:chaskiy/constants/api.dart';
 import 'package:chaskiy/models/api_response.dart';
+import 'package:chaskiy/models/user.dart';
 import 'package:chaskiy/services/firebase_token.service.dart';
 import 'package:chaskiy/services/http.service.dart';
 
@@ -12,10 +13,12 @@ class AuthRequest extends HttpService {
   Future<ApiResponse> loginRequest({
     required String email,
     required String password,
+    String? role,
   }) async {
     final apiResult = await post(Api.login, {
       "email": email,
       "password": password,
+      if (role != null) "role": role,
       "tokens": await FirebaseTokenService().getDeviceToken(),
     });
 
@@ -23,9 +26,13 @@ class AuthRequest extends HttpService {
   }
 
   //
-  Future<ApiResponse> qrLoginRequest({required String code}) async {
+  Future<ApiResponse> qrLoginRequest({
+    required String code,
+    String? role,
+  }) async {
     final apiResult = await post(Api.qrlogin, {
       "code": code,
+      if (role != null) "role": role,
       "tokens": await FirebaseTokenService().getDeviceToken(),
     });
 
@@ -76,6 +83,32 @@ class AuthRequest extends HttpService {
   Future<ApiResponse> logoutRequest() async {
     final apiResult = await get(Api.logout);
     return ApiResponse.fromResponse(apiResult);
+  }
+
+  Future<ApiResponse> updateOnlineStatus({required bool isOnline}) async {
+    final apiResult = await post(Api.updateProfile, {
+      "_method": "PUT",
+      "is_online": isOnline ? 1 : 0,
+    });
+    return ApiResponse.fromResponse(apiResult);
+  }
+
+  Future<User> getMyDetails() async {
+    final result = await get(Api.myProfile);
+    final response = ApiResponse.fromResponse(result);
+    if (!response.allGood) throw response.message ?? 'No se pudo actualizar';
+    return User.fromJson(Map<String, dynamic>.from(response.body));
+  }
+
+  Future<ApiResponse> submitDriverDocuments({required List<File> files}) async {
+    final formData = FormData.fromMap({});
+    for (final file in files) {
+      formData.files.add(
+        MapEntry('documents[]', await MultipartFile.fromFile(file.path)),
+      );
+    }
+    final result = await postWithFiles(Api.driverDocumentSubmission, formData);
+    return ApiResponse.fromResponse(result);
   }
 
   //

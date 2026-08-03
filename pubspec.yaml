@@ -50,6 +50,7 @@ dependencies:
   easy_refresh: ^3.4.0
   eva_icons_flutter:
     path: third_party/eva_icons_flutter
+  file_picker: ^10.3.10
   firebase_auth: ^6.2.0
   firebase_core: ^4.5.0
   firebase_crashlytics: ^5.0.8

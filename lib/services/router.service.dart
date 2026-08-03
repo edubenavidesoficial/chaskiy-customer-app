@@ -20,6 +20,7 @@ import 'package:chaskiy/views/pages/delivery_address/edit_delivery_addresses.pag
 import 'package:chaskiy/views/pages/delivery_address/new_delivery_addresses.page.dart';
 import 'package:chaskiy/views/pages/favourite/favourites.page.dart';
 import 'package:chaskiy/views/pages/home.page.dart';
+import 'package:chaskiy/views/pages/driver/driver_home.page.dart';
 import 'package:chaskiy/views/pages/order/orders_tracking.page.dart';
 import 'package:chaskiy/views/pages/profile/change_password.page.dart';
 import 'package:chaskiy/views/pages/service/service_details.page.dart';
@@ -56,6 +57,12 @@ Route<dynamic>? generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         settings: RouteSettings(name: AppRoutes.homeRoute, arguments: Map()),
         builder: (context) => LocationFetchPage(child: HomePage()),
+      );
+
+    case AppRoutes.driverHomeRoute:
+      return MaterialPageRoute(
+        settings: const RouteSettings(name: AppRoutes.driverHomeRoute),
+        builder: (context) => const DriverHomePage(),
       );
 
     //SEARCH

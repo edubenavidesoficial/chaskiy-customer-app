@@ -5,6 +5,7 @@ import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/app_images.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/constants/sizes.dart';
+import 'package:chaskiy/enums/app_role.dart';
 import 'package:chaskiy/utils/ui_spacer.dart';
 import 'package:chaskiy/view_models/login.view_model.dart';
 import 'package:chaskiy/views/pages/auth/login/compain_login_type.view.dart';
@@ -23,9 +24,14 @@ import 'package:velocity_x/velocity_x.dart';
 import 'login/scan_login.view.dart';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({this.required = false, Key? key}) : super(key: key);
+  LoginPage({
+    this.required = false,
+    this.expectedRole = AppRole.customer,
+    Key? key,
+  }) : super(key: key);
 
   final bool required;
+  final AppRole expectedRole;
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -36,7 +42,10 @@ class _LoginPageState extends State<LoginPage> {
     return DynamicStatusBar(
       baseColor: context.backgroundColor,
       child: ViewModelBuilder<LoginViewModel>.reactive(
-        viewModelBuilder: () => LoginViewModel(context),
+        viewModelBuilder: () => LoginViewModel(
+          context,
+          expectedRole: widget.expectedRole,
+        ),
         onViewModelReady: (model) => model.initialise(),
         builder: (context, model, child) {
           return PopScope(
@@ -77,8 +86,19 @@ class _LoginPageState extends State<LoginPage> {
                           //
                           HStack([
                             VStack([
-                              "Welcome Back".tr().text.xl2.semiBold.make(),
-                              "Login to continue".tr().text.light.make(),
+                              (widget.expectedRole == AppRole.driver
+                                      ? "Acceso para conductores"
+                                      : "Welcome Back".tr())
+                                  .text
+                                  .xl2
+                                  .semiBold
+                                  .make(),
+                              (widget.expectedRole == AppRole.driver
+                                      ? "Conductor o motorizado"
+                                      : "Login to continue".tr())
+                                  .text
+                                  .light
+                                  .make(),
                             ]).expand(),
                             Image.asset(AppImages.appLogo)
                                 .h(60)
@@ -108,12 +128,14 @@ class _LoginPageState extends State<LoginPage> {
                         ]).wFull(context).px20().pOnly(top: Vx.dp20),
                         //
                         //register
-                        HStack([
-                          UiSpacer.divider().expand(),
-                          "OR".tr().text.light.make().px8(),
-                          UiSpacer.divider().expand(),
-                        ]).py8().px20(),
-                        "New user?".tr().richText
+                        if (widget.expectedRole == AppRole.customer)
+                          HStack([
+                            UiSpacer.divider().expand(),
+                            "OR".tr().text.light.make().px8(),
+                            UiSpacer.divider().expand(),
+                          ]).py8().px20(),
+                        if (widget.expectedRole == AppRole.customer)
+                          "New user?".tr().richText
                             .withTextSpanChildren([
                               " ".textSpan.make(),
                               "Create An Account"
@@ -125,17 +147,63 @@ class _LoginPageState extends State<LoginPage> {
                             ])
                             .makeCentered()
                             .py12()
-                            .onInkTap(model.openRegister),
-                        SocialMediaView(model, bottomPadding: 10),
+                              .onInkTap(model.openRegister),
+                        if (widget.expectedRole == AppRole.customer)
+                          SocialMediaView(model, bottomPadding: 10),
                         ScanLoginView(model),
-                        if (Platform.isAndroid)
+                        if (widget.expectedRole == AppRole.customer &&
+                            Platform.isAndroid)
                           CompanionAppsDownloadView(model),
+                        if (widget.expectedRole == AppRole.customer)
+                          _DriverAccessCard(
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => LoginPage(
+                                  expectedRole: AppRole.driver,
+                                ),
+                              ),
+                            ),
+                          ).px20().py16(),
                       ]).scrollVertical(),
                 ),
               ),
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _DriverAccessCard extends StatelessWidget {
+  const _DriverAccessCard({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      color: AppColor.primaryColor.withValues(alpha: .08),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(Sizes.radiusLarge),
+        side: BorderSide(
+          color: AppColor.primaryColor.withValues(alpha: .18),
+        ),
+      ),
+      child: ListTile(
+        onTap: onTap,
+        leading: CircleAvatar(
+          backgroundColor: AppColor.primaryColor,
+          foregroundColor: Colors.white,
+          child: const Icon(Icons.delivery_dining),
+        ),
+        title: const Text(
+          "¿Trabajas con Chaskiy?",
+          style: TextStyle(fontWeight: FontWeight.w700),
+        ),
+        subtitle: const Text("Inicia sesión como conductor o motorizado"),
+        trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
       ),
     );
   }

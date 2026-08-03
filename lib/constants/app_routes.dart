@@ -6,6 +6,7 @@ class AppRoutes {
   static const registerRoute = "register";
   static const forgotPasswordRoute = "forgot_password";
   static const homeRoute = "home";
+  static const driverHomeRoute = "driver_home";
   static const notificationsRoute = "notificaitions";
   static const notificationDetailsRoute = "notificaition_details";
 

@@ -1,10 +1,12 @@
 import 'dart:developer';
 
 import 'package:country_picker/country_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/enums/app_role.dart';
 import 'package:chaskiy/models/api_response.dart';
+import 'package:chaskiy/models/user.dart';
 import 'package:chaskiy/requests/auth.request.dart';
 import 'package:chaskiy/services/alert.service.dart';
 import 'package:chaskiy/services/auth.service.dart';
@@ -15,6 +17,7 @@ import 'package:chaskiy/traits/qrcode_scanner.trait.dart';
 import 'package:chaskiy/views/pages/auth/forgot_password.page.dart';
 import 'package:chaskiy/views/pages/auth/register.page.dart';
 import 'package:chaskiy/views/pages/home.page.dart';
+import 'package:chaskiy/views/pages/driver/driver_home.page.dart';
 import 'package:chaskiy/widgets/bottomsheets/account_verification_entry.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'base.view_model.dart';
@@ -22,6 +25,7 @@ import 'package:velocity_x/velocity_x.dart';
 import 'package:chaskiy/extensions/context.dart';
 
 class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
+  final AppRole expectedRole;
   //the textediting controllers
   TextEditingController phoneTEC = new TextEditingController();
   TextEditingController emailTEC = new TextEditingController();
@@ -36,7 +40,10 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
   Country? selectedCountry;
   String? accountPhoneNumber;
 
-  LoginViewModel(BuildContext context) {
+  LoginViewModel(
+    BuildContext context, {
+    this.expectedRole = AppRole.customer,
+  }) {
     this.viewContext = context;
   }
 
@@ -274,6 +281,7 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
       final apiResponse = await authRequest.loginRequest(
         email: emailTEC.text,
         password: passwordTEC.text,
+        role: expectedRole == AppRole.driver ? 'driver' : null,
       );
       setBusy(false);
 
@@ -292,7 +300,10 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
       setBusy(true);
 
       try {
-        final apiResponse = await authRequest.qrLoginRequest(code: loginCode);
+        final apiResponse = await authRequest.qrLoginRequest(
+          code: loginCode,
+          role: expectedRole == AppRole.driver ? 'driver' : null,
+        );
         //
         setBusy(false);
         await handleDeviceLogin(apiResponse);
@@ -315,12 +326,25 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
           text: apiResponse.message,
         );
       } else {
+        final user = User.fromJson(apiResponse.body["user"]);
+        final authenticatedRole = AppRole.fromBackendRole(user.role);
+        if (authenticatedRole != expectedRole) {
+          final message = expectedRole == AppRole.driver
+              ? "Esta cuenta no pertenece a un conductor o motorizado."
+              : "Esta cuenta pertenece a un conductor. Usa el acceso para conductores y motorizados.";
+          AlertService.error(title: "Acceso incorrecto", text: message);
+          return;
+        }
         //everything works well
         //firebase auth
         setBusy(true);
         final fbToken = apiResponse.body["fb_token"];
         await FirebaseAuth.instance.signInWithCustomToken(fbToken);
-        await AuthServices.saveUser(apiResponse.body["user"]);
+        await AuthServices.saveUser(apiResponse.body["user"], reload: false);
+        if (expectedRole == AppRole.driver &&
+            apiResponse.body["vehicle"] is Map) {
+          await AuthServices.saveDriverVehicle(apiResponse.body["vehicle"]);
+        }
         await AuthServices.setAuthBearerToken(apiResponse.body["token"]);
         await AuthServices.isAuthenticated();
         setBusy(false);
@@ -329,7 +353,11 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
         //   AppRoutes.homeRoute,
         //   (_) => false,
         // );
-        viewContext.nextAndRemoveUntilPage(HomePage());
+        if (expectedRole == AppRole.driver) {
+          viewContext.nextAndRemoveUntilPage(const DriverHomePage());
+        } else {
+          viewContext.nextAndRemoveUntilPage(HomePage());
+        }
       }
     } on FirebaseAuthException catch (error) {
       AlertService.error(

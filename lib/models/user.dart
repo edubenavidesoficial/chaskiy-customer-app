@@ -10,6 +10,12 @@ class User {
   String photo;
   String role;
   String walletAddress;
+  int? vendorId;
+  double rating;
+  bool isOnline;
+  bool isTaxiDriver;
+  bool documentRequested;
+  bool pendingDocumentApproval;
 
   User({
     required this.id,
@@ -22,6 +28,12 @@ class User {
     required this.photo,
     required this.role,
     required this.walletAddress,
+    this.vendorId,
+    this.rating = 5,
+    this.isOnline = false,
+    this.isTaxiDriver = false,
+    this.documentRequested = false,
+    this.pendingDocumentApproval = false,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -36,6 +48,14 @@ class User {
       countryCode: json['country_code'],
       photo: json['photo'] ?? "",
       role: json['role_name'] ?? "client",
+      vendorId: json['vendor_id'],
+      rating: double.tryParse('${json['rating'] ?? 5}') ?? 5,
+      isOnline: _jsonBool(json['is_online']),
+      isTaxiDriver: _jsonBool(json['is_taxi_driver']),
+      documentRequested: _jsonBool(json['document_requested']),
+      pendingDocumentApproval: _jsonBool(
+        json['pending_document_approval'],
+      ),
     );
   }
 
@@ -51,6 +71,17 @@ class User {
       'photo': photo,
       'role_name': role,
       'wallet_address': walletAddress,
+      'vendor_id': vendorId,
+      'rating': rating,
+      'is_online': isOnline ? 1 : 0,
+      'is_taxi_driver': isTaxiDriver ? 1 : 0,
+      'document_requested': documentRequested,
+      'pending_document_approval': pendingDocumentApproval,
     };
+  }
+
+  static bool _jsonBool(dynamic value) {
+    if (value is bool) return value;
+    return value == 1 || value?.toString() == '1';
   }
 }

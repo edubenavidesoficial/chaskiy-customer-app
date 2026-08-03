@@ -36,7 +36,7 @@ class TaxiDriverInfoView extends StatelessWidget {
                 VxRating(
                   size: 14,
                   maxRating: 5.0,
-                  value: driver.rating ?? 0.0,
+                  value: driver.rating,
                   isSelectable: false,
                   onRatingUpdate: (value) {},
                   selectionColor: AppColor.ratingColor,

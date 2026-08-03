@@ -20,6 +20,7 @@ class Api {
   static const verifyPhoneAccount = "/verify/phone";
   static const updateProfile = "/profile/update";
   static const updatePassword = "/profile/password/update";
+  static const myProfile = "/my/profile";
   //
   static const sendOtp = "/otp/send";
   static const verifyOtp = "/otp/verify";
@@ -72,6 +73,14 @@ class Api {
   //Taxi booking
   static const vehicleTypes = "/vehicle/types";
   static const vehicleTypePricing = "/vehicle/types/pricing";
+  static const driverVehicleTypes = "/partner/vehicle/types";
+  static const driverCarMakes = "/partner/car/makes";
+  static const driverCarModels = "/partner/car/models";
+  static const driverVehicleRegister = "/driver/vehicle/register";
+  static const driverVehicles = "/driver/vehicles";
+  static const activateDriverVehicle = "/driver/vehicle/{id}/activate";
+  static const driverDocumentSubmission =
+      "/driver/document/request/submission";
   static const newTaxiBooking = "/taxi/book/order";
   static const currentTaxiBooking = "/taxi/current/order";
   static const lastRatebleTaxiBooking = "/taxi/rateable/order";
