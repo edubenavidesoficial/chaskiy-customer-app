@@ -81,6 +81,7 @@ class Api {
   static const activateDriverVehicle = "/driver/vehicle/{id}/activate";
   static const driverDocumentSubmission =
       "/driver/document/request/submission";
+  static const driverLocationSync = "/driver/location/sync";
   static const newTaxiBooking = "/taxi/book/order";
   static const currentTaxiBooking = "/taxi/current/order";
   static const lastRatebleTaxiBooking = "/taxi/rateable/order";

@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:chaskiy/constants/api.dart';
 import 'package:chaskiy/models/api_response.dart';
 import 'package:chaskiy/models/order.dart';
@@ -59,6 +62,35 @@ class OrderRequest extends HttpService {
     } else {
       throw apiResponse.message!;
     }
+  }
+
+  Future<Order> updateDriverOrder({
+    required int id,
+    required String status,
+  }) async {
+    final result = await patch('${Api.orders}/$id', {'status': status});
+    final response = ApiResponse.fromResponse(result);
+    if (!response.allGood) throw response.message ?? 'No se pudo actualizar';
+    final source = response.body is Map && response.body['order'] != null
+        ? response.body['order']
+        : response.body;
+    return Order.fromJson(source);
+  }
+
+  Future<Order> submitDriverProof({
+    required int id,
+    required File file,
+    required String proofType,
+  }) async {
+    final result = await postWithFiles('${Api.orders}/$id', {
+      '_method': 'PUT',
+      'status': 'delivered',
+      'proof_type': proofType,
+      'signature': await MultipartFile.fromFile(file.path),
+    });
+    final response = ApiResponse.fromResponse(result);
+    if (!response.allGood) throw response.message ?? 'No se pudo completar';
+    return Order.fromJson(response.body['order']);
   }
 
   //

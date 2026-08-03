@@ -100,11 +100,11 @@
 		<key>NSCameraUsageDescription</key>
 		<string>Usamos la cámara para actualizar tu foto de perfil y adjuntar imágenes.</string>
 		<key>NSLocationAlwaysUsageDescription</key>
-		<string>Usamos tu ubicación para mostrar proveedores cercanos y calcular entregas.</string>
+		<string>Cuando trabajas como conductor disponible, Chaskiy usa tu ubicación para asignarte pedidos y compartir el avance de la entrega.</string>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>Usamos tu ubicación mientras utilizas la app para mostrar proveedores cercanos y calcular entregas.</string>
 		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-		<string>Usamos tu ubicación para mostrar proveedores cercanos y calcular entregas.</string>
+		<string>Cuando trabajas como conductor disponible, Chaskiy usa tu ubicación incluso en segundo plano para asignarte pedidos y compartir el avance de la entrega.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>Usamos tus fotos para actualizar tu perfil y adjuntar imágenes.</string>
 		<key>NSMicrophoneUsageDescription</key>
@@ -112,6 +112,7 @@
 		<key>UIBackgroundModes</key>
 		<array>
 			<string>fetch</string>
+			<string>location</string>
 			<string>remote-notification</string>
 		</array>
 		<key>UILaunchStoryboardName</key>
