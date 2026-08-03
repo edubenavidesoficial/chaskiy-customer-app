@@ -1,3 +1,9 @@
 #include "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
 #include "Generated.xcconfig"
 BUILD_LIBRARY_FOR_DISTRIBUTION = NO
+
+// Primera versión pública configurada en App Store Connect.
+// Se declara después de Generated.xcconfig para que el Archive de Xcode use
+// exactamente la versión y el build esperados por Apple.
+FLUTTER_BUILD_NAME = 1.0
+FLUTTER_BUILD_NUMBER = 96

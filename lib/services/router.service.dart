@@ -23,6 +23,7 @@ import 'package:chaskiy/views/pages/home.page.dart';
 import 'package:chaskiy/views/pages/driver/driver_home.page.dart';
 import 'package:chaskiy/views/pages/order/orders_tracking.page.dart';
 import 'package:chaskiy/views/pages/profile/change_password.page.dart';
+import 'package:chaskiy/views/pages/profile/security_privacy.page.dart';
 import 'package:chaskiy/views/pages/service/service_details.page.dart';
 import 'package:chaskiy/views/pages/vendor_details/vendor_details.page.dart';
 import 'package:chaskiy/views/pages/notification/notification_details.page.dart';
@@ -134,6 +135,12 @@ Route<dynamic>? generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         settings: RouteSettings(name: AppRoutes.changePasswordRoute),
         builder: (context) => ChangePasswordPage(),
+      );
+
+    case AppRoutes.securityPrivacyRoute:
+      return MaterialPageRoute(
+        settings: RouteSettings(name: AppRoutes.securityPrivacyRoute),
+        builder: (context) => const SecurityPrivacyPage(),
       );
 
     //Delivery addresses

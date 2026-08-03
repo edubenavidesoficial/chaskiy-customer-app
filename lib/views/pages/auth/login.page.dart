@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/app_images.dart';
@@ -9,7 +7,6 @@ import 'package:chaskiy/enums/app_role.dart';
 import 'package:chaskiy/utils/ui_spacer.dart';
 import 'package:chaskiy/view_models/login.view_model.dart';
 import 'package:chaskiy/views/pages/auth/login/compain_login_type.view.dart';
-import 'package:chaskiy/views/pages/auth/login/companion_apps_download.view.dart';
 import 'package:chaskiy/views/pages/auth/login/email_login.view.dart';
 import 'package:chaskiy/views/pages/auth/login/otp_login.view.dart';
 import 'package:chaskiy/views/pages/auth/login/social_media.view.dart';
@@ -20,6 +17,7 @@ import 'package:localize_and_translate/localize_and_translate.dart';
 
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import 'login/scan_login.view.dart';
 
@@ -151,19 +149,22 @@ class _LoginPageState extends State<LoginPage> {
                         if (widget.expectedRole == AppRole.customer)
                           SocialMediaView(model, bottomPadding: 10),
                         ScanLoginView(model),
-                        if (widget.expectedRole == AppRole.customer &&
-                            Platform.isAndroid)
-                          CompanionAppsDownloadView(model),
                         if (widget.expectedRole == AppRole.customer)
-                          _DriverAccessCard(
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => LoginPage(
-                                  expectedRole: AppRole.driver,
+                          VStack([
+                            _DriverAccessCard(
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => LoginPage(
+                                    expectedRole: AppRole.driver,
+                                  ),
                                 ),
                               ),
                             ),
-                          ).px20().py16(),
+                            const SizedBox(height: 10),
+                            _VendorAccessCard(
+                              onTap: () => _openVendorLogin(context),
+                            ),
+                          ]).px20().py16(),
                       ]).scrollVertical(),
                 ),
               ),
@@ -172,6 +173,18 @@ class _LoginPageState extends State<LoginPage> {
         },
       ),
     );
+  }
+
+  Future<void> _openVendorLogin(BuildContext context) async {
+    final opened = await launchUrlString(
+      'https://app.chaskiy.com/login',
+      mode: LaunchMode.externalApplication,
+    );
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo abrir el acceso de vendedor')),
+      );
+    }
   }
 }
 
@@ -204,6 +217,40 @@ class _DriverAccessCard extends StatelessWidget {
         ),
         subtitle: const Text("Inicia sesión como conductor o motorizado"),
         trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+      ),
+    );
+  }
+}
+
+class _VendorAccessCard extends StatelessWidget {
+  const _VendorAccessCard({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      color: AppColor.primaryColor.withValues(alpha: .08),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(Sizes.radiusLarge),
+        side: BorderSide(
+          color: AppColor.primaryColor.withValues(alpha: .18),
+        ),
+      ),
+      child: ListTile(
+        onTap: onTap,
+        leading: CircleAvatar(
+          backgroundColor: AppColor.primaryColor,
+          foregroundColor: Colors.white,
+          child: const Icon(Icons.storefront_outlined),
+        ),
+        title: const Text(
+          'Iniciar sesión como vendedor',
+          style: TextStyle(fontWeight: FontWeight.w700),
+        ),
+        subtitle: const Text('Accede al portal de vendedores'),
+        trailing: const Icon(Icons.open_in_new_rounded, size: 18),
       ),
     );
   }

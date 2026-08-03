@@ -155,7 +155,7 @@ class _SecuritySection extends StatelessWidget {
               isDark ? const Color(0xFF123B3A) : const Color(0xFFE2FAF6),
           title: 'Seguridad y privacidad',
           subtitle: 'Controla tu privacidad y permisos',
-          onTap: model.openPrivacyPolicy,
+          onTap: model.openSecurityPrivacy,
         ),
       ],
     );

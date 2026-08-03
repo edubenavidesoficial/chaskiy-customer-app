@@ -97,6 +97,10 @@ class ProfileViewModel extends PaymentViewModel {
     Navigator.of(viewContext).pushNamed(AppRoutes.changePasswordRoute);
   }
 
+  openSecurityPrivacy() async {
+    Navigator.of(viewContext).pushNamed(AppRoutes.securityPrivacyRoute);
+  }
+
   //
   openRefer() async {
     await showModalBottomSheet(
