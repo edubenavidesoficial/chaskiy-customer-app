@@ -84,6 +84,7 @@ dependencies:
   google_places_flutter: ^2.1.1
   google_sign_in: ^5.3.3
   group_radio_button: 1.2.0
+  hand_signature: ^3.0.3
   hugeicons: ^0.0.7
   image_picker: ^1.2.1
   in_app_review: ^2.0.11

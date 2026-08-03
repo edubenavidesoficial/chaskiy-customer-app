@@ -82,10 +82,18 @@ class Api {
   static const driverDocumentSubmission =
       "/driver/document/request/submission";
   static const driverLocationSync = "/driver/location/sync";
+  static const driverPayoutsReport = "/driver/payouts/report";
+  static const driverEarningsReport = "/driver/earnings/report";
+  static const driverMetrics = "/driver/metrics";
+  static const driverPaymentAccounts = "/payment/accounts";
+  static const driverPayoutRequest = "/payouts/request";
+  static const driverEarning = "/earning/user";
   static const newTaxiBooking = "/taxi/book/order";
   static const currentTaxiBooking = "/taxi/current/order";
   static const lastRatebleTaxiBooking = "/taxi/rateable/order";
   static const cancelTaxiBooking = "/taxi/order/cancel";
+  static const acceptDriverAssignment = "/taxi/order/asignment/accept";
+  static const rejectDriverAssignment = "/taxi/order/asignment/reject";
   static const taxiDriverInfo = "/taxi/driver/info";
   static const taxiLocationAvailable = "/taxi/location/available";
   static const taxiTripLocationHistory = "/taxi/location/history";

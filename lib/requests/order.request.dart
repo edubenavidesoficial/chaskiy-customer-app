@@ -93,6 +93,32 @@ class OrderRequest extends HttpService {
     return Order.fromJson(response.body['order']);
   }
 
+  Future<Order> acceptDriverAssignment({
+    required int orderId,
+    required int driverId,
+  }) async {
+    final result = await post(Api.acceptDriverAssignment, {
+      'order_id': orderId,
+      'driver_id': driverId,
+      'status': 'preparing',
+    });
+    final response = ApiResponse.fromResponse(result);
+    if (!response.allGood) throw response.message ?? 'Asignación no disponible';
+    return Order.fromJson(response.body['order']);
+  }
+
+  Future<void> rejectDriverAssignment({
+    required int orderId,
+    required int driverId,
+  }) async {
+    final result = await post(Api.rejectDriverAssignment, {
+      'order_id': orderId,
+      'driver_id': driverId,
+    });
+    final response = ApiResponse.fromResponse(result);
+    if (!response.allGood) throw response.message ?? 'No se pudo rechazar';
+  }
+
   //
   Future<Order> trackOrder(String code, {int? vendorTypeId}) async {
     //
