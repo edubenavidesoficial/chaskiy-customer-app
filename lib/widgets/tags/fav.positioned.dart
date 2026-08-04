@@ -1,6 +1,6 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/models/product.dart';
 import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/view_models/favourite.vm.dart';
@@ -15,45 +15,42 @@ class FavPositiedView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //fav icon
-
+    //fav icon con estilo "vidrio" (blur sobre la imagen)
     return Positioned(
-      top: 0,
-      left: !Utils.isArabic ? null : 0,
-      right: Utils.isArabic ? null : 0,
+      top: 6,
+      left: !Utils.isArabic ? null : 6,
+      right: Utils.isArabic ? null : 6,
       child: ViewModelBuilder<FavouriteViewModel>.reactive(
         viewModelBuilder: () => FavouriteViewModel(context, product),
         builder: (context, model, child) {
-          return model.isBusy
-              ? BusyIndicator().wh(18, 18).p4()
-              : Icon(
-                  product.isFavourite
-                      ? FlutterIcons.favorite_mdi
-                      : FlutterIcons.favorite_border_mdi,
-                  color: AppColor.primaryColor,
-                  size: 20,
-                )
-                  .p4()
-                  // .box
-                  // .withDecoration(
-                  //   BoxDecoration(
-                  //     color: context.theme.colorScheme.surface,
-                  //     borderRadius: BorderRadius.only(
-                  //       bottomRight: Radius.circular(Utils.isArabic ? 6 : 0),
-                  //       bottomLeft: Radius.circular(!Utils.isArabic ? 6 : 0),
-                  //     ),
-                  //   ),
-                  // )
-                  // .make()
-                  .onTap(
-                  () {
-                    !model.isAuthenticated()
-                        ? model.openLogin()
-                        : !model.product.isFavourite
-                            ? model.addFavourite()
-                            : model.removeFavourite();
-                  },
-                );
+          return ClipOval(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              child: Container(
+                color: Colors.black.withOpacity(.22),
+                padding: const EdgeInsets.all(6),
+                child: model.isBusy
+                    ? BusyIndicator().wh(16, 16)
+                    : Icon(
+                        product.isFavourite
+                            ? Icons.favorite_rounded
+                            : Icons.favorite_border_rounded,
+                        color: product.isFavourite
+                            ? const Color(0xFFFF5A5F)
+                            : Colors.white,
+                        size: 18,
+                      ).onTap(
+                        () {
+                          !model.isAuthenticated()
+                              ? model.openLogin()
+                              : !model.product.isFavourite
+                                  ? model.addFavourite()
+                                  : model.removeFavourite();
+                        },
+                      ),
+              ),
+            ),
+          );
         },
       ),
     );

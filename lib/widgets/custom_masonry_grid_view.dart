@@ -100,7 +100,12 @@ class CustomMasonryGridView extends StatelessWidget {
             loadingWidget: this.loadingWidget ?? LoadingShimmer(),
             emptyView: this.emptyWidget ?? UiSpacer.emptySpace(),
             child: SingleChildScrollView(
-              child: _getListView(),
+              // si no hay items se muestra el estado vacío (antes quedaba
+              // la pantalla en blanco) y el pull-to-refresh sigue activo
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: this.items.isEmpty
+                  ? (this.emptyWidget ?? UiSpacer.emptySpace())
+                  : _getListView(),
               padding: padding ??
                   EdgeInsets.symmetric(
                     horizontal: 2,

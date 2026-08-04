@@ -9,7 +9,6 @@ import 'package:chaskiy/services/location.service.dart';
 import 'package:chaskiy/views/pages/profile/profile.page.dart';
 import 'package:chaskiy/view_models/home.vm.dart';
 import 'package:chaskiy/widgets/base.page.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:stacked/stacked.dart';
 import 'package:upgrader/upgrader.dart';
@@ -109,16 +108,16 @@ class _HomePageState extends State<HomePage>
                       _HomeNavItem(
                         index: 0,
                         currentIndex: model.currentIndex,
-                        icon: HugeIcons.strokeRoundedHome03,
-                        activeIcon: HugeIcons.strokeRoundedHome02,
+                        icon: Icons.home_outlined,
+                        activeIcon: Icons.home_rounded,
                         label: "Home".tr(),
                         onTap: model.onTabChange,
                       ),
                       _HomeNavItem(
                         index: 1,
                         currentIndex: model.currentIndex,
-                        icon: HugeIcons.strokeRoundedInboxUnread,
-                        activeIcon: HugeIcons.strokeRoundedInbox,
+                        icon: Icons.receipt_long_outlined,
+                        activeIcon: Icons.receipt_long_rounded,
                         label: "Orders".tr(),
                         onTap: model.onTabChange,
                       ),
@@ -126,16 +125,16 @@ class _HomePageState extends State<HomePage>
                       _HomeNavItem(
                         index: 2,
                         currentIndex: model.currentIndex,
-                        icon: HugeIcons.strokeRoundedSearch01,
-                        activeIcon: HugeIcons.strokeRoundedSearch02,
+                        icon: Icons.search_rounded,
+                        activeIcon: Icons.saved_search_rounded,
                         label: "Search".tr(),
                         onTap: model.onTabChange,
                       ),
                       _HomeNavItem(
                         index: 3,
                         currentIndex: model.currentIndex,
-                        icon: HugeIcons.strokeRoundedMenu08,
-                        activeIcon: HugeIcons.strokeRoundedMenu03,
+                        icon: Icons.menu_rounded,
+                        activeIcon: Icons.menu_open_rounded,
                         label: "Menu".tr(),
                         onTap: model.onTabChange,
                       ),

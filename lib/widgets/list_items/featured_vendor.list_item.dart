@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:chaskiy/models/vendor.dart';
 import 'package:chaskiy/widgets/custom_image.view.dart';
@@ -78,18 +80,14 @@ class FeaturedVendorListItem extends StatelessWidget {
         Positioned(
           top: 8,
           right: 8,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(.94),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(.12),
-                  blurRadius: 6,
-                ),
-              ],
+          child: ClipOval(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              child: ColoredBox(
+                color: Colors.black.withOpacity(.22),
+                child: FavVendorTag(vendor),
+              ),
             ),
-            child: FavVendorTag(vendor),
           ),
         ),
         Positioned(
@@ -286,35 +284,36 @@ class _StatusPill extends StatelessWidget {
     final color = open
         ? FeaturedVendorListItem._successColor
         : FeaturedVendorListItem._closedColor;
-    return Container(
-      padding: centered
-          ? const EdgeInsets.symmetric(horizontal: 14, vertical: 8)
-          : const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(.95),
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(.15), blurRadius: 8),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: centered ? 8 : 7,
-            height: centered ? 8 : 7,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(30),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        child: Container(
+          padding: centered
+              ? const EdgeInsets.symmetric(horizontal: 14, vertical: 8)
+              : const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+          color: Colors.black.withOpacity(.30),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: centered ? 8 : 7,
+                height: centered ? 8 : 7,
+                decoration:
+                    BoxDecoration(color: color, shape: BoxShape.circle),
+              ),
+              SizedBox(width: centered ? 6 : 5),
+              Text(
+                open ? 'Abierto' : 'Cerrado',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: centered ? 13 : 11,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
           ),
-          SizedBox(width: centered ? 6 : 5),
-          Text(
-            open ? 'Abierto' : 'Cerrado',
-            style: TextStyle(
-              color: color,
-              fontSize: centered ? 13 : 11,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

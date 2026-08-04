@@ -73,9 +73,11 @@ class TopVendors extends StatelessWidget {
                 itemBuilder: (context, index) {
                   //
                   final vendor = model.vendors[index];
-                  return VendorListItem(
-                    vendor: vendor,
-                    onPressed: model.vendorSelected,
+                  return FittedBox(
+                    child: VendorListItem(
+                      vendor: vendor,
+                      onPressed: model.vendorSelected,
+                    ),
                   );
                 },
                 emptyWidget: EmptyVendor(),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/utils/ui_spacer.dart';
-import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/view_models/main_search.vm.dart';
 import 'package:chaskiy/views/pages/search/widget/property_search_result.view.dart';
 import 'package:chaskiy/widgets/base.page.dart';
@@ -39,62 +38,90 @@ class MainSearchPage extends StatelessWidget {
                   vm.searchResults.isEmpty &&
                   !vm.isBusy,
               child: Container(
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: AppColor.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: AppColor.primaryColor.withOpacity(0.1),
-                  ),
+                  color: AppColor.primaryColor.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: HStack([
                   Icon(
-                    Icons.info_outline,
+                    Icons.location_on_rounded,
                     color: AppColor.primaryColor,
-                    size: 20,
+                    size: 14,
                   ),
-                  10.widthBox,
-                  "Results are currently based on your location. You can disable this in the filter section."
-                      .tr()
+                  6.widthBox,
+                  "Resultados según tu ubicación · ajústalo en filtros"
                       .text
+                      .size(12)
                       .color(AppColor.primaryColor)
+                      .maxLines(1)
+                      .overflow(TextOverflow.ellipsis)
                       .make()
                       .expand(),
-                ], crossAlignment: CrossAxisAlignment.start),
-              ).py(10),
+                ], crossAlignment: CrossAxisAlignment.center),
+              ).py(4),
             ),
             //tab-
             LoadingIndicator(
               loading: vm.isBusy,
-              child:
-                  ContainedTabBarView(
+              child: Theme(
+                // apaga la línea divisoria inferior del TabBar (Material 3)
+                data: context.theme.copyWith(
+                  tabBarTheme: context.theme.tabBarTheme.copyWith(
+                    dividerColor: Colors.transparent,
+                    dividerHeight: 0,
+                  ),
+                ),
+                child: ContainedTabBarView(
                     callOnChangeWhileIndexIsChanging: true,
                     tabBarProperties: TabBarProperties(
+                      height: 46,
+                      margin: const EdgeInsets.only(top: 2, bottom: 10),
                       alignment: TabBarAlignment.start,
                       isScrollable: true,
-                      labelPadding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 0,
+                      labelPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
                       ),
-
-                      //
-                      // padding: EdgeInsets.all(0),
-                      labelColor: AppColor.primaryColor,
-                      unselectedLabelColor: Utils.textColorByTheme(true),
-                      labelStyle: context.textTheme.bodyLarge!.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      // unselectedLabelStyle:
-                      //     context.textTheme.bodyLarge!.copyWith(),
-                      indicatorWeight: 4,
-                      indicator: BoxDecoration(
-                        // color: Colors.red,
-                        border: Border(
-                          bottom: BorderSide(
-                            color: context.theme.primaryColor,
-                            width: 3,
+                      // contenedor "glass" translúcido estilo iOS
+                      background: Container(
+                        decoration: BoxDecoration(
+                          color: context.theme.colorScheme.onSurface
+                              .withOpacity(.05),
+                          borderRadius: BorderRadius.circular(26),
+                          border: Border.all(
+                            color: context.theme.colorScheme.onSurface
+                                .withOpacity(.06),
                           ),
                         ),
+                      ),
+                      labelColor: AppColor.primaryColor,
+                      unselectedLabelColor: context
+                          .theme.colorScheme.onSurface
+                          .withOpacity(.55),
+                      labelStyle: context.textTheme.bodyLarge!.copyWith(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 14,
+                      ),
+                      unselectedLabelStyle:
+                          context.textTheme.bodyLarge!.copyWith(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                      // pill flotante de la pestaña activa
+                      indicatorPadding: const EdgeInsets.all(4),
+                      indicator: BoxDecoration(
+                        color: context.theme.colorScheme.surface,
+                        borderRadius: BorderRadius.circular(22),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(.14),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                     ),
                     tabs: [
@@ -120,7 +147,8 @@ class MainSearchPage extends StatelessWidget {
                       if (vm.showProperties) PropertySearchResultView(vm),
                     ],
                     // onChange: vm.onTabChange,
-                  ).expand(),
+                  ),
+              ).expand(),
             ),
           ]).px(16),
         );

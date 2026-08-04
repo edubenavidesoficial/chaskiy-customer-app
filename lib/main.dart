@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -30,6 +31,28 @@ void main() async {
       if (kDebugMode) {
         HttpOverrides.global = DevHttpOverrides();
       }
+
+      // Textos en español para todos los pull-to-refresh (easy_refresh)
+      EasyRefresh.defaultHeaderBuilder = () => const ClassicHeader(
+            dragText: 'Desliza para actualizar',
+            armedText: 'Suelta para actualizar',
+            readyText: 'Actualizando...',
+            processingText: 'Actualizando...',
+            processedText: 'Actualizado',
+            noMoreText: 'No hay más resultados',
+            failedText: 'No se pudo actualizar',
+            messageText: 'Actualizado a las %T',
+          );
+      EasyRefresh.defaultFooterBuilder = () => const ClassicFooter(
+            dragText: 'Desliza para cargar más',
+            armedText: 'Suelta para cargar más',
+            readyText: 'Cargando...',
+            processingText: 'Cargando...',
+            processedText: 'Listo',
+            noMoreText: 'No hay más resultados',
+            failedText: 'No se pudo cargar',
+            messageText: 'Actualizado a las %T',
+          );
 
       // Solo bloquean el primer fotograma los servicios imprescindibles
       await Future.wait([

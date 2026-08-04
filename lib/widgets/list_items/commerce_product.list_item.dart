@@ -37,7 +37,13 @@ class CommerceProductListItem extends StatelessWidget {
                 width: double.infinity,
                 height: height,
                 boxFit: boxFit ?? BoxFit.contain,
-              ).box.slate100.withRounded(value: 5).clip(Clip.antiAlias).make(),
+              ).box
+                  // fondo adaptado al tema (antes slate100 fijo: bloque
+                  // blanco en modo oscuro)
+                  .color(context.theme.colorScheme.onSurface.withOpacity(.04))
+                  .withRounded(value: 14)
+                  .clip(Clip.antiAlias)
+                  .make(),
 
               //fav icon
               FavPositiedView(product),
@@ -105,7 +111,7 @@ class CommerceProductListItem extends StatelessWidget {
         //   width: 2,
         // )
         .color(context.theme.colorScheme.surface)
-        .withRounded(value: 5)
+        .withRounded(value: 18)
         .outerShadow
         .make();
   }
