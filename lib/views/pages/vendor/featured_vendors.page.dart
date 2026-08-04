@@ -15,6 +15,13 @@ class FeaturedVendorsPage extends StatelessWidget {
       viewModelBuilder: () => FeaturedVendorsPageViewModel(context),
       onViewModelReady: (vm) => vm.initialise(),
       builder: (context, vm, child) {
+        // abiertos primero, luego por cercanía (solo presentación, no toca el VM)
+        final vendors = [...vm.vendors]..sort((a, b) {
+          if (a.isOpen != b.isOpen) return a.isOpen ? -1 : 1;
+          final da = a.distance ?? double.maxFinite;
+          final db = b.distance ?? double.maxFinite;
+          return da.compareTo(db);
+        });
         return Scaffold(
           backgroundColor: const Color(0xFFF6F8FC),
           appBar: AppBar(
@@ -73,11 +80,11 @@ class FeaturedVendorsPage extends StatelessWidget {
                               crossAxisCount: 2,
                               crossAxisSpacing: 14,
                               mainAxisSpacing: 16,
-                              childAspectRatio: .64,
+                              childAspectRatio: .62,
                             ),
-                        itemCount: vm.vendors.length,
+                        itemCount: vendors.length,
                         itemBuilder: (context, index) {
-                          final vendor = vm.vendors[index];
+                          final vendor = vendors[index];
                           return FeaturedVendorListItem(
                             vendor: vendor,
                             onPressed: vm.vendorSelected,
@@ -106,7 +113,11 @@ class _HeaderButton extends StatelessWidget {
       child: InkWell(
         onTap: onPressed,
         borderRadius: BorderRadius.circular(13),
-        child: Icon(icon, color: Colors.white),
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: Icon(icon, color: Colors.white, size: 22),
+        ),
       ),
     );
   }
