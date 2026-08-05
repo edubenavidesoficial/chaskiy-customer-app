@@ -36,21 +36,17 @@ class _CustomImageState extends State<CustomImage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    if (this.widget.imageUrl == null ||
-        (this.widget.hideDefaultImg &&
-            !this.widget.imageUrl.isNotDefaultImage)) {
+    final noImage =
+        this.widget.imageUrl == null || this.widget.imageUrl!.trim().isEmpty;
+
+    if (this.widget.hideDefaultImg &&
+        (noImage || !this.widget.imageUrl.isNotDefaultImage)) {
       return 0.widthBox;
     }
 
-    //if default image
-    if (!this.widget.imageUrl.isNotDefaultImage) {
-      return Image.asset(
-        AppImages.appLogo,
-        fit: BoxFit.cover,
-        height: this.widget.height,
-        width: this.widget.width,
-        color: this.widget.color,
-      );
+    //sin imagen o imagen "default" del backend → placeholder elegante
+    if (noImage || !this.widget.imageUrl.isNotDefaultImage) {
+      return _fallbackView;
     }
 
     //
@@ -95,11 +91,7 @@ class _CustomImageState extends State<CustomImage>
       memCacheHeight: _cacheDimension(widget.height),
       maxWidthDiskCache: 1440,
       maxHeightDiskCache: 1440,
-      errorWidget:
-          (context, imageUrl, _) => Image.asset(
-            imageUrl.isNotDefaultImage ? AppImages.noImage : AppImages.appLogo,
-            fit: this.widget.boxFit ?? BoxFit.cover,
-          ),
+      errorWidget: (context, imageUrl, _) => _fallbackView,
       fit: this.widget.boxFit ?? BoxFit.cover,
       progressIndicatorBuilder: (context, imageURL, progress) {
         // return BusyIndicator().centered();
@@ -119,6 +111,33 @@ class _CustomImageState extends State<CustomImage>
       height: this.widget.height,
       width: this.widget.width,
       color: this.widget.color,
+    );
+  }
+
+  /// Placeholder cuando no hay imagen (o falla la carga): fondo suave del
+  /// tema con el logo pequeño y tenue al centro — nunca estirado.
+  Widget get _fallbackView {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      height: this.widget.height,
+      width: this.widget.width,
+      color: Color.alphaBlend(
+        scheme.onSurface.withOpacity(.05),
+        scheme.surface,
+      ),
+      alignment: Alignment.center,
+      child: FractionallySizedBox(
+        widthFactor: .38,
+        heightFactor: .38,
+        child: Opacity(
+          opacity: .40,
+          child: Image.asset(
+            AppImages.appLogo,
+            fit: BoxFit.contain,
+            color: this.widget.color,
+          ),
+        ),
+      ),
     );
   }
 

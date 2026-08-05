@@ -101,3 +101,45 @@ extension NumberParsing on dynamic {
     return "$frontString$maskedString$endString";
   }
 }
+
+extension HtmlStringParsing on String {
+  /// Convierte el HTML que llega del backend (editor de texto enriquecido) en
+  /// texto plano: así se muestra con la tipografía y los colores de la app y
+  /// no con los estilos incrustados del editor (fondos blancos, fuentes, etc).
+  String get htmlToPlainText {
+    var value = this;
+
+    // saltos de línea antes de quitar las etiquetas
+    value = value.replaceAll(
+      RegExp(r'<br\s*/?>|</p>|</div>|</li>|</h[1-6]>', caseSensitive: false),
+      '\n',
+    );
+    // etiquetas y comentarios
+    value = value.replaceAll(RegExp(r'<[^>]*>'), '');
+    // entidades más comunes
+    const entities = {
+      '&nbsp;': ' ',
+      '&amp;': '&',
+      '&lt;': '<',
+      '&gt;': '>',
+      '&quot;': '"',
+      '&#39;': "'",
+      '&apos;': "'",
+      '&aacute;': 'á',
+      '&eacute;': 'é',
+      '&iacute;': 'í',
+      '&oacute;': 'ó',
+      '&uacute;': 'ú',
+      '&ntilde;': 'ñ',
+      '&uuml;': 'ü',
+    };
+    entities.forEach((entity, char) {
+      value = value.replaceAll(RegExp(entity, caseSensitive: false), char);
+    });
+
+    // espacios sobrantes y líneas en blanco repetidas
+    value = value.replaceAll(RegExp(r'[ \t]+'), ' ');
+    value = value.replaceAll(RegExp(r'\n{3,}'), '\n\n');
+    return value.split('\n').map((line) => line.trim()).join('\n').trim();
+  }
+}

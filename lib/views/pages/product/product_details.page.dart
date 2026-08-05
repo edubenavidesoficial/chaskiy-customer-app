@@ -1,33 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_colors.dart';
-import 'package:chaskiy/constants/sizes.dart';
 import 'package:chaskiy/models/option_group.dart';
+import 'package:chaskiy/extensions/string.dart';
 import 'package:chaskiy/models/product.dart';
 import 'package:chaskiy/utils/ui_spacer.dart';
-import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/view_models/product_details.vm.dart';
 import 'package:chaskiy/views/pages/product/widgets/product_details.header.dart';
 import 'package:chaskiy/views/pages/product/widgets/product_details_cart.bottom_sheet.dart';
+import 'package:chaskiy/views/pages/product/widgets/product_details_floating.actions.dart';
+import 'package:chaskiy/views/pages/product/widgets/product_details_image.header.dart';
 import 'package:chaskiy/views/pages/product/widgets/product_option_group.dart';
 import 'package:chaskiy/views/pages/product/widgets/product_options.header.dart';
+import 'package:chaskiy/views/pages/product/widgets/product_qty.selector.dart';
+import 'package:chaskiy/views/pages/product/widgets/product_vendor.tile.dart';
 import 'package:chaskiy/widgets/base.page.dart';
-import 'package:chaskiy/widgets/buttons/share.btn.dart';
-import 'package:chaskiy/widgets/cart_page_action.dart';
-import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:chaskiy/widgets/states/loading_indicator.dart';
-import 'package:chaskiy/widgets/webviewer.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:banner_carousel/banner_carousel.dart';
 
 class ProductDetailsPage extends StatelessWidget {
-  ProductDetailsPage({
-    required this.product,
-    Key? key,
-  }) : super(key: key);
+  ProductDetailsPage({required this.product, Key? key}) : super(key: key);
 
   final Product product;
+
+  /// cuánto monta la hoja de contenido sobre la cabecera
+  static const double _sheetOverlap = 26;
 
   //
   @override
@@ -36,141 +34,122 @@ class ProductDetailsPage extends StatelessWidget {
       viewModelBuilder: () => ProductDetailsViewModel(context, product),
       onViewModelReady: (model) => model.getProductDetails(),
       builder: (context, model, child) {
+        final theme = context.theme;
+        // en modo claro la hoja lleva un tinte de marca muy suave para que
+        // las tarjetas blancas del contenido resalten
+        final sheetColor =
+            theme.brightness == Brightness.dark
+                ? theme.colorScheme.surface
+                : Color.alphaBlend(
+                  AppColor.primaryColor.withOpacity(.05),
+                  theme.colorScheme.surface,
+                );
+
         return BasePage(
-          title: model.product.name,
-          showAppBar: true,
-          showLeadingAction: true,
-          elevation: 0,
-          appBarColor: AppColor.faintBgColor,
-          appBarItemColor: AppColor.primaryColor,
-          showCart: true,
-          actions: [
-            SizedBox(
-              width: 50,
-              height: 50,
-              child: FittedBox(
-                child: ShareButton(
-                  model: model,
+          showAppBar: false,
+          backgroundColor: sheetColor,
+          body: Stack(
+            children: [
+              // Column (y no slivers) para que la hoja se pinte encima de la
+              // cabecera y sus esquinas redondeadas queden a la vista
+              SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    //foto(s) del producto
+                    ProductDetailsImageHeader(product: model.product),
+
+                    //contenido sobre una hoja redondeada que monta la imagen
+                    Transform.translate(
+                      offset: const Offset(0, -_sheetOverlap),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: sheetColor,
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(28),
+                          ),
+                        ),
+                        padding: const EdgeInsets.fromLTRB(20, 26, 20, 150),
+                        child: _content(context, model, theme),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            UiSpacer.hSpace(10),
-            PageCartAction(),
-          ],
-          body: CustomScrollView(
-            slivers: [
-              //product image
-              SliverToBoxAdapter(
-                child: BannerCarousel(
-                  customizedBanners: model.product.photos.map((photoPath) {
-                    return Container(
-                      child: CustomImage(
-                        imageUrl: photoPath,
-                        boxFit: BoxFit.contain,
-                        canZoom: true,
-                      ),
-                    );
-                  }).toList(),
-                  customizedIndicators: IndicatorModel.animation(
-                    width: 10,
-                    height: 6,
-                    spaceBetween: 2,
-                    widthAnimation: 50,
-                  ),
-                  margin: EdgeInsets.zero,
-                  height: context.percentHeight * 30,
-                  width: context.percentWidth * 100,
-                  activeColor: AppColor.primaryColor,
-                  disableColor: Colors.grey.shade300,
-                  animation: true,
-                  borderRadius: 0,
-                  indicatorBottom: true,
-                ).box.color(AppColor.faintBgColor).make(),
-              ),
 
-              SliverToBoxAdapter(
-                child: VStack(
-                  [
-                    //product header
-                    ProductDetailsHeader(product: model.product),
-                    //product description
-                    UiSpacer.divider(height: 1, thickness: 2).py12(),
-                    WebViewer(
-                      url: model.product.description_url,
-                      height: 50, // Fixed height
-                      isScrollable: false, // Disable scrolling within WebView
-                      showProgressBar: true,
-                      enableJavaScript: true,
-                    ),
-                    UiSpacer.divider(height: 1, thickness: 2).py12(),
-
-                    //options header
-                    Visibility(
-                      visible: model.product.optionGroups.isNotEmpty,
-                      child: LoadingIndicator(
-                        loading: model.busy(model.product),
-                        child: VStack(
-                          [
-                            ProductOptionsHeader(
-                              description:
-                                  "Select options to add them to the product/service"
-                                      .tr(),
-                            ),
-
-                            //options
-                            VStack(
-                              [
-                                ...buildProductOptions(model),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    //more from vendor
-                    OutlinedButton(
-                      onPressed: model.openVendorPage,
-                      child: "View more from"
-                          .tr()
-                          .richText
-                          .color(Utils.primaryOrTheme)
-                          .sm
-                          .withTextSpanChildren(
-                            [
-                              " ${model.product.vendor.name}"
-                                  .textSpan
-                                  .semiBold
-                                  .color(Utils.primaryOrTheme)
-                                  .make(),
-                            ],
-                          )
-                          .make()
-                          .py12(),
-                    ).centered().py16(),
-                  ],
-                )
-                    .pOnly(bottom: context.percentHeight * 30)
-                    .box
-                    .outerShadow3Xl
-                    .color(context.theme.colorScheme.surface)
-                    .topRounded(value: Sizes.radiusExtraLarge)
-                    .clip(Clip.antiAlias)
-                    .make(),
-              ),
+              //volver, compartir y carrito sobre la imagen
+              ProductDetailsFloatingActions(model: model),
             ],
-          ).box.color(AppColor.faintBgColor).make(),
-          bottomSheet: ProductDetailsCartBottomSheet(model: model),
+          ),
+          bottomSheet: ProductDetailsCartBottomSheet(
+            model: model,
+            backgroundColor: sheetColor,
+          ),
         );
       },
     );
   }
 
+  Widget _content(
+    BuildContext context,
+    ProductDetailsViewModel model,
+    ThemeData theme,
+  ) {
+    return VStack([
+      //nombre, precio, reseñas y etiquetas
+      ProductDetailsHeader(product: model.product),
+
+      //descripción: el backend la envía en HTML; se limpia para mostrarla con
+      //la tipografía y los colores del tema
+      if (model.product.description.htmlToPlainText.isNotEmpty) ...[
+        UiSpacer.vSpace(14),
+        Text(
+          model.product.description.htmlToPlainText,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+            height: 1.45,
+          ),
+        ),
+      ],
+
+      //opciones del producto
+      Visibility(
+        visible: model.product.optionGroups.isNotEmpty,
+        child: LoadingIndicator(
+          loading: model.busy(model.product),
+          child: VStack([
+            UiSpacer.vSpace(18),
+            ProductOptionsHeader(
+              description:
+                  "Select options to add them to the product/service".tr(),
+            ),
+            VStack([...buildProductOptions(model)]),
+          ]),
+        ),
+      ),
+
+      //tienda del producto
+      UiSpacer.vSpace(18),
+      ProductVendorTile(
+        vendor: model.product.vendor,
+        onPressed: model.openVendorPage,
+      ),
+
+      //cantidad
+      if (model.product.hasStock) ...[
+        UiSpacer.vSpace(18),
+        ProductQtySelector(model: model),
+      ],
+    ]);
+  }
+
   //
-  buildProductOptions(model) {
+  List<Widget> buildProductOptions(ProductDetailsViewModel model) {
     return model.product.optionGroups.map((OptionGroup optionGroup) {
-      return ProductOptionGroup(optionGroup: optionGroup, model: model)
-          .pOnly(bottom: Vx.dp12);
+      return ProductOptionGroup(
+        optionGroup: optionGroup,
+        model: model,
+      ).pOnly(bottom: Vx.dp12);
     }).toList();
   }
 }
