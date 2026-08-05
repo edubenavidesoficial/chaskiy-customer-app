@@ -10,6 +10,9 @@ class DeliveryAddressRequest extends HttpService {
   Future<List<DeliveryAddress>> getDeliveryAddresses({
     int? vendorId,
     List<int>? vendorIds,
+    // las direcciones cambian al crearlas/editarlas: sin esto se servía la
+    // respuesta cacheada (5 min) y la nueva dirección no aparecía
+    bool forceRefresh = true,
   }) async {
     //
 
@@ -26,6 +29,7 @@ class DeliveryAddressRequest extends HttpService {
     final apiResult = await get(
       Api.deliveryAddresses,
       queryParameters: params,
+      forceRefresh: forceRefresh,
     );
 
     //
@@ -47,6 +51,7 @@ class DeliveryAddressRequest extends HttpService {
         "action": "default",
         "vendor_id": vendorId,
       },
+      forceRefresh: true,
     );
 
     //

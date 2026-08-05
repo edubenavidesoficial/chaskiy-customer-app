@@ -1,12 +1,9 @@
-import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/models/delivery_address.dart';
 import 'package:chaskiy/requests/delivery_address.request.dart';
 import 'package:chaskiy/services/geocoder.service.dart';
 import 'package:chaskiy/view_models/base.view_model.dart';
-import 'package:chaskiy/views/pages/delivery_address/widgets/address_search.view.dart';
-import 'package:google_places_flutter/model/prediction.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:what3words/what3words.dart' hide Coordinates;
 import 'package:velocity_x/velocity_x.dart';
@@ -22,41 +19,20 @@ class BaseDeliveryAddressesViewModel extends MyBaseViewModel {
   DeliveryAddress? deliveryAddress;
   What3WordsV3 what3WordsV3Api = What3WordsV3(AppStrings.what3wordsApiKey);
 
-  //
+  /// Se abre directamente el mapa (con su buscador integrado, que ya prioriza
+  /// la zona del usuario). Antes se mostraba una hoja con un buscador global
+  /// que podía devolver una dirección sin coordenadas.
   openLocationPicker() async {
-    //
-    showModalBottomSheet(
-      context: viewContext,
-      isScrollControlled: true,
-      isDismissible: false,
-      builder: (context) {
-        return AddressSearchView(
-          this,
-          addressSelected: (dynamic prediction) async {
-            if (prediction is Prediction) {
-              addressTEC.text = prediction.description ?? "";
-              deliveryAddress?.address = prediction.description;
-              deliveryAddress?.latitude = prediction.lat?.toDoubleOrNull();
-              deliveryAddress?.longitude = prediction.lng?.toDoubleOrNull();
-              //
-              setBusy(true);
-              await getLocationCityName(deliveryAddress!);
-              setBusy(false);
-            } else if (prediction is Address) {
-              print("Regular Address ==> ${prediction.addressLine}");
-              addressTEC.text = prediction.addressLine ?? "";
-              deliveryAddress?.address = prediction.addressLine;
-              deliveryAddress?.latitude = prediction.coordinates?.latitude;
-              deliveryAddress?.longitude = prediction.coordinates?.longitude;
-              deliveryAddress?.city = prediction.locality;
-              deliveryAddress?.state = prediction.adminArea;
-              deliveryAddress?.country = prediction.countryName;
-            }
-          },
-          selectOnMap: showAddressLocationPicker,
-        );
-      },
-    );
+    await showAddressLocationPicker();
+  }
+
+  /// El servidor no acepta direcciones sin coordenadas.
+  bool get hasValidCoordinates {
+    final latitude = deliveryAddress?.latitude;
+    final longitude = deliveryAddress?.longitude;
+    return latitude != null &&
+        longitude != null &&
+        !(latitude == 0 && longitude == 0);
   }
 
   //

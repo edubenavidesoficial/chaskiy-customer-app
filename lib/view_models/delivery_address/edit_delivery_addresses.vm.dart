@@ -86,6 +86,15 @@ class EditDeliveryAddressesViewModel extends BaseDeliveryAddressesViewModel {
   //
   updateDeliveryAddress() async {
     if (formKey.currentState!.validate()) {
+      // El servidor rechaza las direcciones sin coordenadas, así que se avisa
+      // aquí en lugar de dejar que falle el guardado.
+      if (!hasValidCoordinates) {
+        AlertService.error(
+          title: "Edit Delivery Address".tr(),
+          text: "Elige la ubicación en el mapa para guardar la dirección",
+        );
+        return;
+      }
       //
       deliveryAddress!.name = nameTEC.text;
       deliveryAddress!.description = descriptionTEC.text;

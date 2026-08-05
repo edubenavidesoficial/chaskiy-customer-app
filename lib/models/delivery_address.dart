@@ -56,8 +56,10 @@ class DeliveryAddress {
         city: json["city"],
         state: json["state"],
         country: json["country"],
-        latitude: double.parse(json["latitude"].toString()),
-        longitude: double.parse(json["longitude"].toString()),
+        // tryParse: una dirección guardada sin coordenadas rompía el parseo
+        // y dejaba toda la lista vacía
+        latitude: double.tryParse(json["latitude"].toString()),
+        longitude: double.tryParse(json["longitude"].toString()),
         distance: json["distance"] == null
             ? null
             : double.parse(json["distance"].toString()),

@@ -21,6 +21,9 @@ class GeocoderService extends HttpService {
   /// Private constructor
   GeocoderService._() {}
 
+  /// Radio en el que se priorizan los resultados alrededor del usuario.
+  static const int searchRadiusInMeters = 30000;
+
   Future<List<Address>> findAddressesFromCoordinates(
     Coordinates coordinates, {
     int limit = 5,
@@ -125,11 +128,23 @@ class GeocoderService extends HttpService {
     }
     //use in-app geocoding
     final apiKey = AppStrings.googleMapApiKey;
-    address = address.replaceAll(" ", "+");
-    // String url =
-    //     "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$address;key=$apiKey;location=$myLatLng;region=$region;radius=200";
-        String url =
-        "https://maps.googleapis.com/maps/api/place/textsearch/json?query=$address;key=$apiKey;location=$myLatLng;region=$region;radius=200";
+
+    // Los parámetros iban separados por ";" en vez de "&", así que Google los
+    // recibía como parte del texto buscado: la búsqueda nunca se limitaba a
+    // la zona del usuario. El radio también era de apenas 200 m.
+    final url = Uri.https(
+      'maps.googleapis.com',
+      '/maps/api/place/textsearch/json',
+      {
+        'query': address,
+        'key': apiKey,
+        if (myLatLng.isNotEmpty) ...{
+          'location': myLatLng,
+          'radius': '$searchRadiusInMeters',
+        },
+        if (region.isNotEmpty) 'region': region,
+      },
+    ).toString();
     final result = await get(
       Api.externalRedirect,
       queryParameters: {"endpoint": url},

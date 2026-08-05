@@ -123,6 +123,42 @@ class _TopMapControls extends StatelessWidget {
                 controller: vm.searchTEC,
                 debounceDuration: const Duration(milliseconds: 600),
                 suggestionsCallback: vm.fetchPlaces,
+                // el paquete muestra "No items found!" en inglés por defecto
+                emptyBuilder:
+                    (context) => ListTile(
+                      leading: Icon(
+                        HugeIcons.strokeRoundedSearch01,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      title: Text(
+                        'No encontramos ese lugar',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      subtitle: const Text(
+                        'Revisa cómo lo escribiste o muévete en el mapa',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ),
+                // por defecto muestra "Error: ..." con el detalle técnico
+                errorBuilder:
+                    (context, error) => ListTile(
+                      leading: Icon(
+                        Icons.wifi_off_rounded,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                      title: Text(
+                        'No pudimos buscar ahora',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                      subtitle: const Text(
+                        'Revisa tu conexión e inténtalo de nuevo',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ),
                 itemBuilder:
                     (_, address) => ListTile(
                       leading: const Icon(HugeIcons.strokeRoundedLocation01),

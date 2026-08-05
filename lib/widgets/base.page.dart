@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/views/shared/go_to_cart.view.dart';
@@ -96,9 +95,11 @@ class _BasePageState extends State<BasePage> {
                               ? widget.leading == null
                                   ? IconButton(
                                     icon: Icon(
+                                      // misma flecha en toda la app
                                       !Utils.isArabic
-                                          ? FlutterIcons.arrow_left_fea
-                                          : FlutterIcons.arrow_right_fea,
+                                          ? Icons.arrow_back_ios_new_rounded
+                                          : Icons.arrow_forward_ios_rounded,
+                                      size: 20,
                                       color:
                                           widget.appBarItemColor == null
                                               ? Colors.white
