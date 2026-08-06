@@ -73,7 +73,13 @@ class TaxiRequest extends HttpService {
   }
 
   Future<Order?> getOnGoingTrip() async {
-    final apiResult = await get("${Api.currentTaxiBooking}");
+    // el viaje en curso cambia en segundos: si se lee de caché, justo después
+    // de pedir el viaje se recibe la respuesta vieja ("sin viaje") y la app
+    // sale de la pantalla de búsqueda de conductor
+    final apiResult = await get(
+      "${Api.currentTaxiBooking}",
+      forceRefresh: true,
+    );
     //
     final apiResponse = ApiResponse.fromResponse(apiResult);
     //
@@ -99,7 +105,11 @@ class TaxiRequest extends HttpService {
 
   //
   Future<Driver> getDriverInfo(int id) async {
-    final apiResult = await get("${Api.taxiDriverInfo}/$id");
+    //la asignación del conductor también es información en tiempo real
+    final apiResult = await get(
+      "${Api.taxiDriverInfo}/$id",
+      forceRefresh: true,
+    );
     //
     final apiResponse = ApiResponse.fromResponse(apiResult);
     final driver = Driver.fromJson(apiResponse.body["driver"]);
@@ -134,7 +144,7 @@ class TaxiRequest extends HttpService {
   }
 
   Future<Order?> getLastTripForRating() async {
-    final apiResult = await get(Api.lastRatebleTaxiBooking);
+    final apiResult = await get(Api.lastRatebleTaxiBooking, forceRefresh: true);
     final apiResponse = ApiResponse.fromResponse(apiResult);
     if (apiResponse.allGood) {
       if (apiResponse.body["order"] != null) {

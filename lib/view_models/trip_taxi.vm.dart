@@ -22,6 +22,8 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   PaymentMethodRequest paymentOptionRequest = PaymentMethodRequest();
   //
   Order? onGoingOrderTrip;
+  //código del último viaje del que ya se avisó que terminó, para no repetir
+  String? notifiedEndedTripCode;
   double newTripRating = 3.0;
   TextEditingController tripReviewTEC = TextEditingController();
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
@@ -68,6 +70,8 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
       final apiResponse = await taxiRequest.cancelTrip(onGoingOrderTrip!.id);
       //
       if (apiResponse.allGood) {
+        //ya se avisa aquí, que el listener no vuelva a mostrar el aviso
+        notifiedEndedTripCode = onGoingOrderTrip?.code;
         toastSuccessful(
           apiResponse.message ?? "Viaje cancelado correctamente".tr(),
         );
@@ -137,12 +141,15 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
           setCurrentStep(6);
           break;
         case "failed":
+          //antes el viaje se cerraba sin decir nada y parecía que la app falló
+          notifyTripEnded("failed");
           setCurrentStep(1);
           clearMapData();
           stopAllListeners();
           closeOrderSummary();
           break;
         case "cancelled":
+          notifyTripEnded("cancelled");
           setCurrentStep(1);
           clearMapData();
           stopAllListeners();
@@ -163,6 +170,20 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
       //check for last trip that requires rating
       setCurrentStep(6);
     }
+  }
+
+  //avisa una sola vez que el viaje terminó sin llegar a completarse
+  void notifyTripEnded(String status) {
+    final tripCode = onGoingOrderTrip?.code;
+    if (tripCode == null || notifiedEndedTripCode == tripCode) {
+      return;
+    }
+    notifiedEndedTripCode = tripCode;
+    toastError(
+      status == "cancelled"
+          ? "El viaje fue cancelado".tr()
+          : "No se pudo completar el viaje".tr(),
+    );
   }
 
   //
@@ -247,12 +268,19 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   loadDriverDetails() async {
     try {
       final mDriverId = onGoingOrderTrip?.driverId;
-      // onGoingOrderTrip.driver =
-      //     await taxiRequest.getDriverInfo(onGoingOrderTrip.driverId);
-      onGoingOrderTrip = await taxiRequest.getOnGoingTrip();
+      //aún no hay conductor asignado: no hay detalles que cargar
+      if (mDriverId == null) {
+        return;
+      }
+      final refreshedTrip = await taxiRequest.getOnGoingTrip();
+      //si el servidor todavía no devuelve el viaje, se conserva el que ya
+      //teníamos; dejarlo en null cerraba la búsqueda de conductor sin avisar
+      if (refreshedTrip != null) {
+        onGoingOrderTrip = refreshedTrip;
+      }
       //loop until driver data is gotten
       if (onGoingOrderTrip?.driver == null) {
-        onGoingOrderTrip?.driver = await taxiRequest.getDriverInfo(mDriverId!);
+        onGoingOrderTrip?.driver = await taxiRequest.getDriverInfo(mDriverId);
         if (onGoingOrderTrip?.driver == null) {
           await Future.delayed(Duration(seconds: 5));
           loadDriverDetails();
@@ -266,6 +294,10 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
 
   //Start listening to driver location changes
   void startDriverDetailsListener() async {
+    //sin conductor asignado no hay ubicación que seguir
+    if (onGoingOrderTrip?.driverId == null) {
+      return;
+    }
     if (AppStrings.useWebsocketAssignment) {
       OrderDriverLocationWebsocketService().connectToDriverLocationChannel(
         "${onGoingOrderTrip?.driverId}",
@@ -290,7 +322,9 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
         },
       );
     } else {
-      //
+      //este método se llama en cada evento del viaje: sin cancelar el anterior
+      //quedaban varios listeners abiertos sobre el mismo conductor
+      driverLocationStream?.cancel();
       driverLocationStream = firebaseFirestore
           .collection("drivers")
           .doc("${onGoingOrderTrip?.driverId}")
@@ -422,7 +456,9 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     );
     //
     if (apiResponse.allGood) {
-      toastSuccessful(apiResponse.message ?? "Viaje calificado correctamente".tr());
+      toastSuccessful(
+        apiResponse.message ?? "Viaje calificado correctamente".tr(),
+      );
       dismissTripRating();
     } else {
       toastError(apiResponse.message ?? "No se pudo calificar el viaje".tr());

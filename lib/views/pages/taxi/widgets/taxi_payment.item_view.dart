@@ -3,6 +3,7 @@ import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/models/payment_method.dart';
 import 'package:chaskiy/utils/ui_spacer.dart';
 import 'package:chaskiy/widgets/custom_image.view.dart';
+import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class TaxiPaymentItemView extends StatelessWidget {
@@ -19,19 +20,15 @@ class TaxiPaymentItemView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HStack(
-      [
-        //
-        CustomImage(
-          imageUrl: paymentMethod.photo,
-          width: 30,
-          height: 30,
-        ),
-        //
-        UiSpacer.horizontalSpace(space: 10),
-        "${paymentMethod.name}".text.make(),
-      ],
-    )
+    return HStack([
+          //
+          CustomImage(imageUrl: paymentMethod.photo, width: 30, height: 30),
+          //
+          UiSpacer.horizontalSpace(space: 10),
+          //el nombre viene del servidor en inglés; si no hay traducción se
+          //muestra tal cual
+          "${paymentMethod.name}".tr().text.make(),
+        ])
         .p4()
         .box
         .px8
