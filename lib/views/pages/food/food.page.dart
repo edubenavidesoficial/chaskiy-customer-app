@@ -53,149 +53,143 @@ class _FoodPageState extends State<FoodPage>
           appBarItemColor: AppColor.primaryColor,
           showCart: true,
           key: model.pageKey,
-          body: VStack(
-            [
-              //location setion
-              VendorHeader(
-                model: model,
-                showSearch: false,
-                onrefresh: model.reloadPage,
-              ),
+          body: VStack([
+            //location setion
+            VendorHeader(
+              model: model,
+              showSearch: false,
+              onrefresh: model.reloadPage,
+            ),
 
-              SmartRefresher(
-                enablePullDown: true,
-                enablePullUp: false,
-                controller: model.refreshController,
-                onRefresh: model.reloadPage,
-                child: VStack(
-                  [
-                    //search bar
-                    SearchBarInput(
-                      hintText:
-                          "Search for your desired foods or restaurants".tr(),
-                      readOnly: true,
-                      search: Search(
-                        vendorType: widget.vendorType,
-                        showProductsTag: true,
-                        showVendorsTag: true,
-                        // viewType: SearchType.vendorProducts,
-                      ),
-                    ).px12(),
+            SmartRefresher(
+              enablePullDown: true,
+              enablePullUp: false,
+              controller: model.refreshController,
+              onRefresh: model.reloadPage,
+              child:
+                  VStack(
+                    [
+                      //search bar
+                      SearchBarInput(
+                        hintText:
+                            "Search for your desired foods or restaurants".tr(),
+                        readOnly: true,
+                        search: Search(
+                          vendorType: widget.vendorType,
+                          showProductsTag: true,
+                          showVendorsTag: true,
+                          // viewType: SearchType.vendorProducts,
+                        ),
+                      ).px16(),
 
-                    //banners
-                    Banners(
-                      widget.vendorType,
-                      viewportFraction: 0.96,
-                    ),
+                      //banners
+                      Banners(widget.vendorType, viewportFraction: 0.96),
 
-                    //categories
-                    // Categories(
-                    //   widget.vendorType,
-                    // ),
-                    //categories
-                    VendorTypeCategories(
-                      widget.vendorType,
-                      title: "Categories".tr(),
-                      childAspectRatio: 1.4,
-                      crossAxisCount: AppStrings.categoryPerRow,
-                    ),
-                    //flash sales products
-                    FlashSaleView(widget.vendorType),
-                    //popular vendors
-                    SectionVendorsView(
-                      widget.vendorType,
-                      title: "Popular vendors".tr(),
-                      scrollDirection: Axis.horizontal,
-                      type: SearchFilterType.sales,
-                      itemWidth: context.percentWidth * 60,
-                      byLocation: AppStrings.enableFatchByLocation,
-                      spacer: 0,
-                    ),
-                    //campain vendors
-                    SectionProductsView(
-                      widget.vendorType,
-                      title: "Campaigns".tr(),
-                      scrollDirection: Axis.horizontal,
-                      type: ProductFetchDataType.FLASH,
-                      itemWidth: context.percentWidth * 38,
-                      viewType: GridViewProductListItem,
-                      byLocation: AppStrings.enableFatchByLocation,
-                      // new otpions
-                      separator: 0.widthBox,
-                      itemsPadding: EdgeInsets.symmetric(horizontal: 0),
-                      spacer: 0,
-                    ),
-                    //popular foods
-                    SectionProductsView(
-                      widget.vendorType,
-                      title: "Popular %s Nearby"
-                          .tr()
-                          .fill([widget.vendorType.name]),
-                      scrollDirection: Axis.horizontal,
-                      type: ProductFetchDataType.BEST,
-                      itemWidth: context.percentWidth * 60,
-                      itemHeight: 120,
-                      viewType: FoodHorizontalProductListItem,
-                      listHeight: 115,
-                      byLocation: AppStrings.enableFatchByLocation,
-                      // new otpions
-                      separator: 0.widthBox,
-                      itemsPadding: EdgeInsets.symmetric(horizontal: 0),
-                      spacer: 0,
-                    ),
-                    //new vendors
-                    CustomVisibilty(
-                      visible: !AppStrings.enableSingleVendor,
-                      child: SectionVendorsView(
+                      //categories
+                      // Categories(
+                      //   widget.vendorType,
+                      // ),
+                      //categories
+                      VendorTypeCategories(
                         widget.vendorType,
-                        title: "New on".tr() + " ${AppStrings.appName}",
+                        title: "Categories".tr(),
+                        childAspectRatio: 1.4,
+                        crossAxisCount: AppStrings.categoryPerRow,
+                      ),
+                      //flash sales products
+                      FlashSaleView(widget.vendorType),
+                      //popular vendors
+                      SectionVendorsView(
+                        widget.vendorType,
+                        title: "Popular vendors".tr(),
                         scrollDirection: Axis.horizontal,
-                        type: SearchFilterType.fresh,
-                        itemWidth: context.percentWidth * 60,
+                        type: SearchFilterType.sales,
+                        itemWidth: context.percentWidth * 74,
                         byLocation: AppStrings.enableFatchByLocation,
+                        separator: UiSpacer.horizontalSpace(space: 12),
                         spacer: 0,
                       ),
-                    ),
-                    //all vendor
-                    CustomVisibilty(
-                      visible: !AppStrings.enableSingleVendor,
-                      child: SectionVendorsView(
+                      //campain vendors
+                      SectionProductsView(
                         widget.vendorType,
-                        title: "All Vendors/Restaurants".tr(),
-                        scrollDirection: Axis.vertical,
-                        type: SearchFilterType.best,
-                        viewType: HorizontalVendorListItem,
-                        separator: UiSpacer.verticalSpace(space: 0),
+                        title: "Campaigns".tr(),
+                        scrollDirection: Axis.horizontal,
+                        type: ProductFetchDataType.FLASH,
+                        itemWidth: context.percentWidth * 38,
+                        viewType: GridViewProductListItem,
                         byLocation: AppStrings.enableFatchByLocation,
+                        // new otpions
+                        separator: UiSpacer.horizontalSpace(space: 12),
                         spacer: 0,
                       ),
-                    ),
-                    //all products
-                    CustomVisibilty(
-                      visible: AppStrings.enableSingleVendor,
-                      child: SectionProductsView(
+                      //popular foods
+                      SectionProductsView(
                         widget.vendorType,
-                        title: "All Products".tr(),
-                        scrollDirection: Axis.vertical,
+                        title: "Popular %s Nearby".tr().fill([
+                          widget.vendorType.name,
+                        ]),
+                        scrollDirection: Axis.horizontal,
                         type: ProductFetchDataType.BEST,
-                        viewType: HorizontalProductListItem,
-                        separator: UiSpacer.verticalSpace(space: 0),
-                        listHeight: null,
+                        itemWidth: context.percentWidth * 78,
+                        itemHeight: 84,
+                        viewType: FoodHorizontalProductListItem,
+                        listHeight: 112,
                         byLocation: AppStrings.enableFatchByLocation,
+                        // new otpions
+                        separator: UiSpacer.horizontalSpace(space: 12),
+                        spacer: 0,
                       ),
-                    ),
-                    //view all vendors
-                    ViewAllVendorsView(
-                      vendorType: widget.vendorType,
-                    ),
-                    UiSpacer.verticalSpace(),
-                  ],
-                  // key: model.pageKey,
-                  spacing: 12,
-                ).scrollVertical(),
-              ).expand(),
-            ],
-          ),
+                      //new vendors
+                      CustomVisibilty(
+                        visible: !AppStrings.enableSingleVendor,
+                        child: SectionVendorsView(
+                          widget.vendorType,
+                          title: "New on".tr() + " ${AppStrings.appName}",
+                          scrollDirection: Axis.horizontal,
+                          type: SearchFilterType.fresh,
+                          itemWidth: context.percentWidth * 74,
+                          byLocation: AppStrings.enableFatchByLocation,
+                          separator: UiSpacer.horizontalSpace(space: 12),
+                          spacer: 0,
+                        ),
+                      ),
+                      //all vendor
+                      CustomVisibilty(
+                        visible: !AppStrings.enableSingleVendor,
+                        child: SectionVendorsView(
+                          widget.vendorType,
+                          title: "All Vendors/Restaurants".tr(),
+                          scrollDirection: Axis.vertical,
+                          type: SearchFilterType.best,
+                          viewType: HorizontalVendorListItem,
+                          separator: UiSpacer.verticalSpace(space: 10),
+                          byLocation: AppStrings.enableFatchByLocation,
+                          spacer: 0,
+                        ),
+                      ),
+                      //all products
+                      CustomVisibilty(
+                        visible: AppStrings.enableSingleVendor,
+                        child: SectionProductsView(
+                          widget.vendorType,
+                          title: "All Products".tr(),
+                          scrollDirection: Axis.vertical,
+                          type: ProductFetchDataType.BEST,
+                          viewType: HorizontalProductListItem,
+                          separator: UiSpacer.verticalSpace(space: 0),
+                          listHeight: null,
+                          byLocation: AppStrings.enableFatchByLocation,
+                        ),
+                      ),
+                      //view all vendors
+                      ViewAllVendorsView(vendorType: widget.vendorType),
+                      UiSpacer.verticalSpace(),
+                    ],
+                    // key: model.pageKey,
+                    spacing: 12,
+                  ).scrollVertical(),
+            ).expand(),
+          ]),
         );
       },
     );

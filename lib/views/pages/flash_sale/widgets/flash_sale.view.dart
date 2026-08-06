@@ -1,12 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/models/flash_sale.dart';
 import 'package:chaskiy/models/vendor_type.dart';
 import 'package:chaskiy/utils/ui_spacer.dart';
-import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/view_models/flash_sale.vm.dart';
 import 'package:chaskiy/views/pages/flash_sale/flash_sale.page.dart';
 import 'package:chaskiy/views/pages/flash_sale/widgets/flash_sale.item_view.dart';
@@ -28,11 +24,29 @@ class FlashSaleView extends StatefulWidget {
 }
 
 class _FlashSaleViewState extends State<FlashSaleView> {
+  //a partir de aquí un contador ya no aporta urgencia y se vuelve ilegible
+  static const Duration _countdownThreshold = Duration(hours: 48);
+
+  static const List<String> _months = [
+    'ene',
+    'feb',
+    'mar',
+    'abr',
+    'may',
+    'jun',
+    'jul',
+    'ago',
+    'sep',
+    'oct',
+    'nov',
+    'dic',
+  ];
+
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<FlashSaleViewModel>.reactive(
-      viewModelBuilder: () =>
-          FlashSaleViewModel(context, vendorType: widget.vendorType),
+      viewModelBuilder:
+          () => FlashSaleViewModel(context, vendorType: widget.vendorType),
       onViewModelReady: (vm) => vm.initialise(),
       builder: (context, vm, child) {
         //
@@ -42,22 +56,13 @@ class _FlashSaleViewState extends State<FlashSaleView> {
           return UiSpacer.emptySpace();
         }
         //
-        return VStack(
-          [
-            UiSpacer.verticalSpace(),
-            ...flashSalesListView(context, vm),
-            UiSpacer.vSpace(10),
-          ],
-        );
+        return VStack([...flashSalesListView(context, vm)]);
       },
     );
   }
 
   //
-  List<Widget> flashSalesListView(
-    BuildContext context,
-    FlashSaleViewModel vm,
-  ) {
+  List<Widget> flashSalesListView(BuildContext context, FlashSaleViewModel vm) {
     List<Widget> list = [];
     List<FlashSale> flashsales = vm.flashSales;
     //
@@ -70,87 +75,133 @@ class _FlashSaleViewState extends State<FlashSaleView> {
         return;
       }
 
-      Widget title = HStack(
-        [
-          Icon(
-            FlutterIcons.sale_mco,
-            color: Utils.textColorByColor(AppColor.closeColor),
-          ),
-
-          VStack(
-            [
-              "${flashsale.name}"
-                  .text
-                  .semiBold
-                  .lg
-                  .color(Utils.textColorByTheme())
-                  .make(),
-              UiSpacer.vSpace(1),
-              HStack(
-                [
-                  "TIME LEFT:"
-                      .tr()
-                      .text
-                      .light
-                      .sm
-                      .color(Utils.textColorByTheme())
-                      .make(),
-                  UiSpacer.hSpace(6),
-                  SlideCountdown(
-                    textStyle: TextStyle(
-                      fontSize: 11,
-                      color: Utils.textColorByColor(AppColor.closeColor),
-                    ),
-                    duration: flashsale.countDownDuration,
-                    separatorType: SeparatorType.symbol,
-                    slideDirection: SlideDirection.up,
-                    onDone: () {
-                      vm.notifyListeners();
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ).expand(),
-
-          //
-          "SEE ALL"
-              .tr()
-              .text
-              .color(Utils.textColorByColor(AppColor.closeColor))
-              .make()
-              .onTap(
-                () => openFlashSaleItems(context, flashsale),
-              ),
-        ],
-        spacing: 10,
-      ).px12().py8().box.color(AppColor.closeColor).make().wFull(context);
-      //categories list
+      //items de la promoción
       Widget items = CustomListedListView(
         noScrollPhysics: false,
         scrollDirection: Axis.horizontal,
-        items: (flashsale.items ?? []).map(
-          (flashSaleItem) {
-            return FittedBox(
-              child: FlashSaleItemListItem(flashSaleItem),
-            ).pOnly(right: 5);
-          },
-        ).toList(),
-      ).h(Platform.isAndroid ? 160 : 190);
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        items:
+            (flashsale.items ?? [])
+                .map(
+                  (flashSaleItem) => Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: FlashSaleItemListItem(flashSaleItem),
+                  ),
+                )
+                .toList(),
+      ).h(216);
 
       //
       list.add(
-        VStack(
-          [
-            title,
-            items.py4(),
+        Padding(
+          padding: const EdgeInsets.only(top: 4, bottom: 4),
+          child: VStack([
+            _header(context, flashsale),
             UiSpacer.vSpace(10),
-          ],
-        ).py12(),
+            items,
+          ]),
+        ),
       );
     });
 
     return list;
+  }
+
+  //cabecera: antes era una franja roja a todo el ancho que partía la pantalla
+  Widget _header(BuildContext context, FlashSale flashsale) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: AppColor.closeColor.withOpacity(.14),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.local_fire_department_rounded,
+              color: AppColor.closeColor,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "${flashsale.name}",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -.4,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                _deadline(context, flashsale),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            "See all".tr(),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppColor.primaryColor,
+              fontWeight: FontWeight.w700,
+            ),
+          ).onInkTap(() => openFlashSaleItems(context, flashsale)),
+        ],
+      ),
+    );
+  }
+
+  //cuenta regresiva solo cuando falta poco; si no, la fecha de cierre
+  Widget _deadline(BuildContext context, FlashSale flashsale) {
+    final theme = Theme.of(context);
+    final duration = flashsale.countDownDuration;
+    final labelStyle = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+
+    if (duration > _countdownThreshold) {
+      final expiresAt = flashsale.expiresAt;
+      if (expiresAt == null) {
+        return const SizedBox.shrink();
+      }
+      return Text(
+        "Hasta el ${expiresAt.day} de ${_months[expiresAt.month - 1]}",
+        style: labelStyle,
+      );
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text("TIME LEFT:".tr(), style: labelStyle),
+        const SizedBox(width: 6),
+        SlideCountdown(
+          duration: duration,
+          separatorType: SeparatorType.symbol,
+          slideDirection: SlideDirection.up,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: AppColor.closeColor,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+          ),
+          onDone: () => setState(() {}),
+        ),
+      ],
+    );
   }
 
   openFlashSaleItems(BuildContext context, FlashSale flashsale) {

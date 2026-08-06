@@ -53,12 +53,13 @@ class SectionProductsView extends StatelessWidget {
     return CustomVisibilty(
       // visible: !AppStrings.enableSingleVendor,
       child: ViewModelBuilder<ProductsViewModel>.reactive(
-        viewModelBuilder: () => ProductsViewModel(
-          context,
-          vendorType,
-          type,
-          byLocation: byLocation,
-        ),
+        viewModelBuilder:
+            () => ProductsViewModel(
+              context,
+              vendorType,
+              type,
+              byLocation: byLocation,
+            ),
         onViewModelReady: (model) => model.initialise(),
         builder: (context, model, child) {
           //if not busy and list is empty && hideEmpty == true
@@ -68,7 +69,7 @@ class SectionProductsView extends StatelessWidget {
           //listview
           Widget listView = CustomListView(
             scrollDirection: scrollDirection,
-            padding: itemsPadding ?? EdgeInsets.symmetric(horizontal: 10),
+            padding: itemsPadding ?? EdgeInsets.symmetric(horizontal: 16),
             dataSet: model.products,
             isLoading: model.isBusy,
             noScrollPhysics: scrollDirection != Axis.horizontal,
@@ -110,10 +111,7 @@ class SectionProductsView extends StatelessWidget {
                   );
                 }
                 //regular views
-                itemView = CommerceProductListItem(
-                  product,
-                  height: 80,
-                );
+                itemView = CommerceProductListItem(product, height: 80);
               }
 
               //
@@ -129,23 +127,21 @@ class SectionProductsView extends StatelessWidget {
           //
           return CustomVisibilty(
             visible: !model.isBusy && !model.products.isEmpty,
-            child: VStack(
-              [
-                //
-                Padding(
-                  padding: titlePadding ?? EdgeInsets.symmetric(horizontal: 12),
-                  child: SectionTitle("$title"),
-                ),
-                //
-                if (model.products.isEmpty)
-                  listView.h(240)
-                else if (listHeight != null)
-                  listView.h(listHeight!)
-                else
-                  listView
-              ],
-              spacing: spacer ?? 5,
-            ),
+            child: VStack([
+              //
+              Padding(
+                padding:
+                    titlePadding ?? const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                child: SectionTitle("$title"),
+              ),
+              //
+              if (model.products.isEmpty)
+                listView.h(240)
+              else if (listHeight != null)
+                listView.h(listHeight!)
+              else
+                listView,
+            ], spacing: spacer ?? 5),
           );
 
           //

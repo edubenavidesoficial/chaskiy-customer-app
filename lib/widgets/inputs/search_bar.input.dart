@@ -53,8 +53,8 @@ class SearchBarInput extends StatelessWidget {
               hintText: hintText ?? "Search".tr(),
               hintStyle: context.textTheme.bodyMedium!.copyWith(
                 fontSize: 15,
-                fontWeight: FontWeight.w100,
-                color: Colors.grey.shade400,
+                fontWeight: FontWeight.w500,
+                color: colors.onSurfaceVariant,
               ),
               border: InputBorder.none,
               enabledBorder: InputBorder.none,

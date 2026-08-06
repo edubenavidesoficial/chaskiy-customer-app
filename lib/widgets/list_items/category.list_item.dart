@@ -24,18 +24,35 @@ class CategoryListItem extends StatelessWidget {
   final bool inverted;
   final Color? textColor;
   final int lines;
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     Widget child = 5.heightBox;
+
     if (inverted) {
-      Color bgColor = Vx.hexToColor(category.color);
-      Color mTextColor = Utils.textColorByColor(bgColor);
+      //el color de la categoría se usa solo como tinte: un bloque sólido de
+      //color claro quedaba ilegible sobre el tema oscuro
+      final accent = Vx.hexToColor(category.color);
+      final isDark = theme.brightness == Brightness.dark;
+      final bgColor = Color.alphaBlend(
+        accent.withOpacity(isDark ? .18 : .14),
+        theme.colorScheme.surface,
+      );
       child = _buildCategoryViewBase(
         maxLine,
         inverted,
-        textColor ?? mTextColor,
+        textColor ?? theme.colorScheme.onSurface,
       );
-      child = child.p(8).box.roundedSM.color(bgColor).make();
+      child = Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: accent.withOpacity(isDark ? .30 : .22)),
+        ),
+        child: child,
+      );
     } else {
       Color mTextColor = Utils.textColorByColor(Colors.transparent);
       child = _buildCategoryViewBase(
@@ -55,11 +72,16 @@ class CategoryListItem extends StatelessWidget {
         _height = h!;
       }
       child =
-          child
-              .w(_width)
-              .h(_height)
-              .onInkTap(() => this.onPressed(this.category))
-              .px4();
+          SizedBox(
+            width: _width,
+            height: _height,
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(18),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(onTap: () => onPressed(category), child: child),
+            ),
+          ).px4();
     } else {
       child = child.onInkTap(() => this.onPressed(this.category)).px4();
     }
@@ -72,6 +94,7 @@ class CategoryListItem extends StatelessWidget {
         .size(AppStrings.categoryTextSize)
         .wrapWords(true)
         .center
+        .fontWeight(FontWeight.w700)
         .color(textColor)
         .make()
         .py(1);
@@ -80,6 +103,7 @@ class CategoryListItem extends StatelessWidget {
           .minFontSize(AppStrings.categoryTextSize)
           .size(AppStrings.categoryTextSize)
           .center
+          .fontWeight(FontWeight.w700)
           .color(textColor)
           .maxLines(lines)
           .ellipsis
@@ -93,10 +117,11 @@ class CategoryListItem extends StatelessWidget {
           //
           CustomImage(
                 imageUrl: category.imageUrl,
-                boxFit: BoxFit.fill,
+                boxFit: BoxFit.contain,
                 width: AppStrings.categoryImageWidth * (inverted ? 0.75 : 1),
                 height: AppStrings.categoryImageHeight * (inverted ? 0.75 : 1),
-              ).box.roundedSM
+              ).box
+              .withRounded(value: 14)
               .clip(Clip.antiAlias)
               .color(
                 inverted ? Colors.transparent : Vx.hexToColor(category.color),
@@ -108,7 +133,7 @@ class CategoryListItem extends StatelessWidget {
           nameView,
         ],
         crossAlignment: CrossAxisAlignment.center,
-        alignment: MainAxisAlignment.start,
+        alignment: MainAxisAlignment.center,
       ),
     );
   }

@@ -7,6 +7,7 @@ import 'package:chaskiy/view_models/vendor/categories.vm.dart';
 import 'package:chaskiy/views/pages/category/categories.page.dart';
 import 'package:chaskiy/widgets/custom_dynamic_grid_view.dart';
 import 'package:chaskiy/widgets/list_items/category.list_item.dart';
+import 'package:chaskiy/widgets/section.title.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -55,7 +56,7 @@ class _VendorTypeCategoriesState extends State<VendorTypeCategories> {
           ),
       onViewModelReady: (model) => model.initialise(),
       builder: (context, model, child) {
-        EdgeInsets topheaderPading = EdgeInsets.symmetric(horizontal: 12);
+        EdgeInsets topheaderPading = const EdgeInsets.fromLTRB(16, 12, 16, 0);
         if (widget.headerPadding != null) {
           topheaderPading = widget.headerPadding!;
         }
@@ -70,18 +71,22 @@ class _VendorTypeCategoriesState extends State<VendorTypeCategories> {
             padding: topheaderPading,
             child: HStack([
               VStack([
-                if (widget.showTitle) (headerTitle.tr().text.xl.medium.make()),
+                if (widget.showTitle) SectionTitle(headerTitle.tr()),
                 if (widget.showDescription)
                   headerDescription.tr().text.xl.semiBold.make(),
               ]).expand(),
               //
-              seeAllText.tr().text.color(AppColor.primaryColor).make().onInkTap(
-                () {
-                  context.nextPage(
-                    CategoriesPage(vendorType: widget.vendorType),
-                  );
-                },
-              ),
+              seeAllText
+                  .tr()
+                  .text
+                  .color(AppColor.primaryColor)
+                  .fontWeight(FontWeight.w700)
+                  .make()
+                  .onInkTap(() {
+                    context.nextPage(
+                      CategoriesPage(vendorType: widget.vendorType),
+                    );
+                  }),
             ]),
           ),
 
@@ -90,7 +95,7 @@ class _VendorTypeCategoriesState extends State<VendorTypeCategories> {
           if (AppStrings.categoryStyleGrid)
             CustomDynamicHeightGridView(
               padding:
-                  widget.listPadding ?? EdgeInsets.symmetric(horizontal: 10),
+                  widget.listPadding ?? EdgeInsets.symmetric(horizontal: 12),
               crossAxisCount: AppStrings.categoryPerRow,
               itemCount: model.categories.length,
               mainAxisSpacing: 0,
@@ -114,7 +119,7 @@ class _VendorTypeCategoriesState extends State<VendorTypeCategories> {
           if (!AppStrings.categoryStyleGrid)
             Padding(
               padding:
-                  widget.listPadding ?? EdgeInsets.symmetric(horizontal: 10),
+                  widget.listPadding ?? EdgeInsets.symmetric(horizontal: 12),
               child: HStack(
                 [
                   ...model.categories.map((e) {
@@ -123,7 +128,8 @@ class _VendorTypeCategoriesState extends State<VendorTypeCategories> {
                       onPressed: model.categorySelected,
                       maxLine: !AppStrings.categoryStyleGrid,
                       lines: 2,
-                      h: AppStrings.categoryImageHeight + 41,
+                      //el borde y el relleno de la tarjeta necesitan más alto
+                      h: AppStrings.categoryImageHeight + 52,
                       inverted: widget.invertedItemDesign,
                     ).w(context.screenWidth / AppStrings.categoryPerRow);
                   }).toList(),
