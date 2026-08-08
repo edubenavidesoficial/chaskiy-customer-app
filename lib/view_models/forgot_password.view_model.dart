@@ -27,8 +27,7 @@ class ForgotPasswordViewModel extends MyBaseViewModel {
 
   ForgotPasswordViewModel(BuildContext context) {
     this.viewContext = context;
-    String countryCode = PhoneUtilService.countryCode ?? "us";
-    this.selectedCountry = Country.parse(countryCode);
+    this.selectedCountry = PhoneUtilService.defaultCountry();
   }
 
   //
@@ -36,6 +35,7 @@ class ForgotPasswordViewModel extends MyBaseViewModel {
     showCountryPicker(
       context: viewContext,
       showPhoneCode: true,
+      countryFilter: PhoneUtilService.allowedCountryCodes,
       onSelect: countryCodeSelected,
     );
   }

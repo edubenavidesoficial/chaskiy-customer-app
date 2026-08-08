@@ -1,12 +1,22 @@
 import 'dart:io';
 import 'package:country_picker/country_picker.dart';
+import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/services/local_storage.service.dart';
+import 'package:chaskiy/services/location.service.dart';
+import 'package:chaskiy/utils/utils.dart';
 
 class PhoneUtilService {
   static Country? _userCountry;
   static bool _isInitialized = false;
   static Future<void>? _initialization;
   static const String _storageKey = 'USER_COUNTRY_CODE';
+
+  /// Valores del ajuste *Código del país* que significan "sin restricción".
+  static const List<String> _unrestrictedCodes = ["INTERNATIONAL", "AUTO"];
+
+  /// Último recurso, solo si ninguna señal (cuenta, GPS, IP, dispositivo ni
+  /// panel) logra resolver un país.
+  static const String _lastResortCode = "EC";
 
   /// Initialize the service - call this on app startup
   static Future<void> init() async {
@@ -26,35 +36,31 @@ class PhoneUtilService {
     } catch (e) {
       print('Error initializing PhoneUtilService: $e');
       // Set fallback even if init fails
-      _userCountry = Country.tryParse('EC');
+      _userCountry = defaultCountry();
       _isInitialized = true;
     } finally {
       _initialization = null;
     }
   }
 
-  /// Get the user's country based on device locale and SIM card info
+  /// Resuelve dónde está realmente el usuario, de la señal más confiable a la
+  /// menos: ubicación del GPS ya geocodificada, país de la IP, región
+  /// configurada en el dispositivo y, si no hay red, el último país conocido.
+  ///
+  /// Se vuelve a resolver en cada arranque —la caché es solo respaldo— para
+  /// que un país mal detectado no se quede pegado en el dispositivo.
   static Future<Country?> getUserCountry() async {
     if (_userCountry != null) {
       return _userCountry;
     }
 
-    // Try to get from cache first
-    final cachedCountryCode = await _getCachedCountryCode();
-    if (cachedCountryCode != null) {
-      try {
-        _userCountry = Country.tryParse(cachedCountryCode);
-        if (_userCountry != null) {
-          return _userCountry;
-        }
-      } catch (e) {
-        print('Error parsing cached country code: $e');
-      }
-    }
-
-    // Región del dispositivo; no consultamos la SIM porque es una API
-    // obsoleta en iOS y añade trabajo innecesario al arranque.
-    _userCountry = await _getCountryFromLocale() ?? Country.tryParse('EC');
+    // No consultamos la SIM porque es una API obsoleta en iOS y añade trabajo
+    // innecesario al arranque.
+    _userCountry =
+        _parseCountry(LocationService.currenctAddress?.countryCode) ??
+        await _getCountryFromIp() ??
+        await _getCountryFromLocale() ??
+        _parseCountry(await _getCachedCountryCode());
 
     // Cache the result
     if (_userCountry != null) {
@@ -62,6 +68,76 @@ class PhoneUtilService {
     }
 
     return _userCountry;
+  }
+
+  /// Países que el panel permite en los selectores de teléfono, tomados del
+  /// ajuste *Código del país* (admite varios separados por coma).
+  ///
+  /// Devuelve `null` cuando el panel está en INTERNATIONAL o AUTO, es decir
+  /// cuando no hay restricción y se deben mostrar todos.
+  static List<String>? get allowedCountryCodes {
+    String raw;
+    try {
+      raw = AppStrings.countryCode;
+    } catch (e) {
+      // El ajuste todavía no llega desde el servidor.
+      return null;
+    }
+
+    final codes =
+        raw
+            .split(",")
+            .map((code) => code.trim().toUpperCase())
+            .where(
+              (code) => code.isNotEmpty && !_unrestrictedCodes.contains(code),
+            )
+            .where((code) => Country.tryParse(code) != null)
+            .toList();
+
+    return codes.isEmpty ? null : codes;
+  }
+
+  /// País que deben mostrar por defecto los selectores de teléfono.
+  ///
+  /// Nada está fijo en el código: se toma el país guardado en la cuenta
+  /// (para no alterar un número ya validado), luego dónde está el usuario y
+  /// por último lo que diga el panel. El resultado siempre queda dentro de
+  /// los países que el panel permite.
+  static Country defaultCountry({String? accountCountryCode}) {
+    final allowed = allowedCountryCodes;
+
+    Country? pick(String? value) {
+      final country = _parseCountry(value);
+      if (country == null) {
+        return null;
+      }
+      final isAllowed =
+          allowed == null ||
+          allowed.contains(country.countryCode.toUpperCase());
+      return isAllowed ? country : null;
+    }
+
+    return pick(accountCountryCode) ??
+        pick(LocationService.currenctAddress?.countryCode) ??
+        pick(_userCountry?.countryCode) ??
+        pick(allowed?.first) ??
+        Country.parse(_lastResortCode);
+  }
+
+  /// Convierte un código o nombre de país en [Country]; `null` si no aplica.
+  static Country? _parseCountry(String? value) {
+    final raw = value?.trim() ?? "";
+    return raw.isEmpty ? null : Country.tryParse(raw);
+  }
+
+  /// País según la IP desde la que se conecta el dispositivo.
+  static Future<Country?> _getCountryFromIp() async {
+    try {
+      return _parseCountry(await Utils.getCurrentCountryCode());
+    } catch (e) {
+      print('Error getting country from IP: $e');
+      return null;
+    }
   }
 
   /// Get country code (2-letter ISO code)

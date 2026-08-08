@@ -125,8 +125,15 @@ class OrderDeliveryAddressPickerView extends StatelessWidget {
           ),
         ),
       ],
-    ).p12().box.roundedSM.border(color: Colors.grey).make().pOnly(
-          bottom: Vx.dp20,
-        );
+    )
+        .p16()
+        .box
+        .roundedLg
+        .color(Theme.of(context).cardColor)
+        .border(
+          color:
+              Theme.of(context).colorScheme.outlineVariant.withValues(alpha: .55),
+        )
+        .make();
   }
 }

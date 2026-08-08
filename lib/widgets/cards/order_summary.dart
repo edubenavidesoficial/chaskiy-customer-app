@@ -1,15 +1,13 @@
-import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_strings.dart';
-import 'package:chaskiy/constants/sizes.dart';
 import 'package:chaskiy/extensions/dynamic.dart';
 import 'package:chaskiy/extensions/string.dart';
 import 'package:chaskiy/models/fee.dart';
 import 'package:chaskiy/services/app_currency_system.service.dart';
-import 'package:chaskiy/views/pages/cart/widgets/amount_tile.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 
+/// Desglose de montos del pedido: líneas de detalle y total destacado.
 class OrderSummary extends StatelessWidget {
   const OrderSummary({
     this.subTotal,
@@ -24,6 +22,7 @@ class OrderSummary extends StatelessWidget {
     this.mCurrencySymbol,
     this.customWidget,
     this.allowConvert = false,
+    this.showTitle = true,
     Key? key,
   }) : super(key: key);
 
@@ -39,122 +38,106 @@ class OrderSummary extends StatelessWidget {
   final List<Fee> fees;
   final Widget? customWidget;
   final bool allowConvert;
+
+  /// La tarjeta de sección ya muestra un título propio; en ese caso se oculta.
+  final bool showTitle;
+
   @override
   Widget build(BuildContext context) {
-    final currencySymbol =
-        mCurrencySymbol != null
-            ? mCurrencySymbol
-            : AppStrings.currentCurrencySymbol;
+    final colors = Theme.of(context).colorScheme;
+    final currencySymbol = mCurrencySymbol ?? AppStrings.currentCurrencySymbol;
 
-    TextStyle totalStyle = context.textTheme.bodyLarge!.copyWith(
-      fontSize: Sizes.fontSizeLarge * 0.90,
-      fontWeight: FontWeight.w600,
-    );
-    TextStyle summaryStyle = context.textTheme.bodyLarge!.copyWith(
-      fontSize: Sizes.fontSizeLarge,
-    );
+    /// Formatea un monto con el símbolo y el separador configurados.
+    String money(double? amount) =>
+        "$currencySymbol ${(amount ?? 0).convertIf(allowConvert)}"
+            .currencyFormat(currencySymbol);
 
-    //view
     return VStack([
-      "Order Summary".tr().text.semiBold.xl.make().pOnly(bottom: Vx.dp12),
-      //custom details
+      if (showTitle)
+        "Order Summary".tr().text.semiBold.xl.make().pOnly(bottom: Vx.dp12),
+
+      //detalle propio de cada pantalla
       if (customWidget != null) customWidget!,
-      AmountTile(
-        "Subtotal".tr(),
-        "$currencySymbol ${(subTotal ?? 0).convertIf(allowConvert)}"
-            .currencyFormat(currencySymbol),
-        amountStyle: summaryStyle,
-      ).py2(),
-      Visibility(
-        visible: discount != null,
-        child:
-            AmountTile(
-              "Discount".tr(),
-              "- " +
-                  "$currencySymbol ${(discount ?? 0).convertIf(allowConvert)}"
-                      .currencyFormat(currencySymbol),
-              amountStyle: summaryStyle,
-            ).py2(),
-      ),
-      AmountTile(
-        "Tax (%s)".tr().fill(["${vendorTax ?? 0}%"]),
-        "+ " +
-            " $currencySymbol ${(tax ?? 0).convertIf(allowConvert)}"
-                .currencyFormat(currencySymbol),
-        amountStyle: summaryStyle,
-      ).py2(),
-      Visibility(
-        visible: deliveryFee != null,
-        child:
-            VStack([
-              DottedLine(dashColor: context.textTheme.bodyLarge!.color!).py8(),
-              AmountTile(
-                "Delivery Fee".tr(),
-                "+ " +
-                    "$currencySymbol ${(deliveryFee ?? 0).convertIf(allowConvert)}"
-                        .currencyFormat(currencySymbol),
-                amountStyle: summaryStyle,
-              ),
-              Visibility(
-                visible: deliveryDiscount != null,
-                child: AmountTile(
-                  "Delivery Discount".tr(),
-                  "- " +
-                      "$currencySymbol ${(deliveryDiscount ?? 0).convertIf(allowConvert)}"
-                          .currencyFormat(currencySymbol),
-                  amountStyle: summaryStyle,
-                ),
-              ),
-            ]).py2(),
-      ),
-      DottedLine(dashColor: context.textTheme.bodyLarge!.color!).py8(),
-      Visibility(
-        visible: fees.isNotEmpty,
-        child: VStack([
-          ...((fees).map((fee) {
-            //fixed
-            if ((fee.percentage != 1)) {
-              return AmountTile(
-                "${fee.name}".tr(),
-                "+ " +
-                    " $currencySymbol ${fee.value.convertIf(allowConvert)}"
-                        .currencyFormat(currencySymbol),
-                amountStyle: summaryStyle,
-              ).py2();
-            } else {
-              //percentage
-              return AmountTile(
-                "${fee.name} (%s)".tr().fill(["${fee.value}%"]),
-                "+ " +
-                    " $currencySymbol ${fee.getRate(subTotal ?? 0)}"
-                        .currencyFormat(currencySymbol),
-                amountStyle: summaryStyle,
-              ).py2();
-            }
-          }).toList()),
-          DottedLine(dashColor: context.textTheme.bodyLarge!.color!).py8(),
-        ]),
-      ),
-      Visibility(
-        visible: driverTip != null && driverTip! > 0,
-        child: VStack([
-          AmountTile(
-            "Driver Tip".tr(),
-            "+ " +
-                "$currencySymbol ${(driverTip ?? 0).convertIf(allowConvert)}"
-                    .currencyFormat(currencySymbol),
-            amountStyle: summaryStyle,
-          ).py2(),
-          DottedLine(dashColor: context.textTheme.bodyLarge!.color!).py8(),
-        ]),
-      ),
-      AmountTile(
-        "Total Amount".tr(),
-        "$currencySymbol ${total.convertIf(allowConvert)}".currencyFormat(
-          currencySymbol,
+
+      _SummaryRow(label: "Subtotal".tr(), amount: money(subTotal)),
+      if (discount != null)
+        _SummaryRow(
+          label: "Discount".tr(),
+          amount: "- ${money(discount)}",
+          highlight: true,
         ),
-        amountStyle: totalStyle,
+      _SummaryRow(
+        label: "Tax (%s)".tr().fill(["${vendorTax ?? 0}%"]),
+        amount: money(tax),
+      ),
+      if (deliveryFee != null)
+        _SummaryRow(label: "Delivery Fee".tr(), amount: money(deliveryFee)),
+      if (deliveryDiscount != null)
+        _SummaryRow(
+          label: "Delivery Discount".tr(),
+          amount: "- ${money(deliveryDiscount)}",
+          highlight: true,
+        ),
+
+      //cargos configurados por el negocio
+      ...fees.map((fee) {
+        final isPercentage = fee.percentage == 1;
+        return _SummaryRow(
+          label:
+              isPercentage
+                  ? "${fee.name} (%s)".tr().fill(["${fee.value}%"])
+                  : "${fee.name}".tr(),
+          amount:
+              isPercentage
+                  ? money(fee.getRate(subTotal ?? 0))
+                  : money(fee.value),
+        );
+      }),
+
+      if (driverTip != null && driverTip! > 0)
+        _SummaryRow(label: "Driver Tip".tr(), amount: money(driverTip)),
+
+      //total
+      Container(
+        margin: const EdgeInsets.only(top: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: colors.primary.withValues(alpha: .10),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: HStack([
+          "Total Amount".tr().text.semiBold.make().expand(),
+          money(total).text.xl.bold.color(colors.primary).make(),
+        ]),
       ),
     ]);
+  }
+}
+
+/// Línea de monto del desglose.
+class _SummaryRow extends StatelessWidget {
+  const _SummaryRow({
+    required this.label,
+    required this.amount,
+    this.highlight = false,
+  });
+
+  final String label;
+  final String amount;
+
+  /// Los descuentos se marcan en verde para diferenciarlos de los cargos.
+  final bool highlight;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return HStack([
+      label.text.color(colors.onSurfaceVariant).make().expand(),
+      12.widthBox,
+      amount.text.medium
+          .color(highlight ? Colors.green.shade600 : colors.onSurface)
+          .make(),
+    ]).py(6);
   }
 }

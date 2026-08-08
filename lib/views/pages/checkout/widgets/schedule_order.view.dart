@@ -9,6 +9,10 @@ import 'package:jiffy/jiffy.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 
+//borde tenue de las tarjetas de la pantalla de pedido
+Color _cardBorderColor(BuildContext context) =>
+    Theme.of(context).colorScheme.outlineVariant.withValues(alpha: .55);
+
 class ScheduleOrderView extends StatelessWidget {
   const ScheduleOrderView(this.vm, {Key? key}) : super(key: key);
   final CheckoutBaseViewModel vm;
@@ -133,12 +137,12 @@ class ScheduleOrderView extends StatelessWidget {
               ]),
             ),
           ])
-          .p12()
+          .p16()
           .box
-          .roundedSM
-          .border(color: Colors.grey)
-          .make()
-          .pOnly(bottom: Vx.dp20),
+          .roundedLg
+          .color(Theme.of(context).cardColor)
+          .border(color: _cardBorderColor(context))
+          .make(),
     );
   }
 }

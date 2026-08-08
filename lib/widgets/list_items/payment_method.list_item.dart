@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:chaskiy/constants/app_colors.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:chaskiy/models/payment_method.dart';
-import 'package:chaskiy/utils/ui_spacer.dart';
 import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -20,26 +19,38 @@ class PaymentOptionListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HStack([
-          //
-          CustomImage(
-            imageUrl: paymentMethod.photo,
-            width: Vx.dp48,
-            height: Vx.dp48,
-            boxFit: BoxFit.contain,
-          ).px4().py8(),
-          //
-          paymentMethod.name.tr().text.medium.lg.make().expand(),
-          UiSpacer.horizontalSpace(),
-        ]).box.roundedSM
-        .border(
-          color:
-              selected
-                  ? AppColor.primaryColor
-                  : context.textTheme.bodyLarge!.color!.withOpacity(0.20),
-          width: selected ? 2 : 1,
-        )
-        .make()
-        .onInkTap(() => onSelected(paymentMethod));
+    final colors = Theme.of(context).colorScheme;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      padding: const EdgeInsets.only(left: 8, right: 12),
+      decoration: BoxDecoration(
+        color:
+            selected
+                ? colors.primary.withValues(alpha: .10)
+                : Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: selected ? colors.primary : colors.outlineVariant,
+          width: selected ? 1.5 : 1,
+        ),
+      ),
+      child: HStack([
+        CustomImage(
+          imageUrl: paymentMethod.photo,
+          width: Vx.dp40,
+          height: Vx.dp40,
+          boxFit: BoxFit.contain,
+        ).py8(),
+        10.widthBox,
+        paymentMethod.name.tr().text.medium.make().expand(),
+        if (selected)
+          Icon(
+            HugeIcons.strokeRoundedCheckmarkCircle02,
+            size: 20,
+            color: colors.primary,
+          ),
+      ]),
+    ).onInkTap(() => onSelected(paymentMethod));
   }
 }

@@ -30,6 +30,10 @@ class CheckoutBaseViewModel extends PaymentViewModel {
   VendorRequest vendorRequest = VendorRequest();
   TextEditingController driverTipTEC = TextEditingController();
   TextEditingController noteTEC = TextEditingController();
+
+  /// Última propina con la que ya se recalculó el total, para no repetir la
+  /// consulta cuando el monto no cambió.
+  String syncedDriverTip = "";
   DeliveryAddress? deliveryAddress;
   bool isPickup = false;
   bool isScheduled = false;
@@ -253,8 +257,26 @@ class CheckoutBaseViewModel extends PaymentViewModel {
     notifyListeners();
   }
 
+  /// Cambia la propina del conductor y recalcula el total.
+  ///
+  /// El resumen mostraba la propina pero el total solo la sumaba si el
+  /// cliente presionaba "listo" en el teclado, así que veía un monto y se le
+  /// cobraba otro.
+  void setDriverTip(String amount) {
+    final tip = amount.trim();
+    if (driverTipTEC.text != tip) {
+      driverTipTEC.text = tip;
+    }
+    if (syncedDriverTip == tip) {
+      notifyListeners();
+      return;
+    }
+    updateTotalOrderSummary();
+  }
+
   //update total/order amount summary
   updateTotalOrderSummary() async {
+    syncedDriverTip = driverTipTEC.text.trim();
     //generate order summary
     Map<String, dynamic> payload = {
       "pickup": isPickup ? 1 : 0,

@@ -28,8 +28,7 @@ class EditProfileViewModel extends MyBaseViewModel {
 
   EditProfileViewModel(BuildContext context) {
     this.viewContext = context;
-    String countryCode = PhoneUtilService.countryCode ?? "EC";
-    this.selectedCountry = Country.parse(countryCode);
+    this.selectedCountry = PhoneUtilService.defaultCountry();
   }
 
   @override
@@ -45,6 +44,11 @@ class EditProfileViewModel extends MyBaseViewModel {
     currentUser = await AuthServices.getCurrentUser();
     nameTEC.text = currentUser!.name;
     emailTEC.text = currentUser!.email;
+    // El país de la cuenta manda: sin esto el número se volvería a guardar
+    // con el prefijo que se haya adivinado del dispositivo.
+    selectedCountry = PhoneUtilService.defaultCountry(
+      accountCountryCode: currentUser!.countryCode,
+    );
     String rawPhone = currentUser!.rawPhone ?? currentUser!.phone;
     //remove non mobile number characters
     rawPhone = rawPhone.replaceAll(RegExp(r"[^0-9]"), "");
@@ -69,6 +73,7 @@ class EditProfileViewModel extends MyBaseViewModel {
     showCountryPicker(
       context: viewContext,
       showPhoneCode: true,
+      countryFilter: PhoneUtilService.allowedCountryCodes,
       onSelect: countryCodeSelected,
     );
   }

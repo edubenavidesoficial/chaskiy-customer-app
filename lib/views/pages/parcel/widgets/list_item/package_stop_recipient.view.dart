@@ -43,14 +43,13 @@ class _PackageStopRecipientViewState extends State<PackageStopRecipientView> {
   //
   bool isOpen = true;
   //customization
-  Country selectedCountry = Country.parse("us");
+  Country selectedCountry = PhoneUtilService.defaultCountry();
 
   @override
   void initState() {
     super.initState();
     isOpen = widget.isOpen;
-    String countryCode = PhoneUtilService.countryCode ?? "us";
-    selectedCountry = Country.parse(countryCode);
+    selectedCountry = PhoneUtilService.defaultCountry();
   }
 
   //
@@ -186,6 +185,7 @@ class _PackageStopRecipientViewState extends State<PackageStopRecipientView> {
     showCountryPicker(
       context: context,
       showPhoneCode: true,
+      countryFilter: PhoneUtilService.allowedCountryCodes,
       onSelect: _countryCodeSelected,
     );
   }

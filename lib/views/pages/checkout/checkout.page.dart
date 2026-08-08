@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import 'package:chaskiy/constants/app_colors.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/extensions/string.dart';
 import 'package:chaskiy/models/checkout.dart';
 import 'package:chaskiy/services/app_currency_system.service.dart';
 import 'package:chaskiy/utils/ui_spacer.dart';
 import 'package:chaskiy/view_models/checkout.vm.dart';
+import 'package:chaskiy/views/pages/checkout/widgets/checkout_bottom_bar.view.dart';
+import 'package:chaskiy/views/pages/checkout/widgets/checkout_section.view.dart';
 import 'package:chaskiy/views/pages/checkout/widgets/driver_cash_delivery_note.view.dart';
+import 'package:chaskiy/views/pages/checkout/widgets/driver_tip.view.dart';
 import 'package:chaskiy/views/pages/checkout/widgets/order_delivery_address.view.dart';
 import 'package:chaskiy/views/pages/checkout/widgets/payment_methods.view.dart';
 import 'package:chaskiy/views/pages/checkout/widgets/schedule_order.view.dart';
 import 'package:chaskiy/widgets/base.page.dart';
-import 'package:chaskiy/widgets/buttons/custom_button.dart';
 import 'package:chaskiy/widgets/cards/order_summary.dart';
 import 'package:chaskiy/widgets/currency_conversion_notice.dart';
 import 'package:chaskiy/widgets/custom_text_form_field.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:flutter/services.dart';
 
 class CheckoutPage extends StatelessWidget {
   const CheckoutPage({required this.checkout, Key? key}) : super(key: key);
@@ -32,108 +32,88 @@ class CheckoutPage extends StatelessWidget {
       viewModelBuilder: () => CheckoutViewModel(context, checkout),
       onViewModelReady: (vm) => vm.initialise(),
       builder: (context, vm, child) {
+        //el teclado tapa la barra inferior, así que se oculta mientras escribe
+        final keyboardIsOpen = context.mq.viewInsets.bottom > 0;
+
         return BasePage(
           showAppBar: true,
           showLeadingAction: true,
           title: "Checkout".tr(),
+          bottomNavigationBar:
+              keyboardIsOpen ? null : CheckoutBottomBarView(vm),
           body: VStack([
-            //
-            UiSpacer.verticalSpace(),
-            Visibility(
-              visible: !vm.isPickup,
-              child: CustomTextFormField(
-                labelText:
-                    "Driver Tip".tr() + " (${AppStrings.currencySymbol})",
-                textEditingController: vm.driverTipTEC,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                onFieldSubmitted: (value) => vm.updateTotalOrderSummary(),
-              ).pOnly(bottom: Vx.dp20),
-            ),
-            //
-            CustomTextFormField(
-              labelText: "Note".tr(),
-              textEditingController: vm.noteTEC,
-            ),
-
-            //note
-            UiSpacer.divider().py12(),
-
-            //pickup time slot
+            //entrega: retiro en local, dirección y programación
             ScheduleOrderView(vm),
-
-            //its pickup
+            if (vm.vendor!.allowScheduleOrder)
+              UiSpacer.verticalSpace(space: 16),
             OrderDeliveryAddressPickerView(vm),
 
-            //payment options
-            Visibility(
-              visible: vm.canSelectPaymentOption,
-              child: PaymentMethodsView(vm),
+            //propina
+            if (!vm.isPickup) ...[
+              UiSpacer.verticalSpace(space: 16),
+              DriverTipView(vm),
+            ],
+
+            //nota para el negocio
+            UiSpacer.verticalSpace(space: 16),
+            CheckoutSectionView(
+              icon: HugeIcons.strokeRoundedStickyNote01,
+              title: "Note".tr(),
+              subtitle: "Any detail the vendor should know".tr(),
+              child: CustomTextFormField(
+                hintText: "Note".tr(),
+                textEditingController: vm.noteTEC,
+                maxLines: 3,
+                minLines: 2,
+              ),
             ),
 
-            //order final price preview
-            OrderSummary(
-              subTotal: vm.checkout!.subTotal,
-              discount:
-                  (vm.checkout!.coupon?.for_delivery ?? false)
-                      ? null
-                      : vm.checkout!.discount,
-              deliveryDiscount:
-                  (vm.checkout!.coupon?.for_delivery ?? false)
-                      ? vm.checkout!.deliveryDiscount
-                      : null,
-              deliveryFee: vm.checkout!.deliveryFee,
-              tax: vm.checkout!.tax,
-              vendorTax:
-                  vm.checkout!.tax_rate?.currencyValueFormat() ??
-                  vm.vendor!.tax,
-              driverTip: double.tryParse("${vm.driverTipTEC.text}") ?? 0.00,
-              total: vm.checkout!.totalWithTip,
-              fees: vm.vendor!.fees,
-              //
-              mCurrencySymbol: AppStrings.currentCurrencySymbol,
-              allowConvert: true,
+            //forma de pago
+            if (vm.canSelectPaymentOption) ...[
+              UiSpacer.verticalSpace(space: 16),
+              CheckoutSectionView(
+                icon: HugeIcons.strokeRoundedWallet01,
+                title: "Payment Methods".tr(),
+                child: PaymentMethodsView(vm, embedded: true),
+              ),
+            ],
+
+            //desglose de montos
+            UiSpacer.verticalSpace(space: 16),
+            CheckoutSectionView(
+              icon: HugeIcons.strokeRoundedInvoice01,
+              title: "Order Summary".tr(),
+              child: OrderSummary(
+                showTitle: false,
+                subTotal: vm.checkout!.subTotal,
+                discount:
+                    (vm.checkout!.coupon?.for_delivery ?? false)
+                        ? null
+                        : vm.checkout!.discount,
+                deliveryDiscount:
+                    (vm.checkout!.coupon?.for_delivery ?? false)
+                        ? vm.checkout!.deliveryDiscount
+                        : null,
+                deliveryFee: vm.checkout!.deliveryFee,
+                tax: vm.checkout!.tax,
+                vendorTax:
+                    vm.checkout!.tax_rate?.currencyValueFormat() ??
+                    vm.vendor!.tax,
+                driverTip: double.tryParse("${vm.driverTipTEC.text}") ?? 0.00,
+                total: vm.checkout!.totalWithTip,
+                fees: vm.vendor!.fees,
+                //
+                mCurrencySymbol: AppStrings.currentCurrencySymbol,
+                allowConvert: true,
+              ),
             ),
 
-            //show notice it driver should be paid in cash
+            //aviso de pago del envío en efectivo
             if (vm.checkout!.deliveryAddress != null)
               CheckoutDriverCashDeliveryNoticeView(
                 vm.checkout!.deliveryAddress!,
               ),
-            //terms and conditions checkbox
-            HStack(
-              [
-                Checkbox(
-                  value: vm.paymentTermsAgreed,
-                  onChanged: (value) {
-                    vm.paymentTermsAgreed = value ?? false;
-                    vm.notifyListeners();
-                  },
-                ),
-                //
-                "By proceeding to place order, you agree that you are bound by our"
-                    .tr()
-                    .richText
-                    .withTextSpanChildren([
-                      "  ".textSpan.make(),
-                      "Terms & Conditions"
-                          .tr()
-                          .textSpan
-                          .color(AppColor.primaryColor)
-                          .bold
-                          .underline
-                          .tap(() {
-                            vm.openPaymentTerms();
-                          })
-                          .make(),
-                      "  ".textSpan.make(),
-                    ])
-                    .make()
-                    .expand(),
-              ],
-              // crossAlignment: CrossAxisAlignment.start,
-              alignment: MainAxisAlignment.start,
-            ).py(20),
+
             //
             if (AppCurrencySystemService().currentCurrencyCode !=
                 AppStrings.currencyCode)
@@ -141,14 +121,7 @@ class CheckoutPage extends StatelessWidget {
                 convertedAmount: vm.checkout!.totalWithTip.convertCurrency,
                 originalAmount: vm.checkout!.totalWithTip,
                 baseCurrency: AppStrings.currencyCode,
-              ),
-            //
-            CustomButton(
-              title: "PLACE ORDER".tr().padRight(14),
-              icon: FlutterIcons.basket_sli,
-              onPressed: vm.paymentTermsAgreed ? () => vm.placeOrder() : null,
-              loading: vm.isBusy,
-            ).centered().py16(),
+              ).pOnly(top: Vx.dp16),
           ]).p20().scrollVertical().pOnly(bottom: context.mq.viewInsets.bottom),
         );
       },

@@ -37,17 +37,13 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
   Country? selectedCountry;
   String? accountPhoneNumber;
 
-  LoginViewModel(
-    BuildContext context, {
-    this.expectedRole = AppRole.customer,
-  }) {
+  LoginViewModel(BuildContext context, {this.expectedRole = AppRole.customer}) {
     this.viewContext = context;
   }
 
   void initialise() async {
     //phone login
-    String countryCode = PhoneUtilService.countryCode ?? "us";
-    this.selectedCountry = Country.parse(countryCode);
+    this.selectedCountry = PhoneUtilService.defaultCountry();
   }
 
   toggleLoginType() {
@@ -59,6 +55,7 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
     showCountryPicker(
       context: viewContext,
       showPhoneCode: true,
+      countryFilter: PhoneUtilService.allowedCountryCodes,
       onSelect: countryCodeSelected,
     );
   }
@@ -311,9 +308,10 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
         final user = User.fromJson(apiResponse.body["user"]);
         final authenticatedRole = AppRole.fromBackendRole(user.role);
         if (authenticatedRole != expectedRole) {
-          final message = expectedRole == AppRole.driver
-              ? "Esta cuenta no pertenece a un conductor o motorizado."
-              : "Esta cuenta pertenece a un conductor. Usa el acceso para conductores y motorizados.";
+          final message =
+              expectedRole == AppRole.driver
+                  ? "Esta cuenta no pertenece a un conductor o motorizado."
+                  : "Esta cuenta pertenece a un conductor. Usa el acceso para conductores y motorizados.";
           AlertService.error(title: "Acceso incorrecto", text: message);
           return;
         }

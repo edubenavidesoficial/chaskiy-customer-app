@@ -39,8 +39,7 @@ class RegisterViewModel extends MyBaseViewModel {
 
   RegisterViewModel(BuildContext context) {
     this.viewContext = context;
-    String countryCode = PhoneUtilService.countryCode ?? "us";
-    this.selectedCountry = Country.parse(countryCode);
+    this.selectedCountry = PhoneUtilService.defaultCountry();
   }
 
   //
@@ -48,6 +47,7 @@ class RegisterViewModel extends MyBaseViewModel {
     showCountryPicker(
       context: viewContext,
       showPhoneCode: true,
+      countryFilter: PhoneUtilService.allowedCountryCodes,
       onSelect: countryCodeSelected,
     );
   }
