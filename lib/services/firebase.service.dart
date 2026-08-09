@@ -25,6 +25,7 @@ import 'package:chaskiy/services/app.service.dart';
 import 'package:chaskiy/services/chat.service.dart';
 import 'package:chaskiy/services/notification.service.dart';
 import 'package:chaskiy/services/toast.service.dart';
+import 'package:chaskiy/services/session.service.dart';
 import 'package:chaskiy/views/pages/home.page.dart';
 import 'package:chaskiy/views/pages/service/service_details.page.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
@@ -211,13 +212,18 @@ class FirebaseService {
             (notificationPayloadData?["is_order"].toString() == "1" ||
                 (notificationPayloadData?["is_order"] is bool &&
                     notificationPayloadData?["is_order"]));
+        final isDriverAssignment =
+            notificationPayloadData?["is_driver_assignment"]?.toString() == "1";
 
         ///
         final hasProduct = notificationPayloadData!.containsKey("product");
         final hasVendor = notificationPayloadData!.containsKey("vendor");
         final hasService = notificationPayloadData!.containsKey("service");
         //
-        if (isChat) {
+        if (isDriverAssignment && SessionService.isDriver) {
+          AppService().refreshAssignedOrders.add(true);
+          return;
+        } else if (isChat) {
           //
           dynamic user = jsonDecode(notificationPayloadData!['user']);
           dynamic peer = jsonDecode(notificationPayloadData!['peer']);

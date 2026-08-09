@@ -17,6 +17,7 @@ class Api {
   static const register = "/register";
   static const driverRegister = "/driver/register";
   static const driverOnboarding = "/driver/onboarding";
+  static const pendingDriverAssignment = "/driver/assignments/pending";
   static const logout = "/logout";
   static const forgotPassword = "/password/reset/init";
   static const verifyPhoneAccount = "/verify/phone";

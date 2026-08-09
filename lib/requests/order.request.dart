@@ -5,8 +5,23 @@ import 'package:chaskiy/constants/api.dart';
 import 'package:chaskiy/models/api_response.dart';
 import 'package:chaskiy/models/order.dart';
 import 'package:chaskiy/services/http.service.dart';
+import 'package:chaskiy/models/driver_assignment.dart';
 
 class OrderRequest extends HttpService {
+  Future<DriverAssignment?> getPendingDriverAssignment() async {
+    final result = await get(Api.pendingDriverAssignment);
+    final response = ApiResponse.fromResponse(result);
+    if (!response.allGood) {
+      throw response.message ?? 'No se pudo consultar la asignación';
+    }
+    if (response.body is! Map || response.body['assignment'] is! Map) {
+      return null;
+    }
+    return DriverAssignment.fromJson(
+      Map<String, dynamic>.from(response.body['assignment']),
+    );
+  }
+
   //
   Future<List<Order>> getOrders({
     int page = 1,
@@ -71,9 +86,10 @@ class OrderRequest extends HttpService {
     final result = await patch('${Api.orders}/$id', {'status': status});
     final response = ApiResponse.fromResponse(result);
     if (!response.allGood) throw response.message ?? 'No se pudo actualizar';
-    final source = response.body is Map && response.body['order'] != null
-        ? response.body['order']
-        : response.body;
+    final source =
+        response.body is Map && response.body['order'] != null
+            ? response.body['order']
+            : response.body;
     return Order.fromJson(source);
   }
 

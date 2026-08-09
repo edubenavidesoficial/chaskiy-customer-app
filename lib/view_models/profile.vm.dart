@@ -27,6 +27,7 @@ import 'package:chaskiy/enums/app_role.dart';
 import 'package:chaskiy/services/session.service.dart';
 import 'package:chaskiy/views/pages/driver/driver_home.page.dart';
 import 'package:chaskiy/views/pages/driver/driver_onboarding.page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class ProfileViewModel extends PaymentViewModel {
   static const String _supportWhatsAppUrl =
@@ -128,6 +129,7 @@ class ProfileViewModel extends PaymentViewModel {
         return;
       }
       await SessionService.setActiveRole(AppRole.driver, user: user);
+      await FirebaseMessaging.instance.subscribeToTopic('d_${user.id}');
       if (viewContext.mounted) {
         Navigator.of(viewContext).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const DriverHomePage()),
