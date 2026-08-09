@@ -102,9 +102,12 @@ class NewDeliveryAddressesViewModel extends BaseDeliveryAddressesViewModel {
         type: apiRespose.allGood ? AlertType.success : AlertType.error,
         title: "New Delivery Address".tr(),
         text: apiRespose.message,
-        onConfirm: () {
-          viewContext.pop(true);
-        },
+        onConfirm:
+            apiRespose.allGood
+                ? () {
+                  viewContext.pop(true);
+                }
+                : null,
       );
       //
       setBusy(false);
