@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Flutter limpia atributos del binario antes de firmarlo. En carpetas
+# administradas por File Provider, FinderInfo puede quedar en el framework
+# contenedor y codesign también lo rechaza. Ampliamos únicamente ese caso.
+last_argument=""
+for argument in "$@"; do
+  last_argument="$argument"
+done
+
+case "$last_argument" in
+  */Flutter.framework/Flutter|*/App.framework/App)
+    framework_path=$(dirname "$last_argument")
+    exec /usr/bin/xattr "$1" "$2" "$3" "$framework_path"
+    ;;
+  *)
+    exec /usr/bin/xattr "$@"
+    ;;
+esac

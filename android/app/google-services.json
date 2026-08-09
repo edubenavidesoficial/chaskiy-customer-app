@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "980239809422",
+    "project_id": "chaskiy-3c070",
+    "storage_bucket": "chaskiy-3c070.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:980239809422:android:093cc8fdfd284dad9a02df",
+        "android_client_info": {
+          "package_name": "com.chaskiy.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "980239809422-1eo708gq3p3iou4g22m5a7ntml7bpei8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chaskiy.app",
+            "certificate_hash": "b3ad1b339aa23769aa638879dc779015f6c92d8b"
+          }
+        },
+        {
+          "client_id": "980239809422-1f3uov5gsr835hjl091h8l1p4f311lsg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chaskiy.app",
+            "certificate_hash": "dc90e00cf3d10544db1fdf05b06ebf563ac5a51b"
+          }
+        },
+        {
+          "client_id": "980239809422-99mt1h6drui66n04t3tr2joodlq0csqp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIXh8ZcTJHBcnWKkptruSj6O_KUDUWJ08"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "980239809422-99mt1h6drui66n04t3tr2joodlq0csqp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "980239809422-rn93bj4ujm7sguqv03nipp7g70fi522o.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.chaskiy.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

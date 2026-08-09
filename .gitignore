@@ -15,10 +15,23 @@ android/local.properties
 # iOS
 ios/Pods/
 ios/.symlinks/
+ios/Pods 2/
+ios/.symlinks 2/
+ios/Flutter/ephemeral/
+ios/Flutter/ephemeral/Packages 2/
+ios/Runner.xcodeproj/xcshareddata/xcschemes/*.backup
 
 # IDE
 .idea/
 .vscode/
 
 # macOS
-.DS_Store
+**/.DS_Store
+
+# Local archives and generated copies
+*.zip
+**/* 2.xcconfig
+**/* 2.sh
+
+# Nested repository metadata from vendored packages
+third_party/**/.git/
