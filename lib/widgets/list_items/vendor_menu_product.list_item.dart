@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
+import 'package:chaskiy/constants/app_semantic_colors.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/extensions/string.dart';
 import 'package:chaskiy/models/product.dart';
 import 'package:chaskiy/services/app_currency_system.service.dart';
 import 'package:chaskiy/widgets/custom_image.view.dart';
 
+/// Producto dentro del catálogo de una tienda.
+///
+/// Los productos marcados como destacados en el panel se muestran con la foto
+/// grande arriba; el resto va en fila compacta.
 class VendorMenuProductListItem extends StatelessWidget {
   const VendorMenuProductListItem(
     this.product, {
@@ -21,135 +27,267 @@ class VendorMenuProductListItem extends StatelessWidget {
   final double? height;
   final double? padding;
 
+  bool get _isFeatured => product.featured == 1;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: padding ?? 16, vertical: 5),
+      child: Material(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(20),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onPressed == null ? null : () => onPressed!(product),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              //un degradado apenas perceptible le da volumen a la tarjeta sin
+              //necesidad de sombras, que en fondo oscuro no se ven
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colors.surfaceContainerHigh,
+                  colors.surfaceContainerLow,
+                ],
+              ),
+              border: Border.all(
+                color: colors.outlineVariant.withValues(alpha: .55),
+              ),
+            ),
+            child:
+                _isFeatured
+                    ? _FeaturedLayout(product: product)
+                    : _CompactLayout(product: product, height: height),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Producto destacado: foto ancha arriba, datos abajo.
+class _FeaturedLayout extends StatelessWidget {
+  const _FeaturedLayout({required this.product});
+
+  final Product product;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Stack(
+          children: [
+            Hero(
+              tag: product.heroTag ?? product.id,
+              child: CustomImage(
+                imageUrl: product.photo,
+                height: 150,
+                boxFit: BoxFit.cover,
+              ),
+            ),
+            const Positioned(top: 12, left: 12, child: _FeaturedBadge()),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: _ProductInfo(product: product, maxLines: 2)),
+              const SizedBox(width: 12),
+              _PriceAndAction(product: product),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Producto normal: foto cuadrada a la izquierda.
+class _CompactLayout extends StatelessWidget {
+  const _CompactLayout({required this.product, this.height});
+
+  final Product product;
+  final double? height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height ?? 104,
+      padding: const EdgeInsets.all(11),
+      child: Row(
+        children: [
+          Hero(
+            tag: product.heroTag ?? product.id,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: CustomImage(
+                imageUrl: product.photo,
+                width: 80,
+                height: 80,
+                boxFit: BoxFit.cover,
+              ),
+            ),
+          ),
+          const SizedBox(width: 13),
+          Expanded(child: _ProductInfo(product: product, maxLines: 2)),
+          const SizedBox(width: 10),
+          _PriceAndAction(product: product),
+        ],
+      ),
+    );
+  }
+}
+
+/// Nombre, calificación y unidad.
+class _ProductInfo extends StatelessWidget {
+  const _ProductInfo({required this.product, required this.maxLines});
+
+  final Product product;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    //sin reseñas la fila solo mostraría "0.0 (0)", que no le dice nada a nadie
+    final hasReviews = product.reviewsCount > 0;
+    final unit = product.unit?.trim() ?? '';
+    final detailStyle = theme.textTheme.bodySmall?.copyWith(
+      color: colors.onSurfaceVariant,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          product.name,
+          maxLines: maxLines,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w800,
+            height: 1.2,
+          ),
+        ),
+        if (hasReviews || unit.isNotEmpty) ...[
+          const SizedBox(height: 5),
+          Row(
+            children: [
+              if (hasReviews) ...[
+                Icon(Icons.star_rounded, size: 17, color: theme.semantics.star),
+                const SizedBox(width: 3),
+                Text(
+                  (product.rating ?? 0).toStringAsFixed(1),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(' (${product.reviewsCount})', style: detailStyle),
+              ],
+              if (hasReviews && unit.isNotEmpty)
+                Text(' · ', style: detailStyle),
+              if (unit.isNotEmpty)
+                Flexible(
+                  child: Text(
+                    unit,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: detailStyle,
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Precio y botón de acción.
+///
+/// El botón abre el detalle del producto, igual que tocar la tarjeta: agregar
+/// directo al carrito se saltaría las opciones que el producto pueda tener.
+class _PriceAndAction extends StatelessWidget {
+  const _PriceAndAction({required this.product});
+
+  final Product product;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final currentPrice =
         product.showDiscount ? product.discountPrice : product.price;
+    final symbol = AppStrings.currentCurrencySymbol;
 
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: padding ?? 16, vertical: 4),
-      child: Material(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(18),
-        elevation: 0,
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onPressed == null ? null : () => onPressed!(product),
-          child: Container(
-            height: height ?? 104,
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              color: colors.surfaceContainerLow,
-            ),
-            child: Row(
-              children: [
-                Hero(
-                  tag: product.heroTag ?? product.id,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: CustomImage(
-                      imageUrl: product.photo,
-                      width: 82,
-                      height: 82,
-                      boxFit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 13),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        product.name,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.star_rounded,
-                            size: 17,
-                            color: Color(0xFFFFB000),
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            '${(product.rating ?? 0).toStringAsFixed(1)}',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          Text(
-                            ' (${product.reviewsCount})',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: colors.onSurfaceVariant,
-                            ),
-                          ),
-                          if (product.unit != null) ...[
-                            const SizedBox(width: 8),
-                            Flexible(
-                              child: Text(
-                                '${product.unit}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: colors.onSurfaceVariant,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      '${AppStrings.currentCurrencySymbol}${currentPrice.convertCurrency.currencyValueFormat()}',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: colors.primary,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    if (product.showDiscount)
-                      Text(
-                        '${AppStrings.currentCurrencySymbol}${product.price.convertCurrency.currencyValueFormat()}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colors.onSurfaceVariant,
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
-                    const SizedBox(height: 6),
-                    Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        color: colors.primaryContainer,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.arrow_forward_rounded,
-                        color: colors.primary,
-                        size: 20,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '$symbol${currentPrice.convertCurrency.currencyValueFormat()}',
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: colors.primary,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        if (product.showDiscount)
+          Text(
+            '$symbol${product.price.convertCurrency.currencyValueFormat()}',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colors.onSurfaceVariant,
+              decoration: TextDecoration.lineThrough,
             ),
           ),
+        const SizedBox(height: 8),
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: colors.primary,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            HugeIcons.strokeRoundedPlusSign,
+            color: colors.onPrimary,
+            size: 19,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Etiqueta de destacado, según el campo `featured` que marca el panel.
+class _FeaturedBadge extends StatelessWidget {
+  const _FeaturedBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: colors.primary,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        'DESTACADO',
+        style: TextStyle(
+          color: colors.onPrimary,
+          fontSize: 10,
+          fontWeight: FontWeight.w900,
+          letterSpacing: .6,
         ),
       ),
     );

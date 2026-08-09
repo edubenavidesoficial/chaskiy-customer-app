@@ -7,9 +7,15 @@ import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class FavVendorTag extends StatelessWidget {
-  const FavVendorTag(this.vendor, {Key? key}) : super(key: key);
+  const FavVendorTag(this.vendor, {this.color, this.size = 22, Key? key})
+      : super(key: key);
 
   final Vendor vendor;
+
+  /// Sobre una foto el color de marca no siempre se distingue, así que quien
+  /// lo use encima de la portada puede forzar uno.
+  final Color? color;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +29,8 @@ class FavVendorTag extends StatelessWidget {
                 model.vendor!.isFavourite
                     ? FlutterIcons.favorite_mdi
                     : FlutterIcons.favorite_border_mdi,
-                size: 22,
-                color: context.theme.primaryColor,
+                size: size,
+                color: color ?? context.theme.primaryColor,
               ).p4().onTap(
                 () {
                   !model.isAuthenticated()

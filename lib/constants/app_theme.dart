@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/constants/app_semantic_colors.dart';
 import 'package:chaskiy/utils/utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   //
   ThemeData lightTheme() {
+    final colorScheme = _lightColorScheme();
+
     return ThemeData(
       // fontFamily: GoogleFonts.ibmPlexSerif().fontFamily,
       // fontFamily: GoogleFonts.krub().fontFamily,
@@ -44,11 +47,8 @@ class AppTheme {
       ),
       buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
       highlightColor: Colors.grey[400],
-      colorScheme: ColorScheme.light(
-        primary: AppColor.primaryColor,
-        secondary: AppColor.accentColor,
-        brightness: Brightness.light,
-      ).copyWith(primary: AppColor.primaryMaterialColor, surface: Colors.white),
+      colorScheme: colorScheme,
+      extensions: const [AppSemanticColors.light],
       //
       tabBarTheme: tabBarTheme,
       elevatedButtonTheme: _elevatedButtonTheme,
@@ -142,6 +142,7 @@ class AppTheme {
       highlightColor: colorScheme.primary.withValues(alpha: .12),
       splashColor: colorScheme.primary.withValues(alpha: .10),
       colorScheme: colorScheme,
+      extensions: const [AppSemanticColors.dark],
       //
       tabBarTheme: tabBarTheme,
       elevatedButtonTheme: _elevatedButtonTheme,
@@ -154,6 +155,66 @@ class AppTheme {
       useMaterial3: true,
     );
   }
+
+  /// Paleta clara completa.
+  ///
+  /// Antes se construía con `ColorScheme.light()` sin definir los tonos
+  /// contenedores, y Flutter los resuelve con respaldos que aquí hacían daño:
+  /// `primaryContainer` caía en `primary` (azul sobre azul, texto invisible),
+  /// todos los `surfaceContainer*` caían en blanco (sin jerarquía entre fondo
+  /// y tarjeta) y `outlineVariant` caía en negro. El tema oscuro sí estaba
+  /// definido, por eso solo se veía mal en claro.
+  ///
+  /// Los tonos de marca se derivan del color que llega del panel, así que si
+  /// se cambia allá, la paleta entera lo sigue.
+  ColorScheme _lightColorScheme() {
+    const surface = Color(0xFFFFFFFF);
+    final primary = AppColor.primaryColor;
+    final secondary = AppColor.accentColor;
+
+    return ColorScheme(
+      brightness: Brightness.light,
+      primary: primary,
+      onPrimary: _readableOn(primary),
+      primaryContainer: _softTint(primary, surface, .13),
+      onPrimaryContainer: _deepen(primary, .18),
+      secondary: secondary,
+      onSecondary: _readableOn(secondary),
+      secondaryContainer: _softTint(secondary, surface, .15),
+      onSecondaryContainer: _deepen(secondary, .22),
+      surface: surface,
+      onSurface: const Color(0xFF101828),
+      surfaceContainerLowest: surface,
+      surfaceContainerLow: const Color(0xFFF6F8FB),
+      surfaceContainer: const Color(0xFFF1F4F9),
+      surfaceContainerHigh: const Color(0xFFEAEFF6),
+      surfaceContainerHighest: const Color(0xFFE2E8F1),
+      onSurfaceVariant: const Color(0xFF5B6B82),
+      outline: const Color(0xFFA6B2C3),
+      outlineVariant: const Color(0xFFDFE5EE),
+      error: const Color(0xFFB3261E),
+      onError: Colors.white,
+      errorContainer: const Color(0xFFF9DEDC),
+      onErrorContainer: const Color(0xFF8C1D18),
+    );
+  }
+
+  /// Tono suave del color de marca sobre un fondo, sin quemar un hexadecimal.
+  static Color _softTint(Color color, Color background, double alpha) =>
+      Color.alphaBlend(color.withValues(alpha: alpha), background);
+
+  /// Versión más oscura, para el texto que va sobre el tono suave.
+  static Color _deepen(Color color, double amount) {
+    final hsl = HSLColor.fromColor(color);
+    return hsl
+        .withLightness((hsl.lightness - amount).clamp(0.0, 1.0))
+        .toColor();
+  }
+
+  /// Blanco o negro según lo que contraste con el color recibido: el panel
+  /// puede configurar un color de marca claro y el texto encima debe leerse.
+  static Color _readableOn(Color color) =>
+      color.computeLuminance() > .55 ? const Color(0xFF101828) : Colors.white;
 
   ElevatedButtonThemeData get _elevatedButtonTheme => ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(

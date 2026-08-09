@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:chaskiy/constants/app_semantic_colors.dart';
 import 'package:chaskiy/constants/app_ui_settings.dart';
 import 'package:chaskiy/models/vendor.dart';
 import 'package:chaskiy/view_models/vendor_details.vm.dart';
 import 'package:chaskiy/views/pages/vendor/vendor_reviews.page.dart';
+import 'package:chaskiy/views/pages/vendor_details/widgets/vendor_meta_chip.dart';
 import 'package:chaskiy/views/pages/vendor_details/widgets/bottomsheets/vendor_full_profie.bottomsheet.dart';
 import 'package:chaskiy/views/pages/vendor_details/widgets/upload_prescription.btn.dart';
 import 'package:chaskiy/widgets/custom_image.view.dart';
@@ -30,6 +32,7 @@ class VendorDetailsHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final semantics = theme.semantics;
     final vendor = model.vendor!;
 
     return ColoredBox(
@@ -122,9 +125,9 @@ class VendorDetailsHeader extends StatelessWidget {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.star_rounded,
-                                color: Color(0xFFFFB000),
+                                color: semantics.star,
                                 size: 18,
                               ),
                               const SizedBox(width: 3),
@@ -173,39 +176,41 @@ class VendorDetailsHeader extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _VendorMetaChip(
+                  VendorMetaChip(
                     icon:
                         vendor.isOpen
                             ? Icons.check_circle_outline_rounded
                             : Icons.schedule_rounded,
                     label: vendor.isOpen ? 'Abierto' : 'Cerrado',
                     foreground:
-                        vendor.isOpen ? const Color(0xFF087F5B) : colors.error,
+                        vendor.isOpen
+                            ? semantics.onSuccessContainer
+                            : colors.onErrorContainer,
                     background:
                         vendor.isOpen
-                            ? const Color(0xFFDDF8ED)
+                            ? semantics.successContainer
                             : colors.errorContainer,
                   ),
                   if (vendor.delivery == 1) ...[
                     const SizedBox(width: 8),
-                    const _VendorMetaChip(
+                    VendorMetaChip(
                       icon: Icons.delivery_dining_outlined,
                       label: 'Entrega',
-                      foreground: Color(0xFF9A5B00),
-                      background: Color(0xFFFFF0C2),
+                      foreground: semantics.onWarningContainer,
+                      background: semantics.warningContainer,
                     ),
                   ],
                   if (vendor.pickup == 1) ...[
                     const SizedBox(width: 8),
-                    _VendorMetaChip(
+                    VendorMetaChip(
                       icon: Icons.shopping_bag_outlined,
                       label: 'Recoger',
-                      foreground: colors.primary,
+                      foreground: colors.onPrimaryContainer,
                       background: colors.primaryContainer,
                     ),
                   ],
                   const SizedBox(width: 8),
-                  _VendorMetaChip(
+                  VendorMetaChip(
                     icon: Icons.schedule_rounded,
                     label: _timeLabel(
                       vendor.prepareTime,
@@ -213,7 +218,7 @@ class VendorDetailsHeader extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  _VendorMetaChip(
+                  VendorMetaChip(
                     icon: Icons.directions_bike_outlined,
                     label: _timeLabel(
                       vendor.deliveryTime,
@@ -259,48 +264,6 @@ class VendorDetailsHeader extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       builder: (_) => VendorFullProfileBottomSheet(vendor),
-    );
-  }
-}
-
-class _VendorMetaChip extends StatelessWidget {
-  const _VendorMetaChip({
-    required this.icon,
-    required this.label,
-    this.foreground,
-    this.background,
-  });
-
-  final IconData icon;
-  final String label;
-  final Color? foreground;
-  final Color? background;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final effectiveForeground = foreground ?? colors.onSurfaceVariant;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: background ?? colors.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: effectiveForeground),
-          const SizedBox(width: 5),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: effectiveForeground,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
