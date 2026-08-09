@@ -58,8 +58,14 @@ class GeocoderService extends HttpService {
     }
     //use in-app geocoding
     final apiKey = AppStrings.googleMapApiKey;
-    String url =
-        "https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinates.toString()};key=$apiKey&radius=200";
+    final url = Uri.https(
+      'maps.googleapis.com',
+      '/maps/api/geocode/json',
+      {
+        'latlng': '${coordinates.latitude},${coordinates.longitude}',
+        'key': apiKey,
+      },
+    ).toString();
 
     final apiResult = await get(
       Api.externalRedirect,
@@ -69,9 +75,13 @@ class GeocoderService extends HttpService {
     final apiResponse = ApiResponse.fromResponse(apiResult);
 
     //
-    if (apiResponse.allGood) {
-      Map<String, dynamic> apiResponseData = apiResponse.body;
-      return (apiResponseData["results"] as List).map((e) {
+    if (apiResponse.allGood && apiResponse.body is Map) {
+      final apiResponseData = apiResponse.body as Map;
+      final results = apiResponseData["results"];
+      if (results is! List) {
+        return [];
+      }
+      return results.map((e) {
         try {
           return Address().fromMap(e);
         } catch (error) {

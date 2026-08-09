@@ -116,14 +116,41 @@ class OPSMapViewModel extends MyBaseViewModel {
       selectedAddress = null;
       setBusyForObject(selectedAddress, true);
       try {
-        final address =
-            (await geocoderService.findAddressesFromCoordinates(
-              Coordinates(position.target.latitude, position.target.longitude),
-            )).first;
+        final addresses = await geocoderService.findAddressesFromCoordinates(
+          Coordinates(position.target.latitude, position.target.longitude),
+        );
 
-        addressSelected(address, moveCamera: false);
+        // Google puede responder ZERO_RESULTS incluso con coordenadas válidas.
+        // Conservamos el punto seleccionado y evitamos acceder al primer
+        // elemento de una lista vacía.
+        final address =
+            addresses.isNotEmpty
+                ? addresses.first
+                : Address(
+                  coordinates: Coordinates(
+                    position.target.latitude,
+                    position.target.longitude,
+                  ),
+                  addressLine:
+                      '${position.target.latitude.toStringAsFixed(6)}, '
+                      '${position.target.longitude.toStringAsFixed(6)}',
+                  featureName: 'Ubicación seleccionada',
+                );
+
+        await addressSelected(address, moveCamera: false);
       } catch (error) {
-        toastError("$error");
+        // Un fallo temporal de geocodificación no debe romper el mapa.
+        selectedAddress = Address(
+          coordinates: Coordinates(
+            position.target.latitude,
+            position.target.longitude,
+          ),
+          addressLine:
+              '${position.target.latitude.toStringAsFixed(6)}, '
+              '${position.target.longitude.toStringAsFixed(6)}',
+          featureName: 'Ubicación seleccionada',
+        );
+        notifyListeners();
       }
       setBusyForObject(selectedAddress, false);
       _debounce?.cancel();

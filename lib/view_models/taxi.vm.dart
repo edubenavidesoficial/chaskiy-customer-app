@@ -25,11 +25,11 @@ class TaxiViewModel extends TripTaxiViewModel {
     this.viewContext = context;
   }
 
-//requests
+  //requests
   CartRequest cartRequest = CartRequest();
   TaxiRequest taxiRequest = TaxiRequest();
   PaymentMethodRequest paymentOptionRequest = PaymentMethodRequest();
-//
+  //
 
   VendorType? vendorType;
   //coupons
@@ -37,6 +37,7 @@ class TaxiViewModel extends TripTaxiViewModel {
   bool canScheduleTaxiOrder = false;
   Coupon? coupon;
   TextEditingController couponTEC = TextEditingController();
+  bool vehicleTypesLoadFailed = false;
 
   //
   CheckOut? checkout = CheckOut();
@@ -123,7 +124,7 @@ class TaxiViewModel extends TripTaxiViewModel {
     }
   }
 
-//checking if taxi booking is enabled in the given location
+  //checking if taxi booking is enabled in the given location
   checkLocationAvailabilityForStep2() async {
     setBusy(true);
     final apiResponse = await taxiRequest.locationAvailable(
@@ -148,16 +149,22 @@ class TaxiViewModel extends TripTaxiViewModel {
   //vehicle types
   fetchVehicleTypes() async {
     setBusyForObject(vehicleTypes, true);
+    vehicleTypesLoadFailed = false;
+    vehicleTypes = [];
+    selectedVehicleType = null;
     try {
       vehicleTypes = await taxiRequest.getVehicleTypePricing(
         pickupLocation!,
         dropoffLocation!,
         countryCode: LocationService.currenctAddress?.countryCode,
       );
+      vehicleTypesLoadFailed = vehicleTypes.isEmpty;
     } catch (error) {
       print("Error getting vehicleTypes ==> $error");
+      vehicleTypesLoadFailed = true;
     }
     setBusyForObject(vehicleTypes, false);
+    notifyListeners();
   }
 
   resortVehicleTypes() {
@@ -240,17 +247,12 @@ class TaxiViewModel extends TripTaxiViewModel {
     };
 
     setBusy(true);
-    final apiResponse = await taxiRequest.placeNeworder(
-      params: params,
-    );
+    final apiResponse = await taxiRequest.placeNeworder(params: params);
     setBusy(false);
 
     //if there was an issue placing the order
     if (!apiResponse.allGood) {
-      AlertService.error(
-        title: "Order failed".tr(),
-        text: apiResponse.message,
-      );
+      AlertService.error(title: "Order failed".tr(), text: apiResponse.message);
     } else {
       //
       onGoingOrderTrip = Order.fromJson(apiResponse.body["order"]);
@@ -278,9 +280,10 @@ class TaxiViewModel extends TripTaxiViewModel {
         image: onGoingOrderTrip!.user.photo,
       ),
       '${onGoingOrderTrip?.driver?.id}': PeerUser(
-          id: "${onGoingOrderTrip?.driver?.id}",
-          name: onGoingOrderTrip?.driver?.name ?? "Driver".tr(),
-          image: onGoingOrderTrip?.driver?.photo),
+        id: "${onGoingOrderTrip?.driver?.id}",
+        name: onGoingOrderTrip?.driver?.name ?? "Driver".tr(),
+        image: onGoingOrderTrip?.driver?.photo,
+      ),
     };
     //
     final chatEntity = ChatEntity(
@@ -293,10 +296,9 @@ class TaxiViewModel extends TripTaxiViewModel {
       supportMedia: AppUISettings.canCustomerChatSupportMedia,
     );
     //
-    Navigator.of(viewContext).pushNamed(
-      AppRoutes.chatRoute,
-      arguments: chatEntity,
-    );
+    Navigator.of(
+      viewContext,
+    ).pushNamed(AppRoutes.chatRoute, arguments: chatEntity);
   }
 
   Future<Order?> getLastTripForRating() async {

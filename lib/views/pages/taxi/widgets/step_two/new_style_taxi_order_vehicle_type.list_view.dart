@@ -24,22 +24,49 @@ class NewTaxiVehicleTypeListView extends StatelessWidget {
       loading: vm.busy(vm.vehicleTypes),
       child: SizedBox(
         height: 142,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-          physics: const BouncingScrollPhysics(),
-          cacheExtent: cardWidth * 4,
-          itemCount: vm.vehicleTypes.length,
-          itemBuilder:
-              (context, index) => SizedBox(
-                width: cardWidth,
-                child: NewHorizontalVehicleTypeListItem(
-                  vm,
-                  vm.vehicleTypes[index],
+        child:
+            vm.vehicleTypes.isEmpty
+                ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          vm.vehicleTypesLoadFailed
+                              ? 'No pudimos cargar los vehículos disponibles.'
+                              : 'No hay vehículos disponibles para esta ruta.',
+                          textAlign: TextAlign.center,
+                        ),
+                        if (vm.vehicleTypesLoadFailed)
+                          TextButton.icon(
+                            onPressed: vm.fetchVehicleTypes,
+                            icon: const Icon(Icons.refresh_rounded),
+                            label: const Text('Intentar nuevamente'),
+                          ),
+                      ],
+                    ),
+                  ),
+                )
+                : ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 6,
+                  ),
+                  physics: const BouncingScrollPhysics(),
+                  cacheExtent: cardWidth * 4,
+                  itemCount: vm.vehicleTypes.length,
+                  itemBuilder:
+                      (context, index) => SizedBox(
+                        width: cardWidth,
+                        child: NewHorizontalVehicleTypeListItem(
+                          vm,
+                          vm.vehicleTypes[index],
+                        ),
+                      ),
+                  separatorBuilder: (_, __) => const SizedBox(width: 10),
                 ),
-              ),
-          separatorBuilder: (_, __) => const SizedBox(width: 10),
-        ),
       ),
     );
   }
