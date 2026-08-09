@@ -126,18 +126,20 @@ class _LoginPageState extends State<LoginPage> {
                         ]).wFull(context).px20().pOnly(top: Vx.dp20),
                         //
                         //register
-                        if (widget.expectedRole == AppRole.customer)
-                          HStack([
+                        HStack([
                             UiSpacer.divider().expand(),
                             "OR".tr().text.light.make().px8(),
                             UiSpacer.divider().expand(),
                           ]).py8().px20(),
-                        if (widget.expectedRole == AppRole.customer)
-                          "New user?".tr().richText
+                        (widget.expectedRole == AppRole.driver
+                                ? '¿Nuevo conductor?'
+                                : "New user?".tr())
+                            .richText
                             .withTextSpanChildren([
                               " ".textSpan.make(),
-                              "Create An Account"
-                                  .tr()
+                              (widget.expectedRole == AppRole.driver
+                                      ? 'Crear cuenta de conductor'
+                                      : "Create An Account".tr())
                                   .textSpan
                                   .semiBold
                                   .color(AppColor.primaryColor)

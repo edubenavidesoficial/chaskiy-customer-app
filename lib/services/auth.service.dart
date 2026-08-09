@@ -88,21 +88,22 @@ class AuthServices {
     dynamic jsonObject, {
     bool reload = true,
   }) async {
-    final currentUser = User.fromJson(jsonObject);
+    final parsedUser = User.fromJson(jsonObject);
     try {
+      currentUser = parsedUser;
       await LocalStorageService.prefs?.setString(
         AppStrings.userKey,
-        json.encode(currentUser.toJson()),
+        json.encode(parsedUser.toJson()),
       );
-      await SessionService.setUser(currentUser);
+      await SessionService.setUser(parsedUser);
 
       //subscribe to firebase topic
       final audienceTopic =
-          SessionService.isDriver ? "d_${currentUser.id}" : "client";
+          SessionService.isDriver ? "d_${parsedUser.id}" : "client";
       final roles = <String>{
         "all",
-        "${currentUser.id}",
-        "${currentUser.role}",
+        "${parsedUser.id}",
+        ...parsedUser.roleNames,
         audienceTopic,
       };
 
@@ -121,7 +122,7 @@ class AuthServices {
         ).loadAppSettings();
       }
 
-      return currentUser;
+      return parsedUser;
     } catch (error) {
       return null;
     }

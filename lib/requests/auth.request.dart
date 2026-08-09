@@ -7,6 +7,7 @@ import 'package:chaskiy/models/api_response.dart';
 import 'package:chaskiy/models/user.dart';
 import 'package:chaskiy/services/firebase_token.service.dart';
 import 'package:chaskiy/services/http.service.dart';
+import 'package:chaskiy/enums/app_role.dart';
 
 class AuthRequest extends HttpService {
   //
@@ -64,19 +65,36 @@ class AuthRequest extends HttpService {
     required String countryCode,
     required String password,
     String code = "",
+    AppRole role = AppRole.customer,
   }) async {
-    final apiResult = await post(Api.register, {
+    final isDriver = role == AppRole.driver;
+    final apiResult = await post(isDriver ? Api.driverRegister : Api.register, {
       "name": name,
       "email": email,
       "phone": phone,
       "country_code": countryCode,
       "password": password,
-      "code": code,
-      "role": "client",
+      if (code.isNotEmpty) isDriver ? "referral_code" : "code": code,
+      if (!isDriver) "role": "client",
+      if (isDriver) "driver_type": "delivery",
       "tokens": await FirebaseTokenService().getDeviceToken(),
     });
 
     return ApiResponse.fromResponse(apiResult);
+  }
+
+  Future<ApiResponse> applyForDriver({
+    required String driverType,
+    List<File> documents = const [],
+  }) async {
+    final formData = FormData.fromMap({'driver_type': driverType});
+    for (final file in documents) {
+      formData.files.add(
+        MapEntry('documents[]', await MultipartFile.fromFile(file.path)),
+      );
+    }
+    final result = await postWithFiles(Api.driverOnboarding, formData);
+    return ApiResponse.fromResponse(result);
   }
 
   //

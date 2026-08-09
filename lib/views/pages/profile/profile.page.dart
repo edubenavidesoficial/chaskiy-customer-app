@@ -95,6 +95,8 @@ class _ProfilePageState extends State<ProfilePage>
                       const SizedBox(height: 18),
                       ProfileCard(model),
                       const SizedBox(height: 18),
+                      if (model.authenticated) _DriverModeSection(model: model),
+                      if (model.authenticated) const SizedBox(height: 18),
                       _SecuritySection(model: model),
                       const SizedBox(height: 18),
                       _PreferencesSection(model: model),
@@ -134,6 +136,47 @@ class _ProfilePageState extends State<ProfilePage>
 
   @override
   bool get wantKeepAlive => true;
+}
+
+class _DriverModeSection extends StatelessWidget {
+  const _DriverModeSection({required this.model});
+
+  final ProfileViewModel model;
+
+  @override
+  Widget build(BuildContext context) {
+    final user = model.currentUser;
+    final status = user?.driverStatus;
+    final approved = user?.driverAccessApproved == true;
+    final pending = status == 'pending';
+
+    return SettingsSection(
+      title: 'Tu actividad',
+      children: [
+        SettingsTile(
+          icon: approved ? Icons.swap_horiz : Icons.delivery_dining_outlined,
+          title:
+              approved
+                  ? 'Cambiar a modo conductor'
+                  : pending
+                  ? 'Solicitud de conductor en revisión'
+                  : 'Quiero conducir con Chaskiy',
+          subtitle:
+              approved
+                  ? 'Recibe asignaciones con esta misma cuenta'
+                  : pending
+                  ? 'Te avisaremos cuando el perfil sea aprobado'
+                  : 'Conserva tu perfil de cliente y solicita acceso',
+          onTap:
+              approved
+                  ? model.switchToDriver
+                  : pending
+                  ? () {}
+                  : model.openDriverOnboarding,
+        ),
+      ],
+    );
+  }
 }
 
 class _SecuritySection extends StatelessWidget {

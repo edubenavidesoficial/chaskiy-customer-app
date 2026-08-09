@@ -260,7 +260,7 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
       final apiResponse = await authRequest.loginRequest(
         email: emailTEC.text,
         password: passwordTEC.text,
-        role: expectedRole == AppRole.driver ? 'driver' : null,
+        role: expectedRole == AppRole.driver ? 'driver' : 'client',
       );
       setBusy(false);
 
@@ -281,7 +281,7 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
       try {
         final apiResponse = await authRequest.qrLoginRequest(
           code: loginCode,
-          role: expectedRole == AppRole.driver ? 'driver' : null,
+          role: expectedRole == AppRole.driver ? 'driver' : 'client',
         );
         //
         setBusy(false);
@@ -355,7 +355,12 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
     Navigator.of(viewContext).push(
       MaterialPageRoute(
         builder:
-            (context) => RegisterPage(email: email, name: name, phone: phone),
+            (context) => RegisterPage(
+              email: email,
+              name: name,
+              phone: phone,
+              expectedRole: expectedRole,
+            ),
       ),
     );
   }

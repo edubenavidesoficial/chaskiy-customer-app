@@ -10,6 +10,8 @@ import 'package:chaskiy/views/pages/driver/driver_vehicles.page.dart';
 import 'package:chaskiy/views/pages/driver/driver_documents.page.dart';
 import 'package:chaskiy/views/pages/driver/driver_finance.page.dart';
 import 'package:chaskiy/views/pages/splash.page.dart';
+import 'package:chaskiy/views/pages/home.page.dart';
+import 'package:chaskiy/enums/app_role.dart';
 import 'package:chaskiy/widgets/base.page.dart';
 import 'package:flutter/material.dart';
 
@@ -39,10 +41,9 @@ class _DriverHomePageState extends State<DriverHomePage> {
     if (!mounted) return;
 
     if (!SessionService.isDriver) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRoutes.homeRoute,
-        (_) => false,
-      );
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.homeRoute, (_) => false);
       return;
     }
     setState(() => _user = user);
@@ -64,13 +65,31 @@ class _DriverHomePageState extends State<DriverHomePage> {
     }
   }
 
+  Future<void> _switchToCustomer() async {
+    final user = _user;
+    if (user == null || !user.hasCustomerRole) return;
+    await DriverAssignmentService.instance.stop();
+    await DriverLocationService.instance.stop();
+    await SessionService.setActiveRole(AppRole.customer, user: user);
+    if (mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => HomePage()),
+        (_) => false,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final pages = <Widget>[
       _DriverDashboard(user: _user),
       const DriverAssignedOrdersPage(),
       const DriverFinancePage(),
-      _DriverAccount(user: _user, onLogout: _logout),
+      _DriverAccount(
+        user: _user,
+        onLogout: _logout,
+        onSwitchToCustomer: _switchToCustomer,
+      ),
     ];
 
     return BasePage(
@@ -120,9 +139,9 @@ class _DriverDashboard extends StatelessWidget {
         children: [
           Text(
             'Hola, ${user?.name ?? 'conductor'}',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 6),
           Text(
@@ -159,10 +178,15 @@ class _DriverDashboard extends StatelessWidget {
 }
 
 class _DriverAccount extends StatelessWidget {
-  const _DriverAccount({required this.user, required this.onLogout});
+  const _DriverAccount({
+    required this.user,
+    required this.onLogout,
+    required this.onSwitchToCustomer,
+  });
 
   final User? user;
   final Future<void> Function() onLogout;
+  final Future<void> Function() onSwitchToCustomer;
 
   @override
   Widget build(BuildContext context) {
@@ -172,9 +196,9 @@ class _DriverAccount extends StatelessWidget {
         children: [
           Text(
             'Cuenta de conductor',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 20),
           ListTile(
@@ -191,14 +215,23 @@ class _DriverAccount extends StatelessWidget {
             subtitle: Text(user?.email ?? ''),
           ),
           const Divider(),
+          if (user?.hasCustomerRole == true)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.swap_horiz),
+              title: const Text('Cambiar a modo cliente'),
+              subtitle: const Text('Compra y solicita servicios'),
+              onTap: onSwitchToCustomer,
+            ),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.directions_car_outlined),
             title: const Text('Mis vehículos'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const DriverVehiclesPage()),
-            ),
+            onTap:
+                () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const DriverVehiclesPage()),
+                ),
           ),
           if (user?.documentRequested == true ||
               user?.pendingDocumentApproval == true)
@@ -212,11 +245,12 @@ class _DriverAccount extends StatelessWidget {
                     : 'Se requiere información',
               ),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const DriverDocumentsPage(),
-                ),
-              ),
+              onTap:
+                  () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const DriverDocumentsPage(),
+                    ),
+                  ),
             ),
           ListTile(
             contentPadding: EdgeInsets.zero,

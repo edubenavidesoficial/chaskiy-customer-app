@@ -14,13 +14,21 @@ import 'package:chaskiy/widgets/custom_text_form_field.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
+import 'package:chaskiy/enums/app_role.dart';
 
 class RegisterPage extends StatefulWidget {
-  RegisterPage({this.email, this.name, this.phone, Key? key}) : super(key: key);
+  RegisterPage({
+    this.email,
+    this.name,
+    this.phone,
+    this.expectedRole = AppRole.customer,
+    Key? key,
+  }) : super(key: key);
 
   final String? email;
   final String? name;
   final String? phone;
+  final AppRole expectedRole;
   @override
   _RegisterPageState createState() => _RegisterPageState();
 }
@@ -29,7 +37,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<RegisterViewModel>.reactive(
-      viewModelBuilder: () => RegisterViewModel(context),
+      viewModelBuilder: () => RegisterViewModel(context, widget.expectedRole),
       onViewModelReady: (model) {
         model.nameTEC.text = widget.name ?? "";
         model.emailTEC.text = widget.email ?? "";
@@ -58,8 +66,19 @@ class _RegisterPageState extends State<RegisterPage> {
                     //
                     VStack([
                       //
-                      "Join Us".tr().text.xl2.semiBold.make(),
-                      "Create an account now".tr().text.light.make(),
+                      (widget.expectedRole == AppRole.driver
+                              ? 'Registro de conductor'
+                              : "Join Us".tr())
+                          .text
+                          .xl2
+                          .semiBold
+                          .make(),
+                      (widget.expectedRole == AppRole.driver
+                              ? 'Crea tu cuenta para trabajar con Chaskiy'
+                              : "Create an account now".tr())
+                          .text
+                          .light
+                          .make(),
 
                       //form
                       Form(

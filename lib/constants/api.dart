@@ -15,6 +15,8 @@ class Api {
   static const login = "/login";
   static const qrlogin = "/login/qrcode";
   static const register = "/register";
+  static const driverRegister = "/driver/register";
+  static const driverOnboarding = "/driver/onboarding";
   static const logout = "/logout";
   static const forgotPassword = "/password/reset/init";
   static const verifyPhoneAccount = "/verify/phone";
@@ -79,8 +81,7 @@ class Api {
   static const driverVehicleRegister = "/driver/vehicle/register";
   static const driverVehicles = "/driver/vehicles";
   static const activateDriverVehicle = "/driver/vehicle/{id}/activate";
-  static const driverDocumentSubmission =
-      "/driver/document/request/submission";
+  static const driverDocumentSubmission = "/driver/document/request/submission";
   static const driverLocationSync = "/driver/location/sync";
   static const driverPayoutsReport = "/driver/payouts/report";
   static const driverEarningsReport = "/driver/earnings/report";

@@ -9,6 +9,8 @@ class User {
   String? countryCode;
   String photo;
   String role;
+  List<String> roleNames;
+  String? driverStatus;
   String walletAddress;
   int? vendorId;
   double rating;
@@ -27,6 +29,8 @@ class User {
     required this.countryCode,
     required this.photo,
     required this.role,
+    this.roleNames = const [],
+    this.driverStatus,
     required this.walletAddress,
     this.vendorId,
     this.rating = 5,
@@ -37,6 +41,18 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
+    final role = json['role_name']?.toString() ?? "client";
+    final rawRoles = json['role_names'] ?? json['roles'];
+    final roles =
+        rawRoles is List
+            ? rawRoles
+                .map((value) => value is Map ? value['name'] : value)
+                .whereType<Object>()
+                .map((value) => value.toString())
+                .toList()
+            : <String>[];
+    if (!roles.contains(role)) roles.add(role);
+
     return User(
       id: json['id'],
       code: json['code'],
@@ -47,15 +63,15 @@ class User {
       walletAddress: json['wallet_address'] ?? "",
       countryCode: json['country_code'],
       photo: json['photo'] ?? "",
-      role: json['role_name'] ?? "client",
+      role: role,
+      roleNames: roles,
+      driverStatus: json['driver_access_status'] ?? json['driver_status'],
       vendorId: json['vendor_id'],
       rating: double.tryParse('${json['rating'] ?? 5}') ?? 5,
       isOnline: _jsonBool(json['is_online']),
       isTaxiDriver: _jsonBool(json['is_taxi_driver']),
       documentRequested: _jsonBool(json['document_requested']),
-      pendingDocumentApproval: _jsonBool(
-        json['pending_document_approval'],
-      ),
+      pendingDocumentApproval: _jsonBool(json['pending_document_approval']),
     );
   }
 
@@ -70,6 +86,8 @@ class User {
       'country_code': countryCode,
       'photo': photo,
       'role_name': role,
+      'role_names': roleNames,
+      'driver_access_status': driverStatus,
       'wallet_address': walletAddress,
       'vendor_id': vendorId,
       'rating': rating,
@@ -79,6 +97,15 @@ class User {
       'pending_document_approval': pendingDocumentApproval,
     };
   }
+
+  bool hasRole(String value) => roleNames.any(
+    (roleName) => roleName.toLowerCase() == value.toLowerCase(),
+  );
+
+  bool get hasDriverRole => hasRole('driver');
+  bool get hasCustomerRole => hasRole('client') || hasRole('customer');
+  bool get driverAccessApproved =>
+      hasDriverRole && (driverStatus == null || driverStatus == 'approved');
 
   static bool _jsonBool(dynamic value) {
     if (value is bool) return value;

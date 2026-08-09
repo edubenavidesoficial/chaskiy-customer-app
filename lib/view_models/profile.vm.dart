@@ -23,6 +23,10 @@ import 'package:in_app_review/in_app_review.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:chaskiy/extensions/context.dart';
+import 'package:chaskiy/enums/app_role.dart';
+import 'package:chaskiy/services/session.service.dart';
+import 'package:chaskiy/views/pages/driver/driver_home.page.dart';
+import 'package:chaskiy/views/pages/driver/driver_onboarding.page.dart';
 
 class ProfileViewModel extends PaymentViewModel {
   static const String _supportWhatsAppUrl =
@@ -99,6 +103,43 @@ class ProfileViewModel extends PaymentViewModel {
 
   openSecurityPrivacy() async {
     Navigator.of(viewContext).pushNamed(AppRoutes.securityPrivacyRoute);
+  }
+
+  Future<void> openDriverOnboarding() async {
+    final submitted = await Navigator.of(viewContext).push<bool>(
+      MaterialPageRoute(builder: (_) => const DriverOnboardingPage()),
+    );
+    if (submitted == true) {
+      currentUser = await _authRequest.getMyDetails();
+      await AuthServices.saveUser(currentUser!.toJson());
+      notifyListeners();
+    }
+  }
+
+  Future<void> switchToDriver() async {
+    try {
+      final user = await _authRequest.getMyDetails();
+      await AuthServices.saveUser(user.toJson());
+      if (!user.driverAccessApproved) {
+        await AlertService.error(
+          title: 'Acceso pendiente',
+          text: 'Tu perfil de conductor todavía no ha sido aprobado.',
+        );
+        return;
+      }
+      await SessionService.setActiveRole(AppRole.driver, user: user);
+      if (viewContext.mounted) {
+        Navigator.of(viewContext).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const DriverHomePage()),
+          (_) => false,
+        );
+      }
+    } catch (error) {
+      await AlertService.error(
+        title: 'No se pudo cambiar de modo',
+        text: '$error',
+      );
+    }
   }
 
   //

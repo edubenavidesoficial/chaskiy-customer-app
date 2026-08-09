@@ -13,8 +13,10 @@ import 'package:localize_and_translate/localize_and_translate.dart';
 import 'base.view_model.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:chaskiy/extensions/context.dart';
+import 'package:chaskiy/enums/app_role.dart';
 
 class RegisterViewModel extends MyBaseViewModel {
+  final AppRole expectedRole;
   //
   AuthRequest _authRequest = AuthRequest();
   // FirebaseAuth auth = FirebaseAuth.instance;
@@ -37,7 +39,7 @@ class RegisterViewModel extends MyBaseViewModel {
   bool agreed = false;
   bool otpLogin = AppStrings.enableOTPLogin;
 
-  RegisterViewModel(BuildContext context) {
+  RegisterViewModel(BuildContext context, this.expectedRole) {
     this.viewContext = context;
     this.selectedCountry = PhoneUtilService.defaultCountry();
   }
@@ -204,6 +206,7 @@ class RegisterViewModel extends MyBaseViewModel {
       countryCode: selectedCountry!.countryCode,
       password: passwordTEC.text,
       code: referralCodeTEC.text,
+      role: expectedRole,
     );
 
     setBusy(false);
@@ -216,6 +219,16 @@ class RegisterViewModel extends MyBaseViewModel {
           text: apiResponse.message,
         );
       } else {
+        if (expectedRole == AppRole.driver) {
+          await AlertService.success(
+            title: 'Solicitud recibida',
+            text:
+                apiResponse.message ??
+                'Tu cuenta de conductor será revisada antes de activarse.',
+          );
+          if (viewContext.mounted) viewContext.pop();
+          return;
+        }
         //everything works well
         //firebase auth
         final fbToken = apiResponse.body["fb_token"];

@@ -28,8 +28,34 @@ class SessionService {
   static bool get isCustomer => activeRole == AppRole.customer;
   static bool get isDriver => activeRole == AppRole.driver;
 
-  static Future<void> setUser(User user) async {
-    final role = AppRole.fromBackendRole(user.role);
+  static bool canUseRole(User user, AppRole role) {
+    return switch (role) {
+      AppRole.customer => user.hasCustomerRole,
+      AppRole.driver => user.driverAccessApproved,
+      AppRole.guest => false,
+    };
+  }
+
+  static Future<void> setUser(User user, {AppRole? preferredRole}) async {
+    final currentRole = activeRole;
+    final backendRole = AppRole.fromBackendRole(user.role);
+    final role =
+        preferredRole != null && canUseRole(user, preferredRole)
+            ? preferredRole
+            : canUseRole(user, currentRole)
+            ? currentRole
+            : canUseRole(user, backendRole)
+            ? backendRole
+            : user.hasCustomerRole
+            ? AppRole.customer
+            : AppRole.guest;
+    await setActiveRole(role, user: user);
+  }
+
+  static Future<void> setActiveRole(AppRole role, {required User user}) async {
+    if (role != AppRole.guest && !canUseRole(user, role)) {
+      throw StateError('El usuario no tiene acceso al modo ${role.name}');
+    }
     _cachedRole = role;
     await LocalStorageService.prefs?.setString(
       AppStrings.activeRole,
