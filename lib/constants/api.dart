@@ -99,6 +99,7 @@ class Api {
   static const taxiDriverInfo = "/taxi/driver/info";
   static const taxiLocationAvailable = "/taxi/location/available";
   static const taxiTripLocationHistory = "/taxi/location/history";
+  static const nearbyTaxiDrivers = "/taxi/nearby/drivers";
 
   //wallet
   static const walletBalance = "/wallet/balance";

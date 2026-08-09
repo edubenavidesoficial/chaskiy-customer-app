@@ -47,13 +47,11 @@ class TaxiViewModel extends TripTaxiViewModel {
 
   //functions
   void initialise() async {
-    // super.initialise();
-    //
-    fetchTaxiPaymentOptions();
-    //
-    getOnGoingTrip();
-    //set current location as pickup location
-    setupCurrentLocationAsPickuplocation();
+    await fetchTaxiPaymentOptions();
+    await getOnGoingTrip();
+    if (!onTrip) {
+      await setupCurrentLocationAsPickuplocation();
+    }
   }
 
   //

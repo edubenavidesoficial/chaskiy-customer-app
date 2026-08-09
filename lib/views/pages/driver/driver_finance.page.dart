@@ -93,18 +93,18 @@ class _DriverFinancePageState extends State<DriverFinancePage> {
                   Expanded(
                     child: Text(
                       'Finanzas',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.w800),
                     ),
                   ),
                   IconButton(
                     tooltip: 'Cuentas de pago',
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const DriverPaymentAccountsPage(),
-                      ),
-                    ),
+                    onPressed:
+                        () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const DriverPaymentAccountsPage(),
+                          ),
+                        ),
                     icon: const Icon(Icons.account_balance_outlined),
                   ),
                   IconButton(
@@ -116,7 +116,10 @@ class _DriverFinancePageState extends State<DriverFinancePage> {
               ),
             ),
             _Metrics(metrics: _metrics),
-            const TabBar(tabs: [Tab(text: 'Ganancias'), Tab(text: 'Pagos')]),
+            const TabBar(
+              tabAlignment: TabAlignment.fill,
+              tabs: [Tab(text: 'Ganancias'), Tab(text: 'Pagos')],
+            ),
             Expanded(
               child: TabBarView(
                 children: [
@@ -190,42 +193,46 @@ class _Metrics extends StatelessWidget {
     final money = _map(metrics['money']);
 
     if (earnings.isNotEmpty) {
-      cards.add(_MetricCardData('Ganancias', [
-        'Actual: ${_amount(earnings['current'])}',
-        'Hoy: ${_amount(earnings['today'])}',
-      ]));
+      cards.add(
+        _MetricCardData('Ganancias', [
+          'Actual: ${_amount(earnings['current'])}',
+          'Hoy: ${_amount(earnings['today'])}',
+        ]),
+      );
     }
     if (orders.isNotEmpty) {
-      cards.add(_MetricCardData('Pedidos', [
-        'Hoy: ${_number(orders['today'])}',
-        'Semana: ${_number(orders['week'])}',
-      ]));
+      cards.add(
+        _MetricCardData('Pedidos', [
+          'Hoy: ${_number(orders['today'])}',
+          'Semana: ${_number(orders['week'])}',
+        ]),
+      );
     }
     if (money.isNotEmpty) {
-      cards.add(_MetricCardData('Dinero', [
-        'Por remitir: ${_amount(money['pending_remittance'])}',
-        if (money.containsKey('remitted'))
-          'Remitido: ${_amount(money['remitted'])}',
-      ]));
+      cards.add(
+        _MetricCardData('Dinero', [
+          'Por remitir: ${_amount(money['pending_remittance'])}',
+          if (money.containsKey('remitted'))
+            'Remitido: ${_amount(money['remitted'])}',
+        ]),
+      );
     }
 
     // Mantiene compatibilidad si el backend incorpora una métrica escalar.
     if (cards.isEmpty) {
       for (final entry in metrics.entries.take(3)) {
         if (entry.value is num || entry.value is String) {
-          cards.add(_MetricCardData(
-            _label(entry.key),
-            [_number(entry.value)],
-          ));
+          cards.add(_MetricCardData(_label(entry.key), [_number(entry.value)]));
         }
       }
     }
     return cards;
   }
 
-  Map<String, dynamic> _map(dynamic value) => value is Map
-      ? Map<String, dynamic>.from(value)
-      : const <String, dynamic>{};
+  Map<String, dynamic> _map(dynamic value) =>
+      value is Map
+          ? Map<String, dynamic>.from(value)
+          : const <String, dynamic>{};
 
   String _number(dynamic value) {
     final number = num.tryParse('${value ?? 0}') ?? 0;
@@ -262,16 +269,18 @@ class _ReportList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (data.isEmpty) return const Center(child: Text('No existen movimientos'));
+    if (data.isEmpty)
+      return const Center(child: Text('No existen movimientos'));
     return ListView.separated(
       padding: const EdgeInsets.all(20),
       itemCount: data.length,
       separatorBuilder: (_, __) => const Divider(),
       itemBuilder: (context, index) {
         final item = data[index];
-        final amount = type == _ReportType.earning
-            ? item['total_earning'] ?? item['amount']
-            : item['amount'];
+        final amount =
+            type == _ReportType.earning
+                ? item['total_earning'] ?? item['amount']
+                : item['amount'];
         final status = item['status'];
         return ListTile(
           contentPadding: EdgeInsets.zero,

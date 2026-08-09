@@ -124,7 +124,10 @@ class LocationService {
           coordinates,
         );
         //
-        currenctAddress = addresses.first;
+        currenctAddress =
+            addresses.isNotEmpty
+                ? addresses.first
+                : _coordinateFallback(coordinates);
         //
         if (currenctAddress != null) {
           currenctAddressSubject.add(currenctAddress!);
@@ -141,6 +144,18 @@ class LocationService {
         }
       } catch (error) {
         print("Error get location ==> $error");
+        currenctAddress = _coordinateFallback(coordinates);
+        currenctAddressSubject.add(currenctAddress!);
+        if (deliveryaddress == null) {
+          await saveSelectedAddressLocally(
+            DeliveryAddress(
+              name: 'Ubicación actual',
+              address: 'Ubicación actual',
+              latitude: coordinates.latitude,
+              longitude: coordinates.longitude,
+            ),
+          );
+        }
       }
     }
 
@@ -165,12 +180,21 @@ class LocationService {
         coordinates,
       );
       //
-      address = addresses.first;
+      address =
+          addresses.isNotEmpty
+              ? addresses.first
+              : _coordinateFallback(coordinates);
     } catch (error) {
       print("Issue with addressFromCoordinates ==> $error");
     }
-    return address;
+    return address ?? _coordinateFallback(coordinates);
   }
+
+  static Address _coordinateFallback(Coordinates coordinates) => Address(
+    coordinates: coordinates,
+    addressLine: 'Ubicación actual',
+    featureName: 'Ubicación actual',
+  );
 
   //Helper methods
 
@@ -228,6 +252,12 @@ class LocationService {
       return null;
     }
 
+    if (savedAddress.address == 'Current Location') {
+      savedAddress.address = 'Ubicación actual';
+    }
+    if (savedAddress.name == 'Current Location') {
+      savedAddress.name = 'Ubicación actual';
+    }
     deliveryaddress = savedAddress;
     currenctAddress = Address(
       coordinates: Coordinates(

@@ -9,6 +9,7 @@ import 'package:chaskiy/models/delivery_address.dart';
 import 'package:chaskiy/models/vehicle_type.dart';
 import 'package:chaskiy/services/geocoder.service.dart';
 import 'package:chaskiy/services/location.service.dart';
+import 'package:chaskiy/requests/taxi.request.dart';
 import 'package:chaskiy/utils/map.utils.dart';
 import 'package:chaskiy/view_models/checkout_base.vm.dart';
 import 'package:chaskiy/views/pages/delivery_address/widgets/address_search.view.dart';
@@ -44,6 +45,8 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
   Set<Marker> gMapMarkers = {};
   PolylinePoints polylinePoints = PolylinePoints();
   StreamSubscription? driverLocationStream;
+  Timer? nearbyDriversTimer;
+  bool _loadingNearbyDrivers = false;
   // for my custom icons
   BitmapDescriptor? sourceIcon;
   BitmapDescriptor? destinationIcon;
@@ -63,6 +66,7 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
   dispose() {
     super.dispose();
     currentLocationListener?.cancel();
+    nearbyDriversTimer?.cancel();
     pickupLocationFocusNode.dispose();
     dropoffLocationFocusNode.dispose();
   }
@@ -85,6 +89,54 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     //start listening to user current location
     startUserLocationListener();
     setSourceAndDestinationIcons();
+    startNearbyDriversListener();
+  }
+
+  void startNearbyDriversListener() {
+    nearbyDriversTimer?.cancel();
+    loadNearbyDrivers();
+    nearbyDriversTimer = Timer.periodic(
+      const Duration(seconds: 10),
+      (_) => loadNearbyDrivers(),
+    );
+  }
+
+  Future<void> loadNearbyDrivers() async {
+    if (_loadingNearbyDrivers || onTrip || currentOrderStep > 2) return;
+    final position = await Geolocator.getLastKnownPosition();
+    if (position == null) return;
+    _loadingNearbyDrivers = true;
+    try {
+      final drivers = await TaxiRequest().getNearbyDrivers(
+        latitude: position.latitude,
+        longitude: position.longitude,
+      );
+      gMapMarkers.removeWhere(
+        (marker) => marker.markerId.value.startsWith('nearbyDriver_'),
+      );
+      for (final driver in drivers) {
+        final lat = double.tryParse('${driver['latitude']}');
+        final lng = double.tryParse('${driver['longitude']}');
+        if (lat == null || lng == null) continue;
+        gMapMarkers.add(
+          Marker(
+            markerId: MarkerId('nearbyDriver_${driver['id']}'),
+            position: LatLng(lat, lng),
+            icon:
+                driverIcon ??
+                BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueOrange,
+                ),
+            flat: true,
+          ),
+        );
+      }
+      notifyListeners();
+    } catch (_) {
+      // La oferta visual es complementaria y no debe bloquear la reserva.
+    } finally {
+      _loadingNearbyDrivers = false;
+    }
   }
 
   //
@@ -272,21 +324,36 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
 
   //setupCurrentLocationAsPickuplocation()
   setupCurrentLocationAsPickuplocation() async {
-    //get current location
-    Position currentLocation = await Geolocator.getCurrentPosition();
-    //
-    final address = await GeocoderService().findAddressesFromCoordinates(
-      Coordinates(currentLocation.latitude, currentLocation.longitude),
-    );
-    //
-    if (address.isNotEmpty) {
+    try {
+      Position currentLocation = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 12),
+        ),
+      );
+      final address = await GeocoderService().findAddressesFromCoordinates(
+        Coordinates(currentLocation.latitude, currentLocation.longitude),
+      );
+      final label =
+          address.isNotEmpty
+              ? (address.first.addressLine ?? address.first.featureName)
+              : null;
       pickupLocation = DeliveryAddress(
-        name: address.first.featureName,
-        address: address.first.addressLine,
+        name:
+            address.isNotEmpty ? address.first.featureName : 'Ubicación actual',
+        address: label?.isNotEmpty == true ? label : 'Ubicación actual',
         latitude: currentLocation.latitude,
         longitude: currentLocation.longitude,
       );
       pickupLocationTEC.text = pickupLocation?.address ?? "";
+      notifyListeners();
+    } catch (_) {
+      final saved = await LocationService.restoreSelectedAddress();
+      if (saved != null && saved.latitude != null && saved.longitude != null) {
+        pickupLocation = saved;
+        pickupLocationTEC.text = saved.address ?? 'Ubicación actual';
+        notifyListeners();
+      }
     }
   }
 
@@ -306,7 +373,9 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
       Marker(
         markerId: MarkerId('sourcePin'),
         position: LatLng(pickupLocation!.latitude!, pickupLocation!.longitude!),
-        icon: sourceIcon!,
+        icon:
+            sourceIcon ??
+            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
         anchor: Offset(0.5, 0.5),
       ),
     );
@@ -324,19 +393,26 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
           dropoffLocation!.latitude!,
           dropoffLocation!.longitude!,
         ),
-        icon: destinationIcon!,
+        icon:
+            destinationIcon ??
+            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
         anchor: Offset(0.5, 0.5),
       ),
     );
     //load the ploylines
-    PolylineResult polylineResult = await polylinePoints
-        .getRouteBetweenCoordinates(
-          AppStrings.googleMapApiKey,
-          PointLatLng(pickupLocation!.latitude!, pickupLocation!.longitude!),
-          PointLatLng(dropoffLocation!.latitude!, dropoffLocation!.longitude!),
-        );
+    polylineCoordinates.clear();
+    PolylineResult? polylineResult;
+    try {
+      polylineResult = await polylinePoints.getRouteBetweenCoordinates(
+        AppStrings.googleMapApiKey,
+        PointLatLng(pickupLocation!.latitude!, pickupLocation!.longitude!),
+        PointLatLng(dropoffLocation!.latitude!, dropoffLocation!.longitude!),
+      );
+    } catch (_) {
+      polylineResult = null;
+    }
     //get the points from the result
-    List<PointLatLng> result = polylineResult.points;
+    List<PointLatLng> result = polylineResult?.points ?? const [];
     //
     if (result.isNotEmpty) {
       // loop through all PointLatLng points and convert them
@@ -344,6 +420,13 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
       result.forEach((PointLatLng point) {
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));
       });
+    } else {
+      // La Directions API heredada puede estar deshabilitada. Nunca dejamos
+      // el viaje sin representación visual: mostramos origen y destino unidos.
+      polylineCoordinates.addAll([
+        LatLng(pickupLocation!.latitude!, pickupLocation!.longitude!),
+        LatLng(dropoffLocation!.latitude!, dropoffLocation!.longitude!),
+      ]);
     }
 
     // with an id, an RGB color and the list of LatLng pairs
@@ -371,7 +454,7 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     await updateCameraLocation(
       pickupLocationLatLng,
       dropoffLocationLatLng,
-      googleMapController!,
+      googleMapController,
     );
     //
     notifyListeners();

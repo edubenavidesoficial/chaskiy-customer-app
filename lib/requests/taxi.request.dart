@@ -9,6 +9,23 @@ import 'package:chaskiy/models/vehicle_type.dart';
 import 'package:chaskiy/services/http.service.dart';
 
 class TaxiRequest extends HttpService {
+  Future<List<Map<String, dynamic>>> getNearbyDrivers({
+    required double latitude,
+    required double longitude,
+  }) async {
+    final result = await get(
+      Api.nearbyTaxiDrivers,
+      queryParameters: {'latitude': latitude, 'longitude': longitude},
+      forceRefresh: true,
+    );
+    final response = ApiResponse.fromResponse(result);
+    if (!response.allGood || response.body is! List) return const [];
+    return (response.body as List)
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList();
+  }
+
   //
   Future<List<VehicleType>> getVehicleTypes() async {
     final apiResult = await get("${Api.vehicleTypes}");
