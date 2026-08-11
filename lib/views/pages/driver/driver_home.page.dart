@@ -233,25 +233,27 @@ class _DriverAccount extends StatelessWidget {
                   MaterialPageRoute(builder: (_) => const DriverVehiclesPage()),
                 ),
           ),
-          if (user?.documentRequested == true ||
-              user?.pendingDocumentApproval == true)
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.badge_outlined),
-              title: const Text('Documentos'),
-              subtitle: Text(
-                user?.pendingDocumentApproval == true
-                    ? 'Verificación pendiente'
-                    : 'Se requiere información',
-              ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap:
-                  () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const DriverDocumentsPage(),
-                    ),
-                  ),
+          //siempre visible: aunque no haya nada pendiente, es el único lugar
+          //donde el conductor puede ver y enviar su verificación
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.badge_outlined),
+            title: const Text('Verificación y documentos'),
+            subtitle: Text(
+              user?.pendingDocumentApproval == true
+                  ? 'Verificación pendiente'
+                  : user?.documentRequested == true
+                  ? 'Se requiere información'
+                  : 'Consulta o actualiza tus documentos',
             ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap:
+                () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const DriverDocumentsPage(),
+                  ),
+                ),
+          ),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.logout, color: Colors.red),

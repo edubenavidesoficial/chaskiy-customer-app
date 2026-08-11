@@ -77,9 +77,7 @@ class SplashViewModel extends MyBaseViewModel {
       //START: WEBSOCKET SETTINGS
       final websocketSettings = _settingsMap(settings["websocket"]);
       if (websocketSettings != null) {
-        await WebsocketService().saveWebsocketDetails(
-          websocketSettings,
-        );
+        await WebsocketService().saveWebsocketDetails(websocketSettings);
       }
       //END: WEBSOCKET SETTINGS
 
@@ -181,12 +179,10 @@ class SplashViewModel extends MyBaseViewModel {
     //
     await Utils.setJiffyLocale();
     //
-    if (AuthServices.authenticated() && SessionService.isDriver) {
-      Navigator.of(viewContext).pushNamedAndRemoveUntil(
-        AppRoutes.driverHomeRoute,
-        (Route<dynamic> route) => false,
-      );
-    } else if (AuthServices.firstTimeOnApp()) {
+    final isDriverSession =
+        AuthServices.authenticated() && SessionService.isDriver;
+
+    if (!isDriverSession && AuthServices.firstTimeOnApp()) {
       await AuthServices.setLocale("es");
       await translator.setNewLanguage(
         viewContext,
@@ -195,18 +191,18 @@ class SplashViewModel extends MyBaseViewModel {
       );
       await Utils.setJiffyLocale();
     }
-    //
-    if (AuthServices.firstTimeOnApp()) {
-      Navigator.of(viewContext).pushNamedAndRemoveUntil(
-        AppRoutes.welcomeRoute,
-        (Route<dynamic> route) => false,
-      );
-    } else {
-      Navigator.of(viewContext).pushNamedAndRemoveUntil(
-        AppRoutes.homeRoute,
-        (Route<dynamic> route) => false,
-      );
-    }
+    //una sola navegación: antes se empujaba la pantalla del conductor y
+    //enseguida la del cliente encima, así que el modo conductor nunca se veía
+    final nextRoute =
+        isDriverSession
+            ? AppRoutes.driverHomeRoute
+            : AuthServices.firstTimeOnApp()
+            ? AppRoutes.welcomeRoute
+            : AppRoutes.homeRoute;
+
+    Navigator.of(
+      viewContext,
+    ).pushNamedAndRemoveUntil(nextRoute, (Route<dynamic> route) => false);
 
     //
     RemoteMessage? initialMessage =

@@ -6,6 +6,7 @@ import 'package:chaskiy/models/order.dart';
 import 'package:chaskiy/models/user.dart';
 import 'package:chaskiy/requests/auth.request.dart';
 import 'package:chaskiy/requests/order.request.dart';
+import 'package:chaskiy/services/app.service.dart';
 import 'package:chaskiy/services/auth.service.dart';
 import 'package:chaskiy/services/driver_location.service.dart';
 import 'package:chaskiy/services/driver_assignment.service.dart';
@@ -29,24 +30,43 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
   bool _changingAvailability = false;
   Object? _error;
   StreamSubscription<DriverAssignment>? _assignmentSubscription;
+  StreamSubscription<bool>? _refreshSubscription;
+  Timer? _refreshTimer;
   bool _showingAssignment = false;
+
+  /// Cada cuánto se vuelve a pedir la lista.
+  ///
+  /// Una asignación hecha a mano desde el panel no manda aviso, así que sin
+  /// esto el conductor solo se entera si arrastra la lista hacia abajo.
+  static const _refreshInterval = Duration(seconds: 20);
 
   @override
   void initState() {
     super.initState();
     _assignmentSubscription = DriverAssignmentService.instance.assignments
         .listen(_showAssignment);
+    _refreshSubscription = AppService().refreshAssignedOrders.listen(
+      (_) => _load(silent: true),
+    );
+    _refreshTimer = Timer.periodic(
+      _refreshInterval,
+      (_) => _load(silent: true),
+    );
     _load();
   }
 
   @override
   void dispose() {
     _assignmentSubscription?.cancel();
+    _refreshSubscription?.cancel();
+    _refreshTimer?.cancel();
     super.dispose();
   }
 
-  Future<void> _load() async {
-    if (mounted) {
+  /// [silent] evita el indicador de carga: las recargas de fondo no deben
+  /// hacer parpadear la lista que el conductor está mirando.
+  Future<void> _load({bool silent = false}) async {
+    if (mounted && !silent) {
       setState(() {
         _loading = true;
         _error = null;
@@ -56,10 +76,7 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
       final user = await AuthServices.getCurrentUser();
       final orders = await _orderRequest.getOrders(
         page: 1,
-        params: {
-          'driver_id': user.id,
-          'type': 'assigned',
-        },
+        params: {'driver_id': user.id, 'type': 'assigned'},
       );
       if (!mounted) return;
       setState(() {
@@ -75,9 +92,11 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
         }
       }
     } catch (error) {
-      if (mounted) setState(() => _error = error);
+      //un fallo de red en una recarga de fondo no debe borrar la lista que el
+      //conductor ya tiene en pantalla; el siguiente intento la actualiza
+      if (mounted && !silent) setState(() => _error = error);
     } finally {
-      if (mounted) setState(() => _loading = false);
+      if (mounted && !silent) setState(() => _loading = false);
     }
   }
 
@@ -265,9 +284,9 @@ class _DriverAssignmentSheet extends StatelessWidget {
           children: [
             Text(
               assignment.isTaxi ? 'Nueva carrera' : 'Nuevo pedido',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 16),
             ListTile(

@@ -28,7 +28,11 @@ class _DriverOnboardingPageState extends State<DriverOnboardingPage> {
         return;
       }
       final body = Map<String, dynamic>.from(response.body);
-      if (body['user'] is Map) await AuthServices.saveUser(body['user']);
+      //sin `reload: false` la recarga de configuración reinicia la navegación
+      //y esta pantalla se cierra sola antes de confirmar el envío
+      if (body['user'] is Map) {
+        await AuthServices.saveUser(body['user'], reload: false);
+      }
       await AlertService.success(
         title: 'Solicitud recibida',
         text: 'Revisaremos tu perfil antes de habilitar el modo conductor.',

@@ -165,13 +165,13 @@ class _DriverModeSection extends StatelessWidget {
               approved
                   ? 'Recibe asignaciones con esta misma cuenta'
                   : pending
-                  ? 'Te avisaremos cuando el perfil sea aprobado'
+                  ? 'Toca para consultar si ya fue aprobado'
                   : 'Conserva tu perfil de cliente y solicita acceso',
+          //en revisión también se usa `switchToDriver`: vuelve a preguntarle
+          //al servidor y entra al modo conductor si ya quedó aprobado
           onTap:
-              approved
+              approved || pending
                   ? model.switchToDriver
-                  : pending
-                  ? () {}
                   : model.openDriverOnboarding,
         ),
       ],

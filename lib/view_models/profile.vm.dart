@@ -112,7 +112,7 @@ class ProfileViewModel extends PaymentViewModel {
     );
     if (submitted == true) {
       currentUser = await _authRequest.getMyDetails();
-      await AuthServices.saveUser(currentUser!.toJson());
+      await AuthServices.saveUser(currentUser!.toJson(), reload: false);
       notifyListeners();
     }
   }
@@ -120,7 +120,13 @@ class ProfileViewModel extends PaymentViewModel {
   Future<void> switchToDriver() async {
     try {
       final user = await _authRequest.getMyDetails();
-      await AuthServices.saveUser(user.toJson());
+      //`reload: false` a propósito: recargar la configuración desde aquí
+      //reinicia la navegación y deja al usuario otra vez en la app de cliente
+      await AuthServices.saveUser(user.toJson(), reload: false);
+      //el permiso se decide con lo que responde el servidor, así que la
+      //tarjeta del perfil tiene que quedar mostrando lo mismo
+      currentUser = user;
+      notifyListeners();
       if (!user.driverAccessApproved) {
         await AlertService.error(
           title: 'Acceso pendiente',
@@ -129,9 +135,15 @@ class ProfileViewModel extends PaymentViewModel {
         return;
       }
       await SessionService.setActiveRole(AppRole.driver, user: user);
-      await FirebaseMessaging.instance.subscribeToTopic('d_${user.id}');
+      //las notificaciones son secundarias: si la suscripción falla el cambio
+      //de modo igual debe completarse
+      try {
+        await FirebaseMessaging.instance.subscribeToTopic('d_${user.id}');
+      } catch (error) {
+        print("Unable to subscribe to:: d_${user.id}");
+      }
       if (viewContext.mounted) {
-        Navigator.of(viewContext).pushAndRemoveUntil(
+        Navigator.of(viewContext, rootNavigator: true).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const DriverHomePage()),
           (_) => false,
         );

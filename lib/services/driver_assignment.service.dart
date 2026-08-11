@@ -28,7 +28,15 @@ class DriverAssignmentService {
     final user = await AuthServices.getCurrentUser();
     if (!user.isOnline) return;
 
-    await FirebaseMessaging.instance.subscribeToTopic('d_${user.id}');
+    //el tema de FCM solo adelanta el aviso; quien realmente trae las
+    //asignaciones es el sondeo de abajo. Si no hay token de notificaciones
+    //(permiso denegado, o APNs que todavía no registra en iOS) el conductor
+    //igual tiene que poder ponerse en línea.
+    try {
+      await FirebaseMessaging.instance.subscribeToTopic('d_${user.id}');
+    } catch (error) {
+      print("Unable to subscribe to:: d_${user.id}");
+    }
     await _poll();
     _pollTimer = Timer.periodic(const Duration(seconds: 5), (_) => _poll());
     _notificationSubscription = AppService().refreshAssignedOrders.listen((_) {
