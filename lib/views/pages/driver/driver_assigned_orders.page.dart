@@ -5,6 +5,7 @@ import 'package:chaskiy/models/driver_assignment.dart';
 import 'package:chaskiy/models/order.dart';
 import 'package:chaskiy/models/user.dart';
 import 'package:chaskiy/requests/auth.request.dart';
+import 'package:chaskiy/requests/driver_vehicle.request.dart';
 import 'package:chaskiy/requests/order.request.dart';
 import 'package:chaskiy/services/app.service.dart';
 import 'package:chaskiy/services/auth.service.dart';
@@ -24,6 +25,7 @@ class DriverAssignedOrdersPage extends StatefulWidget {
 class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
   final OrderRequest _orderRequest = OrderRequest();
   final AuthRequest _authRequest = AuthRequest();
+  final DriverVehicleRequest _vehicleRequest = DriverVehicleRequest();
   List<Order> _orders = const [];
   User? _user;
   bool _loading = true;
@@ -85,6 +87,7 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
       });
       if (user.isOnline) {
         try {
+          await _ensureReadyToReceive();
           await DriverLocationService.instance.start();
           await DriverAssignmentService.instance.start();
         } catch (error) {
@@ -110,6 +113,7 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
       await AuthServices.saveUser(_user!.toJson(), reload: false);
       if (value) {
         try {
+          await _ensureReadyToReceive();
           await DriverLocationService.instance.start();
           await DriverAssignmentService.instance.start();
         } catch (error) {
@@ -128,6 +132,18 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
       );
     } finally {
       if (mounted) setState(() => _changingAvailability = false);
+    }
+  }
+
+  Future<void> _ensureReadyToReceive() async {
+    final vehicles = await _vehicleRequest.vehicles();
+    final ready = vehicles.any(
+      (vehicle) => vehicle.isActive && vehicle.isVerified,
+    );
+    if (!ready) {
+      throw const DriverLocationException(
+        'Necesitas un vehículo activo y verificado para recibir solicitudes.',
+      );
     }
   }
 

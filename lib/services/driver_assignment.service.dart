@@ -6,6 +6,7 @@ import 'package:chaskiy/services/session.service.dart';
 import 'package:chaskiy/services/app.service.dart';
 import 'package:chaskiy/requests/order.request.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/services.dart';
 
 class DriverAssignmentService {
   DriverAssignmentService._();
@@ -28,14 +29,11 @@ class DriverAssignmentService {
     final user = await AuthServices.getCurrentUser();
     if (!user.isOnline) return;
 
-    //el tema de FCM solo adelanta el aviso; quien realmente trae las
-    //asignaciones es el sondeo de abajo. Si no hay token de notificaciones
-    //(permiso denegado, o APNs que todavía no registra en iOS) el conductor
-    //igual tiene que poder ponerse en línea.
     try {
       await FirebaseMessaging.instance.subscribeToTopic('d_${user.id}');
-    } catch (error) {
-      print("Unable to subscribe to:: d_${user.id}");
+    } catch (_) {
+      // FCM solo adelanta el aviso. El sondeo API sigue funcionando aunque
+      // no exista token, el permiso esté denegado o APNs aún no esté listo.
     }
     await _poll();
     _pollTimer = Timer.periodic(const Duration(seconds: 5), (_) => _poll());
@@ -67,6 +65,8 @@ class DriverAssignmentService {
     final fingerprint = '${assignment.orderId}:${assignment.expiresAt}';
     if (_lastFingerprint == fingerprint) return;
     _lastFingerprint = fingerprint;
+    SystemSound.play(SystemSoundType.alert);
+    HapticFeedback.vibrate();
     _assignments.add(assignment);
   }
 

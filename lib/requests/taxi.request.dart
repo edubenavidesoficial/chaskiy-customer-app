@@ -12,10 +12,15 @@ class TaxiRequest extends HttpService {
   Future<List<Map<String, dynamic>>> getNearbyDrivers({
     required double latitude,
     required double longitude,
+    int? vehicleTypeId,
   }) async {
     final result = await get(
       Api.nearbyTaxiDrivers,
-      queryParameters: {'latitude': latitude, 'longitude': longitude},
+      queryParameters: {
+        'latitude': latitude,
+        'longitude': longitude,
+        if (vehicleTypeId != null) 'vehicle_type_id': vehicleTypeId,
+      },
       forceRefresh: true,
     );
     final response = ApiResponse.fromResponse(result);

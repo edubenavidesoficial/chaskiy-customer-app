@@ -14,6 +14,7 @@ class DriverLocationService {
 
   final DriverRequest _request = DriverRequest();
   StreamSubscription<Position>? _subscription;
+  Timer? _heartbeatTimer;
   bool _syncing = false;
   DateTime? _lastSync;
   Position? _lastPosition;
@@ -46,17 +47,15 @@ class DriverLocationService {
     final settings = _settings();
     _subscription = Geolocator.getPositionStream(
       locationSettings: settings,
-    ).listen(
-      _onPosition,
-      onError: (_) => stop(),
-      cancelOnError: false,
-    );
+    ).listen(_onPosition, onError: (_) => stop(), cancelOnError: false);
+    _heartbeatTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      final position = _lastPosition;
+      if (position != null) _onPosition(position);
+    });
 
     try {
       await _onPosition(
-        await Geolocator.getCurrentPosition(
-          locationSettings: settings,
-        ),
+        await Geolocator.getCurrentPosition(locationSettings: settings),
       );
     } catch (_) {
       // The continuous stream remains responsible for the first valid fix.
@@ -123,6 +122,8 @@ class DriverLocationService {
   }
 
   Future<void> stop() async {
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
     final subscription = _subscription;
     _subscription = null;
     await subscription?.cancel();

@@ -35,8 +35,9 @@ class DriverVehicleRequest extends HttpService {
     if (!response.allGood) throw response.message ?? 'No se pudo registrar';
     return response;
   }
+
   Future<List<DriverVehicle>> vehicles() async {
-    final result = await get(Api.driverVehicles);
+    final result = await get(Api.driverVehicles, forceRefresh: true);
     final response = ApiResponse.fromResponse(result);
     if (!response.allGood) throw response.message ?? 'No se pudieron cargar';
 

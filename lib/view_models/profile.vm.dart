@@ -135,12 +135,10 @@ class ProfileViewModel extends PaymentViewModel {
         return;
       }
       await SessionService.setActiveRole(AppRole.driver, user: user);
-      //las notificaciones son secundarias: si la suscripción falla el cambio
-      //de modo igual debe completarse
       try {
         await FirebaseMessaging.instance.subscribeToTopic('d_${user.id}');
-      } catch (error) {
-        print("Unable to subscribe to:: d_${user.id}");
+      } catch (_) {
+        // El sondeo API garantiza las asignaciones aunque FCM falle.
       }
       if (viewContext.mounted) {
         Navigator.of(viewContext, rootNavigator: true).pushAndRemoveUntil(

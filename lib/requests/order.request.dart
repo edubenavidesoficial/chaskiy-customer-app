@@ -9,7 +9,9 @@ import 'package:chaskiy/models/driver_assignment.dart';
 
 class OrderRequest extends HttpService {
   Future<DriverAssignment?> getPendingDriverAssignment() async {
-    final result = await get(Api.pendingDriverAssignment);
+    // This endpoint is real-time state. Caching a previous null response makes
+    // every five-second poll return "no assignment" for several minutes.
+    final result = await get(Api.pendingDriverAssignment, forceRefresh: true);
     final response = ApiResponse.fromResponse(result);
     if (!response.allGood) {
       throw response.message ?? 'No se pudo consultar la asignación';

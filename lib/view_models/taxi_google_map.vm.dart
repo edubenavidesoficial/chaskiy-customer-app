@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_place_picker_mb_v2/google_maps_place_picker.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:http/http.dart' as http;
 // import 'package:geocoder/geocoder.dart';
 
 class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
@@ -51,6 +53,8 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
   BitmapDescriptor? sourceIcon;
   BitmapDescriptor? destinationIcon;
   BitmapDescriptor? driverIcon;
+  BitmapDescriptor? nearbyDriverIcon;
+  int? nearbyVehicleTypeId;
   //END MAP RELATED VARIABLES
 
   //step 1
@@ -110,6 +114,7 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
       final drivers = await TaxiRequest().getNearbyDrivers(
         latitude: position.latitude,
         longitude: position.longitude,
+        vehicleTypeId: nearbyVehicleTypeId,
       );
       gMapMarkers.removeWhere(
         (marker) => marker.markerId.value.startsWith('nearbyDriver_'),
@@ -123,7 +128,7 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
             markerId: MarkerId('nearbyDriver_${driver['id']}'),
             position: LatLng(lat, lng),
             icon:
-                driverIcon ??
+                nearbyDriverIcon ??
                 BitmapDescriptor.defaultMarkerWithHue(
                   BitmapDescriptor.hueOrange,
                 ),
@@ -167,6 +172,12 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     driverIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.5),
       AppImages.driverCar,
+    );
+    nearbyDriverIcon = await BitmapDescriptor.asset(
+      const ImageConfiguration(),
+      AppImages.driverCar,
+      width: 38,
+      height: 38,
     );
   }
 
@@ -413,6 +424,9 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     }
     //get the points from the result
     List<PointLatLng> result = polylineResult?.points ?? const [];
+    if (result.isEmpty) {
+      result = await _getRoutePointsFromRoutesApi();
+    }
     //
     if (result.isNotEmpty) {
       // loop through all PointLatLng points and convert them
@@ -458,6 +472,56 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     );
     //
     notifyListeners();
+  }
+
+  Future<List<PointLatLng>> _getRoutePointsFromRoutesApi() async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse(
+              'https://routes.googleapis.com/directions/v2:computeRoutes',
+            ),
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Goog-Api-Key': AppStrings.googleMapApiKey,
+              'X-Goog-FieldMask': 'routes.polyline.encodedPolyline',
+            },
+            body: jsonEncode({
+              'origin': {
+                'location': {
+                  'latLng': {
+                    'latitude': pickupLocation!.latitude,
+                    'longitude': pickupLocation!.longitude,
+                  },
+                },
+              },
+              'destination': {
+                'location': {
+                  'latLng': {
+                    'latitude': dropoffLocation!.latitude,
+                    'longitude': dropoffLocation!.longitude,
+                  },
+                },
+              },
+              'travelMode': 'DRIVE',
+              'routingPreference': 'TRAFFIC_AWARE',
+            }),
+          )
+          .timeout(const Duration(seconds: 12));
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        return const [];
+      }
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      final routes = body['routes'];
+      if (routes is! List || routes.isEmpty) return const [];
+      final polyline = routes.first['polyline'];
+      if (polyline is! Map) return const [];
+      final encoded = polyline['encodedPolyline']?.toString();
+      if (encoded == null || encoded.isEmpty) return const [];
+      return polylinePoints.decodePolyline(encoded);
+    } catch (_) {
+      return const [];
+    }
   }
 
   Future<void> updateCameraLocation(

@@ -28,6 +28,9 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   TextEditingController tripReviewTEC = TextEditingController();
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   StreamSubscription? tripUpdateStream;
+  Timer? tripPollingTimer;
+  Timer? driverLocationPollingTimer;
+  bool _refreshingTrip = false;
 
   LatLng? driverPosition;
   double driverPositionRotation = 0;
@@ -44,6 +47,8 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   @override
   dispose() {
     tripUpdateStream?.cancel();
+    tripPollingTimer?.cancel();
+    driverLocationPollingTimer?.cancel();
     driverLocationStream?.cancel();
     OrderDetailsWebsocketService().disconnect();
     super.dispose();
@@ -197,6 +202,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     setCurrentStep(3);
     //foudz
     loadTripUIByOrderStatus();
+    _startTripPolling();
     if (onGoingOrderTrip?.driverId != null) {
       startDriverDetailsListener();
     }
@@ -264,6 +270,39 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     //start order details listening stream
   }
 
+  void _startTripPolling() {
+    tripPollingTimer?.cancel();
+    _refreshTripFromApi();
+    tripPollingTimer = Timer.periodic(
+      const Duration(seconds: 4),
+      (_) => _refreshTripFromApi(),
+    );
+  }
+
+  Future<void> _refreshTripFromApi() async {
+    if (_refreshingTrip || onGoingOrderTrip == null) return;
+    _refreshingTrip = true;
+    try {
+      final previousDriverId = onGoingOrderTrip?.driverId;
+      final previousStatus = onGoingOrderTrip?.status;
+      final refreshedTrip = await taxiRequest.getOnGoingTrip();
+      if (refreshedTrip == null) return;
+      onGoingOrderTrip = refreshedTrip;
+      final driverAssigned =
+          previousDriverId == null && refreshedTrip.driverId != null;
+      final statusChanged = previousStatus != refreshedTrip.status;
+      if (driverAssigned) startDriverDetailsListener();
+      if (driverAssigned || statusChanged) {
+        loadTripUIByOrderStatus();
+      }
+      notifyListeners();
+    } catch (_) {
+      // The next interval retries. Firestore/WebSocket remain optional hints.
+    } finally {
+      _refreshingTrip = false;
+    }
+  }
+
   //DRIVER SECTION
   loadDriverDetails() async {
     try {
@@ -322,29 +361,31 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
         },
       );
     } else {
-      //este método se llama en cada evento del viaje: sin cancelar el anterior
-      //quedaban varios listeners abiertos sobre el mismo conductor
-      driverLocationStream?.cancel();
-      driverLocationStream = firebaseFirestore
-          .collection("drivers")
-          .doc("${onGoingOrderTrip?.driverId}")
-          .snapshots()
-          .listen((event) {
-            //
-            if (!event.exists) {
-              return;
-            }
-            //
-            driverPosition = LatLng(
-              event.data()?["lat"],
-              event.data()?["long"],
-            );
-            driverPositionRotation = double.parse(
-              (event.data()?["rotation"] ?? 0).toString(),
-            );
-            updateDriverMarkerPosition();
-            startZoomFocusDriver();
-          });
+      driverLocationPollingTimer?.cancel();
+      _refreshDriverLocationFromApi();
+      driverLocationPollingTimer = Timer.periodic(
+        const Duration(seconds: 5),
+        (_) => _refreshDriverLocationFromApi(),
+      );
+    }
+  }
+
+  Future<void> _refreshDriverLocationFromApi() async {
+    final orderId = onGoingOrderTrip?.id;
+    if (orderId == null) return;
+    try {
+      final response = await OrderRequest().syncDriverLocation(orderId);
+      final location = response.body['location'];
+      if (location is! Map) return;
+      final lat = double.tryParse('${location['lat']}');
+      final lng = double.tryParse('${location['lng']}');
+      if (lat == null || lng == null) return;
+      driverPosition = LatLng(lat, lng);
+      driverPositionRotation = double.tryParse('${location['rotation']}') ?? 0;
+      updateDriverMarkerPosition();
+      startZoomFocusDriver();
+    } catch (_) {
+      // The driver may not have published the first location yet.
     }
   }
 
@@ -353,6 +394,8 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
       await OrderDriverLocationWebsocketService().disconnect();
     }
     driverLocationStream?.cancel();
+    driverLocationPollingTimer?.cancel();
+    driverLocationPollingTimer = null;
     driverLocationStream = null;
     notifyListeners();
   }
@@ -422,6 +465,10 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   //
   stopAllListeners() async {
     tripUpdateStream?.cancel();
+    tripPollingTimer?.cancel();
+    tripPollingTimer = null;
+    driverLocationPollingTimer?.cancel();
+    driverLocationPollingTimer = null;
     driverLocationStream?.cancel();
 
     if (AppStrings.useWebsocketAssignment) {

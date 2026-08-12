@@ -173,6 +173,8 @@ class TaxiViewModel extends TripTaxiViewModel {
   //
   changeSelectedVehicleType(VehicleType vehicleType) {
     selectedVehicleType = vehicleType;
+    nearbyVehicleTypeId = vehicleType.id;
+    loadNearbyDrivers();
     // resortVehicleTypes();
     calculateTotalAmount();
     //new feature
