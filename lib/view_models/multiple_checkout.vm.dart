@@ -35,11 +35,12 @@ class MultipleCheckoutViewModel extends CheckoutBaseViewModel {
   //
   fetchVendorsDetails() async {
     //
-    vendors = CartServices.productsInCart
-        .map((e) => e.product!.vendor)
-        .toList()
-        .toSet()
-        .toList();
+    vendors =
+        CartServices.productsInCart
+            .map((e) => e.product!.vendor)
+            .toList()
+            .toSet()
+            .toList();
 
     vendors = vendors.distinctBy((model) => model.id).toList();
     //
@@ -48,9 +49,7 @@ class MultipleCheckoutViewModel extends CheckoutBaseViewModel {
       for (var i = 0; i < vendors.length; i++) {
         vendors[i] = await vendorRequest.vendorDetails(
           vendors[i].id,
-          params: {
-            "type": "brief",
-          },
+          params: {"type": "brief"},
         );
       }
     } catch (error) {
@@ -83,7 +82,8 @@ class MultipleCheckoutViewModel extends CheckoutBaseViewModel {
       checkout!.tax = totalTax;
       checkout!.subTotal = subtotals.sum();
       //total
-      checkout!.total = (checkout!.subTotal - checkout!.discount) +
+      checkout!.total =
+          (checkout!.subTotal - checkout!.discount) +
           totalDeliveryFee +
           checkout!.tax;
       //totalfees
@@ -98,13 +98,14 @@ class MultipleCheckoutViewModel extends CheckoutBaseViewModel {
     notifyListeners();
   }
 
-//calcualte for each vendor and prepare jsonobject for checkout
+  //calcualte for each vendor and prepare jsonobject for checkout
   updateOrderData(Vendor mVendor, int index) async {
     //
     //generate order summary
-    List<Cart> vendorCartItems = CartServices.productsInCart
-        .where((e) => e.product!.vendor.id == mVendor.id)
-        .toList();
+    List<Cart> vendorCartItems =
+        CartServices.productsInCart
+            .where((e) => e.product!.vendor.id == mVendor.id)
+            .toList();
     List vendorProducts = vendorCartItems.map((e) => e.toCheckout()).toList();
     Map<String, dynamic> payload = {
       "pickup": isPickup ? 1 : 0,
@@ -180,7 +181,7 @@ class MultipleCheckoutViewModel extends CheckoutBaseViewModel {
     }
   }
 
-//
+  //
   @override
   processOrderPlacement() async {
     //process the order placement
@@ -202,25 +203,17 @@ class MultipleCheckoutViewModel extends CheckoutBaseViewModel {
         checkout!,
         tip: driverTipTEC.text,
         note: noteTEC.text,
-        payload: {
-          "data": vendorsOrderData,
-        },
+        payload: {"data": vendorsOrderData},
       );
       //not error
       if (apiResponse.allGood) {
         //any payment
-        await AlertService.success(
-          title: "Checkout".tr(),
-          text: apiResponse.message,
-        );
+        await AlertService.success(text: apiResponse.message);
         showOrdersTab(context: viewContext);
         if (Navigator.canPop(viewContext)) {
-          Navigator.of(viewContext).popUntil(
-            (route) {
-              return route.settings.name == AppRoutes.homeRoute ||
-                  route.isFirst;
-            },
-          );
+          Navigator.of(viewContext).popUntil((route) {
+            return route.settings.name == AppRoutes.homeRoute || route.isFirst;
+          });
         }
       } else {
         await AlertService.error(

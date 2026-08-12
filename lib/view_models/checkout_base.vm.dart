@@ -9,6 +9,7 @@ import 'package:chaskiy/models/vendor.dart';
 import 'package:chaskiy/models/payment_method.dart';
 import 'package:chaskiy/requests/checkout.request.dart';
 import 'package:chaskiy/requests/delivery_address.request.dart';
+import 'package:chaskiy/requests/order.request.dart';
 import 'package:chaskiy/requests/vendor.request.dart';
 import 'package:chaskiy/requests/payment_method.request.dart';
 import 'package:chaskiy/services/alert.service.dart';
@@ -28,6 +29,7 @@ class CheckoutBaseViewModel extends PaymentViewModel {
   PaymentMethodRequest paymentOptionRequest = PaymentMethodRequest();
 
   VendorRequest vendorRequest = VendorRequest();
+  OrderRequest orderRequest = OrderRequest();
   TextEditingController driverTipTEC = TextEditingController();
   TextEditingController noteTEC = TextEditingController();
 
@@ -107,8 +109,7 @@ class CheckoutBaseViewModel extends PaymentViewModel {
     try {
       //
       checkout!.deliveryAddress =
-          deliveryAddress = await deliveryAddressRequest
-              .preselectedDeliveryAddress(vendorId: vendor?.id);
+          deliveryAddress = await preselectDeliveryAddress();
 
       if (checkout?.deliveryAddress != null) {
         //
@@ -119,6 +120,23 @@ class CheckoutBaseViewModel extends PaymentViewModel {
       print("Error Fetching preselected Address ==> $error");
     }
     setBusyForObject(deliveryAddress, false);
+  }
+
+  /// Dirección con la que se abre el checkout.
+  ///
+  /// El backend solo devuelve la marcada como predeterminada y esa marca es
+  /// opcional al guardar, así que quien nunca la activó llegaba al checkout
+  /// sin dirección. Cuando no hay predeterminada se usa la primera de la
+  /// lista, que el backend ordena por cercanía al vendedor.
+  Future<DeliveryAddress?> preselectDeliveryAddress() async {
+    final defaultAddress = await deliveryAddressRequest
+        .preselectedDeliveryAddress(vendorId: vendor?.id);
+    if (defaultAddress != null) return defaultAddress;
+
+    final addresses = await deliveryAddressRequest.getDeliveryAddresses(
+      vendorId: vendor?.id,
+    );
+    return addresses.isEmpty ? null : addresses.first;
   }
 
   //
@@ -415,34 +433,40 @@ class CheckoutBaseViewModel extends PaymentViewModel {
       }
       //cash payment
       else {
-        await AlertService.success(
-          title: "Checkout".tr(),
-          text: apiResponse.message,
-          confirmBtnText: "Ok".tr(),
-          barrierDismissible: false,
-          onConfirm: () async {
-            await Navigator.of(viewContext).pushNamedAndRemoveUntil(
-              AppRoutes.homeRoute,
-              (route) {
-                return route.isFirst;
-              },
-            );
-            showOrdersTab(context: viewContext);
-
-            // viewContext.pop(true);
-            // if (Navigator.of(viewContext).canPop()) {
-            //   Navigator.of(viewContext).popUntil(
-            //     (route) => route == AppRoutes.homeRoute || route.isFirst,
-            //   );
-            // }
-          },
-        );
+        AlertService.success(text: apiResponse.message);
+        await openNewOrderDetails();
       }
     } else {
       AlertService.error(title: "Checkout".tr(), text: apiResponse.message);
     }
     setBusy(false);
     CartServices.refreshState();
+  }
+
+  /// Saca al usuario del checkout apenas se crea el pedido.
+  ///
+  /// El aviso de éxito es un SnackBar y no bloquea, así que la salida no puede
+  /// depender de que lo toquen: si no, la pantalla de confirmación queda
+  /// activa y el pedido se puede enviar dos veces.
+  ///
+  /// `POST /orders` solo devuelve el mensaje, no el pedido, por eso primero se
+  /// deja el checkout y recién después se consulta el último pedido para abrir
+  /// su detalle. Si esa consulta falla, el usuario ya está en la pestaña de
+  /// pedidos.
+  Future<void> openNewOrderDetails() async {
+    final navigator = Navigator.of(viewContext);
+    showOrdersTab(context: viewContext);
+
+    try {
+      final orders = await orderRequest.getOrders(page: 1);
+      if (orders.isEmpty) return;
+      await navigator.pushNamed(
+        AppRoutes.orderDetailsRoute,
+        arguments: orders.first,
+      );
+    } catch (error) {
+      print("No se pudo abrir el detalle del pedido ==> $error");
+    }
   }
 
   //

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/services/app.service.dart';
@@ -5,9 +7,9 @@ import 'package:localize_and_translate/localize_and_translate.dart';
 
 /// Punto único para mensajes de la aplicación.
 ///
-/// Los estados cotidianos usan SnackBar y no interrumpen la navegación. Los
-/// diálogos se reservan para confirmaciones y operaciones que realmente deben
-/// bloquear la interfaz.
+/// Los estados cotidianos usan un aviso flotante superior que no interrumpe la
+/// navegación. Los diálogos se reservan para confirmaciones y operaciones que
+/// realmente deben bloquear la interfaz.
 class AlertService {
   static String? _translated(String? value) => value?.tr();
 
@@ -142,6 +144,8 @@ class AlertService {
     onConfirm: onConfirm,
   );
 
+  static _ToastHandle? _currentToast;
+
   static Future<bool> _showMessage({
     String? title,
     String? text,
@@ -150,37 +154,35 @@ class AlertService {
     String? actionLabel,
     Function? onAction,
   }) async {
-    final context = _context;
-    if (context == null) return false;
+    final overlay = AppService().navigatorKey.currentState?.overlay;
+    if (overlay == null) return false;
 
-    final message = [
-      if (title != null && title.isNotEmpty) _translated(title),
-      if (text != null && text.isNotEmpty) _translated(text),
-    ].whereType<String>().join(': ');
+    //un solo aviso a la vez: el anterior se va sin animación
+    _currentToast?.remove();
+    _currentToast = null;
 
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.hideCurrentSnackBar();
-    messenger.showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: color,
-        content: Row(
-          children: [
-            Icon(icon, color: Colors.white),
-            const SizedBox(width: 12),
-            Expanded(child: Text(message)),
-          ],
-        ),
-        action:
-            onAction == null
-                ? null
-                : SnackBarAction(
-                  label: (actionLabel ?? 'Ok').tr(),
-                  textColor: Colors.white,
-                  onPressed: () => onAction(),
-                ),
-      ),
+    late final OverlayEntry entry;
+    late final _ToastHandle handle;
+
+    entry = OverlayEntry(
+      builder:
+          (_) => _AppToast(
+            title: (title == null || title.isEmpty) ? null : _translated(title),
+            text: (text == null || text.isEmpty) ? null : _translated(text),
+            color: color,
+            icon: icon,
+            actionLabel: onAction == null ? null : (actionLabel ?? 'Ok').tr(),
+            onAction: onAction,
+            onDismissed: () {
+              handle.remove();
+              if (identical(_currentToast, handle)) _currentToast = null;
+            },
+          ),
     );
+    handle = _ToastHandle(entry);
+
+    _currentToast = handle;
+    overlay.insert(entry);
     return true;
   }
 
@@ -259,3 +261,224 @@ class AlertService {
 }
 
 enum AlertType { success, error, warning, confirm, info, loading, custom }
+
+/// Referencia al aviso en pantalla, para poder quitarlo una sola vez.
+class _ToastHandle {
+  _ToastHandle(this._entry);
+
+  final OverlayEntry _entry;
+  bool _removed = false;
+
+  void remove() {
+    if (_removed) return;
+    _removed = true;
+    _entry.remove();
+  }
+}
+
+/// Aviso flotante que baja desde el borde superior.
+///
+/// Va arriba y no abajo porque en el checkout el borde inferior lo ocupa el
+/// botón de pedido: el aviso lo tapaba justo cuando había que leerlo. La barra
+/// inferior muestra cuánto le queda antes de irse solo.
+class _AppToast extends StatefulWidget {
+  const _AppToast({
+    required this.color,
+    required this.icon,
+    required this.onDismissed,
+    this.title,
+    this.text,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  final Color color;
+  final IconData icon;
+  final VoidCallback onDismissed;
+  final String? title;
+  final String? text;
+  final String? actionLabel;
+  final Function? onAction;
+
+  @override
+  State<_AppToast> createState() => _AppToastState();
+}
+
+class _AppToastState extends State<_AppToast>
+    with SingleTickerProviderStateMixin {
+  static const _visibleDuration = Duration(seconds: 5);
+
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 340),
+    reverseDuration: const Duration(milliseconds: 220),
+  );
+
+  late final Animation<double> _curve = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.easeOutBack,
+    reverseCurve: Curves.easeInCubic,
+  );
+
+  Timer? _autoDismiss;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.forward();
+    _autoDismiss = Timer(_visibleDuration, _dismiss);
+  }
+
+  @override
+  void dispose() {
+    _autoDismiss?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _dismiss() async {
+    _autoDismiss?.cancel();
+    if (!mounted) return;
+    await _controller.reverse();
+    if (!mounted) return;
+    widget.onDismissed();
+  }
+
+  void _runAction() {
+    widget.onAction?.call();
+    _dismiss();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final topInset = MediaQuery.paddingOf(context).top;
+
+    return Positioned(
+      top: topInset + 8,
+      left: 12,
+      right: 12,
+      child: SlideTransition(
+        position: Tween(
+          begin: const Offset(0, -1.4),
+          end: Offset.zero,
+        ).animate(_curve),
+        child: FadeTransition(
+          opacity: _controller,
+          child: Material(
+            color: Colors.transparent,
+            child: Dismissible(
+              key: const ValueKey('app-toast'),
+              direction: DismissDirection.up,
+              onDismissed: (_) => widget.onDismissed(),
+              child: _card(theme, scheme),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _card(ThemeData theme, ColorScheme scheme) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Color.alphaBlend(
+          widget.color.withValues(alpha: .12),
+          scheme.surface,
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: widget.color.withValues(alpha: .40)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: .22),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 14, 10, 14),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: widget.color.withValues(alpha: .20),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(widget.icon, color: widget.color, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(child: _messageText(theme, scheme)),
+                  if (widget.actionLabel != null) ...[
+                    const SizedBox(width: 4),
+                    TextButton(
+                      onPressed: _runAction,
+                      style: TextButton.styleFrom(
+                        foregroundColor: widget.color,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                      ),
+                      child: Text(widget.actionLabel!),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            //cuánto le queda al aviso antes de irse solo
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 1, end: 0),
+              duration: _visibleDuration,
+              builder:
+                  (_, value, _) => LinearProgressIndicator(
+                    value: value,
+                    minHeight: 3,
+                    backgroundColor: Colors.transparent,
+                    color: widget.color.withValues(alpha: .70),
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _messageText(ThemeData theme, ColorScheme scheme) {
+    final title = widget.title;
+    final text = widget.text;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (title != null)
+          Text(
+            title,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: scheme.onSurface,
+            ),
+          ),
+        if (text != null)
+          Padding(
+            padding: EdgeInsets.only(top: title == null ? 0 : 2),
+            child: Text(
+              text,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                height: 1.25,
+                color: scheme.onSurface.withValues(
+                  alpha: title == null ? 1 : .78,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
