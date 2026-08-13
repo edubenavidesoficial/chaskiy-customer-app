@@ -36,22 +36,31 @@ class OrderRequest extends HttpService {
 
     //
     final apiResponse = ApiResponse.fromResponse(apiResult);
-    if (apiResponse.allGood) {
-      List<Order> orders = [];
-      List<dynamic> jsonArray =
-          (apiResponse.body is List) ? apiResponse.body : apiResponse.data;
-      for (var jsonObject in jsonArray) {
-        try {
-          orders.add(Order.fromJson(jsonObject));
-        } catch (e) {
-          print(e);
-        }
-      }
-
-      return orders;
-    } else {
+    if (!apiResponse.allGood) {
       throw apiResponse.message!;
     }
+
+    List<Order> orders = [];
+    List<dynamic> jsonArray =
+        (apiResponse.body is List) ? apiResponse.body : apiResponse.data;
+    Object? parseError;
+    for (var jsonObject in jsonArray) {
+      //un pedido con un dato raro no puede tumbar la lista entera
+      try {
+        orders.add(Order.fromJson(jsonObject));
+      } catch (error) {
+        parseError ??= error;
+        print("Error leyendo un pedido ==> $error");
+      }
+    }
+
+    //el servidor mandó pedidos y no se pudo leer ninguno: eso es una falla, no
+    //una lista vacía, y como tal tiene que verse en pantalla
+    if (orders.isEmpty && jsonArray.isNotEmpty) {
+      throw "No se pudieron leer los pedidos: $parseError";
+    }
+
+    return orders;
   }
 
   //

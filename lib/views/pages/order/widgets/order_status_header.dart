@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:chaskiy/constants/app_colors.dart';
-import 'package:chaskiy/utils/ui_spacer.dart';
+import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/view_models/order_details.vm.dart';
-import 'package:chaskiy/widgets/custom_image.view.dart';
-import 'package:jiffy/jiffy.dart';
-import 'package:localize_and_translate/localize_and_translate.dart';
-import 'package:velocity_x/velocity_x.dart';
 import 'package:chaskiy/views/pages/order/widgets/order_details_card.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
+import 'package:chaskiy/widgets/order_status_chip.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 class OrderStatusHeader extends StatelessWidget {
   const OrderStatusHeader({required this.vm, Key? key}) : super(key: key);
@@ -16,39 +14,52 @@ class OrderStatusHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final mutedStyle = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+
     return OrderDetailsCard(
-      child: HStack(
-        [
-          // vendor logo securely contained
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           CustomImage(
-            imageUrl: vm.order.vendor!.logo,
-            width: 50,
-            height: 50,
-          ).box.roundedSM.clip(Clip.antiAlias).make(),
-          
-          UiSpacer.horizontalSpace(),
-          
-          VStack([
-            "${vm.order.status.tr().capitalized}"
-                .text
-                .semiBold
-                .xl
-                .color(AppColor.getStausColor(vm.order.status))
-                .make(),
-            "${Jiffy.parseFromDateTime(vm.order.updatedAt).format(pattern: 'MMM dd, yyyy \| HH:mm')}"
-                .text
-                .light
-                .sm
-                .make(),
-            "#${vm.order.code}".text.xs.gray400.make(),
-          ]).expand(),
-          
-          // qr code verification icon if required
+            imageUrl: vm.order.vendor?.logo,
+            width: 56,
+            height: 56,
+          ).cornerRadius(14),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  vm.order.vendor?.name ?? "",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text("#${vm.order.code}", style: mutedStyle),
+                Text(Utils.orderDate(vm.order.updatedAt), style: mutedStyle),
+                const SizedBox(height: 10),
+                OrderStatusChip(vm.order.status),
+              ],
+            ),
+          ),
+          //código de verificación: el repartidor lo escanea al entregar
           if (!vm.order.isTaxi && !vm.order.isSerice)
-            Icon(FlutterIcons.qrcode_ant, size: 28)
-                .onInkTap(vm.showVerificationQRCode),
+            IconButton(
+              onPressed: vm.showVerificationQRCode,
+              icon: const Icon(FlutterIcons.qrcode_ant, size: 22),
+              style: IconButton.styleFrom(
+                backgroundColor: theme.colorScheme.surfaceContainerHigh,
+                foregroundColor: theme.colorScheme.onSurface,
+              ),
+            ),
         ],
-        crossAlignment: CrossAxisAlignment.center,
       ),
     );
   }

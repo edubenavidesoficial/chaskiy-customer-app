@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/app_ui_settings.dart';
 import 'package:chaskiy/utils/ui_spacer.dart';
 import 'package:chaskiy/view_models/order_details.vm.dart';
-import 'package:chaskiy/widgets/buttons/custom_button.dart';
+import 'package:chaskiy/widgets/buttons/contact_icon_button.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 class OrderDetailsDriverInfoView extends StatelessWidget {
   const OrderDetailsDriverInfoView(this.vm, {Key? key}) : super(key: key);
@@ -14,52 +12,54 @@ class OrderDetailsDriverInfoView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return vm.order.driver != null
-        ? VStack([
-          vm.order.driver != null
-              ? HStack([
-                //
-                VStack([
-                  "Driver".tr().text.medium.make(),
-                  "${vm.order.driver?.name}".text.medium.xl.make().pOnly(
-                    bottom: Vx.dp20,
-                  ),
-                ]).expand(),
-                //call
-                Visibility(
-                  visible:
-                      vm.order.canChatDriver && AppUISettings.canCallDriver,
-                  child:
-                      CustomButton(
-                        icon: FlutterIcons.phone_call_fea,
-                        iconColor: Colors.white,
-                        color: AppColor.primaryColor,
-                        shapeRadius: Vx.dp48,
-                        onPressed: vm.callDriver,
-                      ).wh(Vx.dp64, Vx.dp40).p12(),
-                ),
-              ])
-              : UiSpacer.emptySpace(),
-          if (vm.order.canChatDriver && AppUISettings.canDriverChat)
-            CustomButton(
-              icon: FlutterIcons.chat_ent,
-              iconColor: Colors.white,
-              title: "Chat with driver".tr(),
-              color: AppColor.primaryColor,
-              onPressed: vm.chatDriver,
-            ).h(Vx.dp48).pOnly(top: Vx.dp12, bottom: Vx.dp20),
+    if (vm.order.driver == null) return UiSpacer.emptySpace();
 
-          //rate driver
-          vm.order.canRateDriver
-              ? CustomButton(
-                icon: FlutterIcons.rate_review_mdi,
-                iconColor: Colors.white,
-                title: "Rate The Driver".tr(),
-                color: AppColor.primaryColor,
-                onPressed: vm.rateDriver,
-              ).h(Vx.dp48).pOnly(top: Vx.dp12, bottom: Vx.dp20)
-              : UiSpacer.emptySpace(),
-        ]).px(20)
-        : UiSpacer.emptySpace();
+    final theme = Theme.of(context);
+    final canCall = vm.order.canChatDriver && AppUISettings.canCallDriver;
+    final canChat = vm.order.canChatDriver && AppUISettings.canDriverChat;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                "${vm.order.driver?.name}",
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            if (canCall)
+              ContactIconButton(
+                icon: FlutterIcons.phone_call_fea,
+                onPressed: vm.callDriver,
+              ),
+            if (canChat) ...[
+              const SizedBox(width: 8),
+              ContactIconButton(
+                icon: FlutterIcons.chat_ent,
+                onPressed: vm.chatDriver,
+              ),
+            ],
+          ],
+        ),
+
+        if (vm.order.canRateDriver) ...[
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: vm.rateDriver,
+              icon: const Icon(FlutterIcons.rate_review_mdi, size: 18),
+              label: Text("Rate The Driver".tr()),
+            ),
+          ),
+        ],
+      ],
+    );
   }
 }

@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:chaskiy/extensions/dynamic.dart';
 import 'package:chaskiy/extensions/string.dart';
 import 'package:chaskiy/models/order.dart';
 import 'package:chaskiy/models/order_product.dart';
 import 'package:chaskiy/constants/app_strings.dart';
-import 'package:chaskiy/utils/ui_spacer.dart';
 import 'package:chaskiy/views/pages/order/widgets/order_digitial_product_download.dart';
 import 'package:chaskiy/widgets/bottomsheets/order_product_action.bottomsheet.dart';
-import 'package:chaskiy/widgets/buttons/arrow_indicator.dart';
-import 'package:chaskiy/widgets/cards/rounded_container.dart';
 import 'package:chaskiy/widgets/custom_image.view.dart';
-import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class OrderProductListItem extends StatelessWidget {
@@ -22,91 +17,76 @@ class OrderProductListItem extends StatelessWidget {
 
   final OrderProduct orderProduct;
   final Order order;
+
   @override
   Widget build(BuildContext context) {
-    return VStack([
-      //other status
-      if (!order.isCommerce)
-        HStack([
-          RoundedContainer(
-            child: CustomImage(
-              imageUrl: orderProduct.product!.photo,
-              width: 50,
-              height: 50,
-            ),
-          ),
+    final theme = Theme.of(context);
+    final mutedStyle = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+    final quantity = orderProduct.quantity;
+    final unitPrice = orderProduct.price;
 
-          VStack([
-            //
-            "${orderProduct.product!.name}".text.make(),
-            if (orderProduct.options != null)
-              "${orderProduct.options}".text.xs.make(),
-            //
-            5.heightBox,
-            //qty
-            "x ${orderProduct.quantity}".text.bold.make(),
-          ]).px12().expand(),
-          "${AppStrings.currencySymbol}${orderProduct.price}"
-              .currencyFormat()
-              .text
-              .semiBold
-              .make(),
-          //
-        ]),
-
-      //completed order
-      if (order.isCommerce)
-        VStack([
-          HStack([
-            //
-            RoundedContainer(
-              child: CustomImage(
-                imageUrl: orderProduct.product!.photo,
-                width: 60,
-                height: 60,
+    final row = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomImage(
+          imageUrl: orderProduct.product?.photo,
+          width: 52,
+          height: 52,
+        ).cornerRadius(12),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "${orderProduct.product?.name}",
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
+              if (orderProduct.options != null &&
+                  orderProduct.options!.isNotEmpty)
+                Text(
+                  orderProduct.options!,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: mutedStyle,
+                ),
+              const SizedBox(height: 4),
+              //el precio guardado es el de una unidad
+              Text("$quantity × ${_money(unitPrice)}", style: mutedStyle),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          _money(unitPrice * quantity),
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
 
-            VStack([
-              //
-              orderProduct.product!.name.text.maxLines(2).ellipsis.light.make(),
-              if (orderProduct.options.isNotEmptyAndNotNull)
-                orderProduct.options!.text.xs.make(),
-
-              HStack([
-                //qty
-                "Qty: %s"
-                    .tr()
-                    .fill([orderProduct.quantity])
-                    .text
-                    .semiBold
-                    .make(),
-                //
-                UiSpacer.hSpace(15),
-                //price
-                "Price: %s"
-                    .tr()
-                    .fill([
-                      "${AppStrings.currencySymbol}${orderProduct.price}"
-                          .currencyFormat(),
-                    ])
-                    .text
-                    .semiBold
-                    .make(),
-              ]),
-            ]).px12().expand(),
-            //
-            UiSpacer.hSpace(6),
-            ArrowIndicator(size: 26),
-            //
-          ]),
-          UiSpacer.divider().py8(),
-        ]).onInkTap(() => showOrderProductActions(context)),
-
-      //download digital product
-      if (_isDigitalProduct) DigitialProductOrderDownload(order, orderProduct),
-    ], spacing: 15);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        //en comercio se puede volver a pedir o calificar el producto
+        order.isCommerce
+            ? InkWell(onTap: () => showOrderProductActions(context), child: row)
+            : row,
+        if (_isDigitalProduct)
+          DigitialProductOrderDownload(order, orderProduct).pOnly(top: 10),
+      ],
+    );
   }
+
+  String _money(double value) =>
+      "${AppStrings.currencySymbol}$value".currencyFormat();
 
   //
   bool get _isDigitalProduct {

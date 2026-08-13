@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:chaskiy/constants/sizes.dart';
 import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/view_models/order_details.vm.dart';
 import 'package:chaskiy/views/pages/cart/widgets/amount_tile.dart';
@@ -16,95 +15,74 @@ class OrderDetailsItemsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VStack([
-      //order stops view
-      Visibility(
-        visible: vm.order.isPackageDelivery,
-        child: OrderStopsView(vm),
-      ),
+    final theme = Theme.of(context);
+    final mutedStyle = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
 
-      (vm.order.isPackageDelivery
-              ? "Package Details"
-              : vm.order.isSerice
-              ? "Service"
-              : "Products")
-          .tr()
-          .text
-          .semiBold
-          .xl
-          .make()
-          .pOnly(bottom: Vx.dp10),
-
-      if (vm.order.isPackageDelivery)
-        VStack([
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        //paradas del envío de paquete
+        if (vm.order.isPackageDelivery) ...[
+          OrderStopsView(vm),
+          const SizedBox(height: 12),
           AmountTile("Package Type".tr(), "${vm.order.packageType?.name}"),
-          AmountTile("Width".tr(), "${vm.order.width}" + "cm"),
-          AmountTile("Length".tr(), "${vm.order.length}" + "cm"),
-          AmountTile("Height".tr(), "${vm.order.height}" + "cm"),
-          AmountTile("Weight".tr(), "${vm.order.weight}" + "kg"),
-        ], crossAlignment: CrossAxisAlignment.end),
+          AmountTile("Width".tr(), "${vm.order.width} cm"),
+          AmountTile("Length".tr(), "${vm.order.length} cm"),
+          AmountTile("Height".tr(), "${vm.order.height} cm"),
+          AmountTile("Weight".tr(), "${vm.order.weight} kg"),
+        ],
 
-      Visibility(
-        visible: vm.order.isSerice,
-        child: VStack([
-          HStack(
-            [
-              "Service".tr().text.make(),
-              "${vm.order.orderService?.service?.name}".text.semiBold.lg
-                  .make()
-                  .expand(),
-            ],
-            spacing: Sizes.paddingSizeDefault,
-            crossAlignment: CrossAxisAlignment.start,
-          ).py4(),
-          if (vm.order.orderService != null &&
-              vm.order.orderService!.options != null &&
-              vm.order.orderService!.options!.isNotEmpty)
-            VStack([
-              "Options".tr().text.make(),
-              "${vm.order.orderService?.options}".text.medium.sm.make(),
-            ]).py4(),
-
-          //
-          HStack(
-            [
-              "Category".tr().text.make().expand(),
-              "${vm.order.orderService?.service?.category?.name}"
-                  .text
-                  .semiBold
-                  .lg
-                  .make(),
-            ],
-            spacing: Sizes.paddingSizeDefault,
-            crossAlignment: CrossAxisAlignment.start,
+        if (vm.order.isSerice) ...[
+          Text(
+            "${vm.order.orderService?.service?.name}",
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ], crossAlignment: CrossAxisAlignment.end),
-      ),
+          Text(
+            "${vm.order.orderService?.service?.category?.name}",
+            style: mutedStyle,
+          ),
+          if (vm.order.orderService?.options != null &&
+              vm.order.orderService!.options!.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text("${vm.order.orderService?.options}", style: mutedStyle),
+          ],
+        ],
 
-      //
-      if (vm.order.orderProducts != null && vm.order.orderProducts!.isNotEmpty)
-        CustomListView(
-          noScrollPhysics: true,
-          dataSet: vm.order.orderProducts!,
-          itemBuilder: (context, index) {
-            //
-            final orderProduct = vm.order.orderProducts![index];
-            return OrderProductListItem(
-              orderProduct: orderProduct,
-              order: vm.order,
-            );
-          },
-          separatorBuilder:
-              vm.order.isCompleted ? (ctx, index) => 0.squareBox : null,
-        ),
+        //
+        if (vm.order.orderProducts != null &&
+            vm.order.orderProducts!.isNotEmpty)
+          CustomListView(
+            padding: EdgeInsets.zero,
+            noScrollPhysics: true,
+            dataSet: vm.order.orderProducts!,
+            separatorBuilder:
+                (_, __) => Divider(
+                  height: 24,
+                  color: theme.colorScheme.outlineVariant,
+                ),
+            itemBuilder: (context, index) {
+              final orderProduct = vm.order.orderProducts![index];
+              return OrderProductListItem(
+                orderProduct: orderProduct,
+                order: vm.order,
+              );
+            },
+          ),
 
-      //order photo
-      if (vm.order.attachments == null || vm.order.attachments!.isEmpty)
-        if (vm.order.photo != null && !Utils.isDefaultImg(vm.order.photo!))
-          CustomImage(
-            imageUrl: vm.order.photo!,
-            boxFit: BoxFit.fill,
-          ).h(context.percentHeight * 30).wFull(context),
-    ]);
+        //foto del pedido
+        if (vm.order.attachments == null || vm.order.attachments!.isEmpty)
+          if (vm.order.photo != null && !Utils.isDefaultImg(vm.order.photo!))
+            CustomImage(
+              imageUrl: vm.order.photo!,
+              boxFit: BoxFit.cover,
+              width: double.infinity,
+              height: context.percentHeight * 25,
+            ).cornerRadius(14).pOnly(top: 12),
+      ],
+    );
   }
 }

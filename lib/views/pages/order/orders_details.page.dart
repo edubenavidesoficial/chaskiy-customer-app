@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:chaskiy/constants/sizes.dart';
 import 'package:chaskiy/models/order.dart';
-import 'package:chaskiy/utils/ui_spacer.dart';
 import 'package:chaskiy/view_models/order_details.vm.dart';
 import 'package:chaskiy/views/pages/order/widgets/order.bottomsheet.dart';
 import 'package:chaskiy/views/pages/order/widgets/order_address.view.dart';
@@ -22,7 +20,6 @@ import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:chaskiy/extensions/context.dart';
-import 'package:chaskiy/utils/utils.dart';
 
 class OrderDetailsPage extends StatelessWidget {
   const OrderDetailsPage({
@@ -36,6 +33,8 @@ class OrderDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return ViewModelBuilder<OrderDetailsViewModel>.reactive(
       viewModelBuilder: () => OrderDetailsViewModel(context, order),
       disposeViewModel: true,
@@ -48,22 +47,18 @@ class OrderDetailsPage extends StatelessWidget {
           showLeadingAction: true,
           isLoading: vm.isBusy,
           elevation: 0,
-          backgroundColor:
-              context.isDarkMode
-                  ? context.theme.scaffoldBackgroundColor
-                  : Colors.grey.shade50,
-          appBarColor: context.primaryColor,
-          appBarItemColor: Utils.textColorByPrimaryColor(),
+          //la barra deja de ser un bloque de color y se funde con la pantalla
+          backgroundColor: theme.colorScheme.surfaceContainerLow,
+          appBarColor: theme.colorScheme.surfaceContainerLow,
+          appBarItemColor: theme.colorScheme.onSurface,
           onBackPressed: () => context.pop(vm.order),
           actions:
               vm.order.isPackageDelivery
                   ? [
-                    Icon(
-                      FlutterIcons.share_2_fea,
-                      color: Utils.textColorByColor(
-                        context.theme.colorScheme.surface,
-                      ),
-                    ).p8().onInkTap(vm.shareOrderDetails).p8(),
+                    IconButton(
+                      onPressed: vm.shareOrderDetails,
+                      icon: const Icon(FlutterIcons.share_2_fea, size: 20),
+                    ),
                   ]
                   : [],
           body:
@@ -74,80 +69,110 @@ class OrderDetailsPage extends StatelessWidget {
                     onRefresh: vm.fetchOrderDetails,
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
-                      child:
-                          VStack([
-                            // 1. Order Status Header Card
-                            OrderStatusHeader(vm: vm),
+                      //el hueco de abajo es para que el botón de cancelar no
+                      //tape la última tarjeta
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children:
+                            [
+                              // 1. estado, negocio y código
+                              OrderStatusHeader(vm: vm),
 
-                            // 2. Deliver Addresses / Path
-                            if (vm.order.deliveryAddress != null)
-                              OrderDetailsCard(child: OrderAddressesView(vm)),
+                              // 2. de dónde sale y a dónde llega
+                              if (vm.order.deliveryAddress != null)
+                                OrderDetailsCard(
+                                  title: "Delivery details".tr(),
+                                  child: OrderAddressesView(vm),
+                                ),
 
-                            if (!vm.order.isPackageDelivery &&
-                                vm.order.deliveryAddress == null)
+                              if (!vm.order.isPackageDelivery &&
+                                  vm.order.deliveryAddress == null)
+                                OrderDetailsCard(
+                                  child: Text(
+                                    "Customer Order Pickup".tr(),
+                                    textAlign: TextAlign.center,
+                                    style: theme.textTheme.bodyLarge,
+                                  ),
+                                ),
+
+                              // 3. seguimiento, mientras el pedido siga vivo
+                              if (_showTrackingCardView(vm))
+                                OrderDetailsCard(
+                                  title: "Order Status tracking".tr(),
+                                  child: OrderStatusView(vm),
+                                ),
+
+                              // 4. qué se pidió
                               OrderDetailsCard(
-                                child: "Customer Order Pickup"
-                                    .tr()
-                                    .text
-                                    .italic
-                                    .xl
-                                    .medium
-                                    .makeCentered()
-                                    .py(8),
+                                title: _itemsTitle(vm),
+                                child: OrderDetailsItemsView(vm),
                               ),
 
-                            // 3. Status Tracking View Card (if active tracking states)
-                            if (_showTrackingCardView(vm))
+                              // 5. negocio
                               OrderDetailsCard(
-                                child: OrderStatusView(vm).py(4),
+                                title:
+                                    (!vm.order.isSerice
+                                            ? "Vendor"
+                                            : "Service Provider")
+                                        .tr(),
+                                child: OrderDetailsVendorInfoView(vm),
                               ),
 
-                            // 4. Products / Services / Items Card
-                            OrderDetailsCard(child: OrderDetailsItemsView(vm)),
+                              // 6. conductor, si ya está asignado
+                              if (vm.order.driver != null)
+                                OrderDetailsCard(
+                                  title: "Driver".tr(),
+                                  child: OrderDetailsDriverInfoView(vm),
+                                ),
 
-                            // 5. Vendor Info Card
-                            OrderDetailsCard(
-                              child: OrderDetailsVendorInfoView(vm),
-                            ),
+                              // 7. nota y adjuntos
+                              if (vm.order.note.isNotEmpty)
+                                OrderDetailsCard(
+                                  title: "Note".tr(),
+                                  child: Text(
+                                    vm.order.note,
+                                    style: theme.textTheme.bodyMedium,
+                                  ),
+                                ),
 
-                            // 6. Driver Info Card (If assigned)
-                            if (vm.order.driver != null)
+                              if (vm.order.attachments != null &&
+                                  vm.order.attachments!.isNotEmpty)
+                                OrderDetailsCard(
+                                  title: "Attachments".tr(),
+                                  child: OrderAttachmentView(vm),
+                                ),
+
+                              // 8. pago y totales
                               OrderDetailsCard(
-                                child: OrderDetailsDriverInfoView(vm),
-                              ),
-
-                            // 7. Note & Attachment Card
-                            if ((vm.order.note.isNotEmpty) ||
-                                (vm.order.attachments != null &&
-                                    vm.order.attachments!.isNotEmpty))
-                              OrderDetailsCard(
-                                child: VStack([
-                                  if (vm.order.note.isNotEmpty) ...[
-                                    "Note".tr().text.semiBold.xl.make(),
-                                    "${vm.order.note}".text.light.sm.make(),
+                                title: "Order Summary".tr(),
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    OrderPaymentInfoView(vm),
+                                    OrderDetailsSummary(vm.order),
                                   ],
-                                  if (vm.order.attachments!.isNotEmpty)
-                                    OrderAttachmentView(vm),
-                                ], spacing: 10),
+                                ),
                               ),
-
-                            // 8. Payment Status & Order Summary Card
-                            OrderDetailsCard(
-                              child: VStack([
-                                OrderPaymentInfoView(vm),
-                                UiSpacer.divider().py(12),
-                                OrderDetailsSummary(vm.order),
-                              ]),
-                            ),
-
-                            UiSpacer.vSpace(60),
-                          ], spacing: Sizes.paddingSizeDefault).p16(),
+                            ].map(_spaced).toList(),
+                      ),
                     ),
                   ),
           bottomSheet: isOrderTracking ? null : OrderBottomSheet(vm),
         );
       },
     );
+  }
+
+  /// Mismo aire entre todas las tarjetas.
+  Widget _spaced(Widget card) =>
+      Padding(padding: const EdgeInsets.only(bottom: 12), child: card);
+
+  String _itemsTitle(OrderDetailsViewModel vm) {
+    if (vm.order.isPackageDelivery) return "Package Details".tr();
+    if (vm.order.isSerice) return "Service".tr();
+    return "Products".tr();
   }
 
   bool _showTrackingCardView(OrderDetailsViewModel vm) {

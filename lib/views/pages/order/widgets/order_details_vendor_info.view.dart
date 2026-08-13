@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/app_ui_settings.dart';
-import 'package:chaskiy/constants/sizes.dart';
 import 'package:chaskiy/extensions/dynamic.dart';
-import 'package:chaskiy/utils/ui_spacer.dart';
 import 'package:chaskiy/view_models/order_details.vm.dart';
-import 'package:chaskiy/widgets/buttons/custom_button.dart';
+import 'package:chaskiy/widgets/buttons/contact_icon_button.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 class OrderDetailsVendorInfoView extends StatelessWidget {
   const OrderDetailsVendorInfoView(this.vm, {Key? key}) : super(key: key);
@@ -16,79 +12,56 @@ class OrderDetailsVendorInfoView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VStack([
-      HStack([
-        //
-        VStack([
-          (!vm.order.isSerice ? "Vendor" : "Service Provider")
-              .tr()
-              .text
-              .medium
-              .make(),
-          vm.order.vendor!.name.text.medium.xl.make().py8().pOnly(
-            bottom: Vx.dp4,
-          ),
-        ]).expand(),
-        //call
-        Visibility(
-          visible: vm.order.canChatVendor && AppUISettings.canCallVendor,
-          child:
-              CustomButton(
+    final theme = Theme.of(context);
+    final canCall = vm.order.canChatVendor && AppUISettings.canCallVendor;
+    final canChat = vm.order.canChatVendor && AppUISettings.canVendorChat;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                vm.order.vendor?.name ?? "",
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            if (canCall)
+              ContactIconButton(
                 icon: FlutterIcons.phone_call_fea,
-                iconColor: Colors.white,
-                color: AppColor.primaryColor,
-                shapeRadius: Sizes.radiusSmall,
                 onPressed: vm.callVendor,
-              ).h(50).fittedBox(),
-          // ).wh(Vx.dp64, Vx.dp40).fittedBox(),
+              ),
+            if (canChat) ...[
+              const SizedBox(width: 8),
+              ContactIconButton(
+                icon: FlutterIcons.chat_ent,
+                onPressed: vm.chatVendor,
+              ),
+            ],
+          ],
         ),
 
-        //chat
-        if (vm.order.canChatVendor)
-          Visibility(
-            visible: AppUISettings.canVendorChat,
-            child:
-                CustomButton(
-                  icon: FlutterIcons.chat_ent,
-                  iconColor: Colors.white,
-                  color: AppColor.primaryColor,
-                  shapeRadius: Sizes.radiusSmall,
-                  onPressed: vm.chatVendor,
-                ).h(50).fittedBox(),
-            // ).h(Vx.dp48).pOnly(top: Vx.dp12, bottom: Vx.dp20),
+        if (vm.order.canRateVendor) ...[
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: vm.rateVendor,
+              icon: const Icon(FlutterIcons.rate_review_mdi, size: 18),
+              label: Text(
+                "Rate %s".tr().fill([
+                  (!vm.order.isSerice ? "Vendor" : "Service Provider").tr(),
+                ]),
+              ),
+            ),
           ),
-      ], spacing: 8),
-
-      //chat
-      /*
-        if (vm.order.canChatVendor)
-          Visibility(
-            visible: AppUISettings.canVendorChat,
-            child: CustomButton(
-              icon: FlutterIcons.chat_ent,
-              iconColor: Colors.white,
-              title: "Chat with %s".tr().fill(
-                  [(!vm.order.isSerice ? "Vendor" : "Service Provider").tr()]),
-              color: AppColor.primaryColor,
-              onPressed: vm.chatVendor,
-            ).h(Vx.dp48).pOnly(top: Vx.dp12, bottom: Vx.dp20),
-          )
-        else
-          UiSpacer.emptySpace(),
-          */
-
-      //rate vendor
-      vm.order.canRateVendor
-          ? CustomButton(
-            icon: FlutterIcons.rate_review_mdi,
-            iconColor: Colors.white,
-            title: "Rate %s".tr().fill([
-              (!vm.order.isSerice ? "Vendor" : "Service Provider").tr(),
-            ]),
-            color: AppColor.primaryColor,
-            onPressed: vm.rateVendor,
-          ).h(Vx.dp48).pOnly(top: Vx.dp12, bottom: Vx.dp20)
-          : UiSpacer.emptySpace(),
-    ]).px(20);
+        ],
+      ],
+    );
   }
 }

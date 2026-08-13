@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:chaskiy/constants/sizes.dart';
 import 'package:chaskiy/services/order.service.dart';
 import 'package:chaskiy/view_models/orders.vm.dart';
 import 'package:chaskiy/widgets/base.page.dart';
@@ -8,6 +7,7 @@ import 'package:chaskiy/widgets/list_items/order.list_item.dart';
 import 'package:chaskiy/widgets/list_items/order_booking.list_item.dart';
 import 'package:chaskiy/widgets/list_items/taxi_order.list_item.dart';
 import 'package:chaskiy/widgets/states/empty.state.dart';
+import 'package:chaskiy/widgets/states/error.state.dart';
 import 'package:chaskiy/widgets/states/order.empty.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:stacked/stacked.dart';
@@ -47,17 +47,26 @@ class _OrdersPageState extends State<OrdersPage>
   Widget build(BuildContext context) {
     vm = OrdersViewModel(context);
     super.build(context);
+    final theme = Theme.of(context);
+
     return BasePage(
       allowTopSafeArea: true,
+      backgroundColor: theme.colorScheme.surfaceContainerLow,
       body: ViewModelBuilder<OrdersViewModel>.reactive(
         viewModelBuilder: () => vm,
         onViewModelReady: (vm) => vm.initialise(),
         builder: (context, vm, child) {
           return VStack([
             //
-            20.heightBox,
-            "My Orders".tr().text.xl2.semiBold.make().px(20),
-            10.heightBox,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
+              child: Text(
+                "My Orders".tr(),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
             //
             if (vm.isAuthenticated())
               CustomListView(
@@ -67,10 +76,16 @@ class _OrdersPageState extends State<OrdersPage>
                 onRefresh: () => vm.fetchMyOrders(),
                 onLoading: () => vm.fetchMyOrders(initialLoading: false),
                 dataSet: vm.orders,
-                padding: EdgeInsets.all(Sizes.paddingSizeDefault),
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
                 emptyWidget: EmptyOrder(),
-                separatorBuilder:
-                    (_, index) => Sizes.paddingSizeSmall.heightBox,
+                //si la consulta falla se veía "Sin pedidos", igual que si de
+                //verdad no hubiera ninguno
+                hasError: vm.hasError,
+                errorWidget: LoadingError(
+                  onrefresh: vm.fetchMyOrders,
+                  description: "${vm.modelError ?? ''}",
+                ),
+                separatorBuilder: (_, index) => 12.heightBox,
                 isLoading: vm.isBusy,
                 itemBuilder: (context, index) {
                   final order = vm.orders[index];
@@ -95,22 +110,6 @@ class _OrdersPageState extends State<OrdersPage>
                         () => OrderService.openOrderPayment(order, vm),
                   );
                 },
-                // listView:
-                //     vm.orders.map((order) {
-                //       //for taxi tye of order
-                //       if (order.taxiOrder != null) {
-                //         return TaxiOrderListItem(
-                //           order: order,
-                //           orderPressed: () => vm.openOrderDetails(order),
-                //         );
-                //       }
-                //       return OrderListItem(
-                //         order: order,
-                //         orderPressed: () => vm.openOrderDetails(order),
-                //         onPayPressed:
-                //             () => OrderService.openOrderPayment(order, vm),
-                //       );
-                //     }).toList(),
               ).expand(),
 
             if (!vm.isAuthenticated())
@@ -119,50 +118,6 @@ class _OrdersPageState extends State<OrdersPage>
                 showAction: true,
                 actionPressed: vm.openLogin,
               ).py12().centered().expand(),
-
-            /*
-              vm.isAuthenticated()
-                  ? CustomListView(
-                      canRefresh: true,
-                      canPullUp: true,
-                      refreshController: vm.refreshController,
-                      onRefresh: vm.fetchMyOrders,
-                      onLoading: () =>
-                          vm.fetchMyOrders(initialLoading: false),
-                      isLoading: vm.isBusy,
-                      dataSet: vm.orders,
-                      hasError: vm.hasError,
-                      errorWidget: LoadingError(
-                        onrefresh: vm.fetchMyOrders,
-                      ),
-                      //
-                      emptyWidget: EmptyOrder(),
-                      itemBuilder: (context, index) {
-                        //
-                        final order = vm.orders[index];
-                        //for taxi tye of order
-                        if (order.taxiOrder != null) {
-                          return TaxiOrderListItem(
-                            order: order,
-                            orderPressed: () => vm.openOrderDetails(order),
-                          );
-                        }
-                        return OrderListItem(
-                          order: order,
-                          orderPressed: () => vm.openOrderDetails(order),
-                          onPayPressed: () =>
-                              OrderService.openOrderPayment(order, vm),
-                        );
-                      },
-                      separatorBuilder: (context, index) =>
-                          UiSpacer.verticalSpace(space: 2),
-                    ).expand()
-                  : EmptyState(
-                      auth: true,
-                      showAction: true,
-                      actionPressed: vm.openLogin,
-                    ).py12().centered().expand(),
-                    */
           ]);
         },
       ),

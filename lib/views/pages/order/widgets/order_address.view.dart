@@ -1,4 +1,6 @@
+import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/app_images.dart';
 import 'package:chaskiy/utils/ui_spacer.dart';
 import 'package:chaskiy/view_models/order_details.vm.dart';
@@ -10,86 +12,77 @@ class OrderAddressesView extends StatelessWidget {
   const OrderAddressesView(this.vm, {Key? key}) : super(key: key);
 
   final OrderDetailsViewModel vm;
+
   @override
   Widget build(BuildContext context) {
-    return VStack(
-      [
-        //
-        vm.order.isPackageDelivery
-            ? VStack(
-                [
-                  //
-                  ParcelOrderStopListView(
-                    "Pickup Location",
-                    vm.order.orderStops!.first,
-                    canCall: vm.order.canChatVendor,
-                  ),
+    if (vm.order.isPackageDelivery) {
+      return VStack([
+        ParcelOrderStopListView(
+          "Pickup Location",
+          vm.order.orderStops!.first,
+          canCall: vm.order.canChatVendor,
+        ),
+        ...stopsList(),
+        ParcelOrderStopListView(
+          "Dropoff Location",
+          vm.order.orderStops!.last,
+          canCall: vm.order.canChatVendor,
+        ),
+      ]);
+    }
 
-                  //stops
-                  ...stopsList(),
-                  //
-                  ParcelOrderStopListView(
-                    "Dropoff Location",
-                    vm.order.orderStops!.last,
-                    canCall: vm.order.canChatVendor,
-                  ),
-                ],
-              )
-            : UiSpacer.emptySpace(),
+    //recorrido del pedido: de dónde sale y a dónde llega
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _point(
+          context,
+          icon: AppImages.pickupLocation,
+          address: "${vm.order.vendor?.address}",
+        ),
+        if (vm.order.deliveryAddress != null) ...[
+          DottedLine(
+            direction: Axis.vertical,
+            lineThickness: 2,
+            dashGapLength: 1,
+            dashColor: AppColor.primaryColor,
+          ).wh(1, 16).px(7),
+          _point(
+            context,
+            icon: AppImages.dropoffLocation,
+            address: "${vm.order.deliveryAddress!.address}",
+            name: vm.order.deliveryAddress!.name,
+          ),
+        ],
+      ],
+    );
+  }
 
-        //regular delivery address
-        Visibility(
-          visible: !vm.order.isPackageDelivery,
-          child: VStack(
-            [
-              "Delivery details".tr().text.xl.semiBold.make(),
-              //vendor address
-              HStack(
-                [
-                  //
-                  Image.asset(
-                    AppImages.pickupLocation,
-                    width: 15,
-                    height: 15,
+  Widget _point(
+    BuildContext context, {
+    required String icon,
+    required String address,
+    String? name,
+  }) {
+    final theme = Theme.of(context);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Image.asset(icon, width: 15, height: 15).pOnly(top: 3),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(address, style: theme.textTheme.bodyMedium),
+              if (name != null && name.isNotEmpty)
+                Text(
+                  name,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
-                  UiSpacer.smHorizontalSpace(),
-                  //
-                  "${vm.order.vendor?.address}".text.make().expand(),
-                ],
-                crossAlignment: CrossAxisAlignment.start,
-              ).py12(),
-              //delivery address
-              Visibility(
-                visible: vm.order.deliveryAddress != null,
-                child: HStack(
-                  [
-                    //
-                    Image.asset(
-                      AppImages.dropoffLocation,
-                      width: 15,
-                      height: 15,
-                    ),
-                    UiSpacer.smHorizontalSpace(),
-                    //
-                    VStack(
-                      [
-                        vm.order.deliveryAddress != null
-                            ? "${vm.order.deliveryAddress!.address}".text.make()
-                            : UiSpacer.emptySpace(),
-                        vm.order.deliveryAddress != null
-                            ? "${vm.order.deliveryAddress!.name}"
-                                .text
-                                .color(Vx.gray400)
-                                .sm
-                                .light
-                                .make()
-                            : UiSpacer.emptySpace(),
-                      ],
-                    ).expand(),
-                  ],
-                  crossAlignment: CrossAxisAlignment.start,
                 ),
-              ),
             ],
           ),
         ),
@@ -101,19 +94,19 @@ class OrderAddressesView extends StatelessWidget {
   List<Widget> stopsList() {
     List<Widget> stopViews = [];
     if (vm.order.orderStops != null && vm.order.orderStops!.length > 2) {
-      stopViews = vm.order.orderStops!
-          .sublist(1, vm.order.orderStops!.length - 1)
-          .mapIndexed((stop, index) {
-        return VStack(
-          [
-            ParcelOrderStopListView(
-              "Stop".tr() + " ${index + 1}",
-              stop,
-              canCall: vm.order.canChatVendor,
-            ),
-          ],
-        );
-      }).toList();
+      stopViews =
+          vm.order.orderStops!
+              .sublist(1, vm.order.orderStops!.length - 1)
+              .mapIndexed((stop, index) {
+                return VStack([
+                  ParcelOrderStopListView(
+                    "Stop".tr() + " ${index + 1}",
+                    stop,
+                    canCall: vm.order.canChatVendor,
+                  ),
+                ]);
+              })
+              .toList();
     } else {
       stopViews.add(UiSpacer.emptySpace());
     }

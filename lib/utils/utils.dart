@@ -101,6 +101,14 @@ class Utils {
     return isDark ? context.textTheme.bodyLarge!.color! : AppColor.primaryColor;
   }
 
+  /// Fecha de un pedido en corto: "11 ago 2026, 09:14".
+  ///
+  /// Las listas venían con el patrón 'dd E, MMM y', que en español se lee
+  /// "11 mar, ago 2026": el día de la semana en medio parecía el mes y la hora
+  /// no aparecía por ningún lado.
+  static String orderDate(DateTime date) =>
+      Jiffy.parseFromDateTime(date).format(pattern: 'd MMM y, HH:mm');
+
   static setJiffyLocale() async {
     String cLocale = translator.activeLocale.languageCode;
     List<String> supportedLocales = Jiffy.getSupportedLocales();

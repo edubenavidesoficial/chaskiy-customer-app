@@ -5,12 +5,15 @@ import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class LoadingError extends StatelessWidget {
-  const LoadingError({
-    this.onrefresh,
-    Key? key,
-  }) : super(key: key);
+  const LoadingError({this.onrefresh, this.description, Key? key})
+    : super(key: key);
 
   final Function? onrefresh;
+
+  /// Lo que respondió el servidor. Sin esto solo queda el texto genérico y no
+  /// hay forma de saber si fue la sesión, la red o el servidor.
+  final String? description;
+
   @override
   Widget build(BuildContext context) {
     return EmptyState(
@@ -20,7 +23,10 @@ class LoadingError extends StatelessWidget {
       actionText: "Retry".tr(),
       title: "Ocurrió un error".tr(),
       description:
-          "Hubo un error al procesar tu solicitud. Inténtalo nuevamente".tr(),
+          (description == null || description!.isEmpty)
+              ? "Hubo un error al procesar tu solicitud. Inténtalo nuevamente"
+                  .tr()
+              : description!,
     ).p20();
   }
 }
