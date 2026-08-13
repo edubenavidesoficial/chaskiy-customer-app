@@ -3,7 +3,6 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/app_ui_settings.dart';
 import 'package:chaskiy/models/order.dart';
-import 'package:chaskiy/services/location.service.dart';
 import 'package:chaskiy/view_models/order_tracking.vm.dart';
 import 'package:chaskiy/widgets/base.page.dart';
 import 'package:chaskiy/widgets/buttons/custom_button.dart';
@@ -14,10 +13,7 @@ import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class OrderTrackingPage extends StatelessWidget {
-  const OrderTrackingPage({
-    required this.order,
-    Key? key,
-  }) : super(key: key);
+  const OrderTrackingPage({required this.order, Key? key}) : super(key: key);
 
   //
   final Order order;
@@ -39,12 +35,7 @@ class OrderTrackingPage extends StatelessWidget {
               //
               GoogleMap(
                 initialCameraPosition: CameraPosition(
-                  target: LatLng(
-                    LocationService.currenctAddress?.coordinates?.latitude ??
-                        0.00,
-                    LocationService.currenctAddress?.coordinates?.longitude ??
-                        0.00,
-                  ),
+                  target: vm.initialCameraTarget,
                   zoom: 15,
                 ),
                 padding: EdgeInsets.only(bottom: Vx.dp64 * 2),
@@ -60,51 +51,47 @@ class OrderTrackingPage extends StatelessWidget {
                 right: 0,
                 bottom: 0,
                 child: SafeArea(
-                  child: HStack(
-                    [
-                      //driver profile
-                      CustomImage(
-                        imageUrl: order.driver!.photo,
-                      )
-                          .wh(Vx.dp56, Vx.dp56)
+                  child:
+                      HStack([
+                            //driver profile
+                            CustomImage(imageUrl: order.driver!.photo)
+                                .wh(Vx.dp56, Vx.dp56)
+                                .box
+                                .roundedFull
+                                .shadowXs
+                                .clip(Clip.antiAlias)
+                                .make(),
+
+                            //
+                            VStack([
+                              order.driver!.name.text.xl.semiBold.make(),
+                              order.driver!.phone.text.make(),
+                            ]).px12().expand(),
+
+                            //call
+                            Visibility(
+                              visible: AppUISettings.canCallDriver,
+                              child:
+                                  CustomButton(
+                                    icon: FlutterIcons.phone_call_fea,
+                                    iconColor: Colors.white,
+                                    title: "",
+                                    color: AppColor.primaryColor,
+                                    shapeRadius: Vx.dp24,
+                                    onPressed: vm.callDriver,
+                                  ).wh(Vx.dp64, Vx.dp40).p12(),
+                            ),
+                          ])
+                          .p12()
                           .box
-                          .roundedFull
-                          .shadowXs
-                          .clip(Clip.antiAlias)
-                          .make(),
-
-                      //
-                      VStack(
-                        [
-                          order.driver!.name.text.xl.semiBold.make(),
-                          order.driver!.phone.text.make(),
-                        ],
-                      ).px12().expand(),
-
-                      //call
-                      Visibility(
-                        visible: AppUISettings.canCallDriver,
-                        child: CustomButton(
-                          icon: FlutterIcons.phone_call_fea,
-                          iconColor: Colors.white,
-                          title: "",
-                          color: AppColor.primaryColor,
-                          shapeRadius: Vx.dp24,
-                          onPressed: vm.callDriver,
-                        ).wh(Vx.dp64, Vx.dp40).p12(),
-                      ),
-                    ],
-                  )
-                      .p12()
-                      .box
-                      .color(context.theme.colorScheme.surface)
-                      .roundedSM
-                      .shadowXl
-                      .outerShadow3Xl
-                      .make()
-                      .wFull(context)
-                      .h(Vx.dp64 * 1.3)
-                      .p12(),
+                          .color(context.theme.colorScheme.surface)
+                          .roundedSM
+                          .shadowXl
+                          .outerShadow3Xl
+                          .make()
+                          .wFull(context)
+                          .h(Vx.dp64 * 1.3)
+                          .p12(),
                 ),
               ),
             ],

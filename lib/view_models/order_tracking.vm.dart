@@ -1,12 +1,13 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/app_images.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/models/order.dart';
+import 'package:chaskiy/models/driver_location.dart';
+import 'package:chaskiy/requests/order.request.dart';
 import 'package:chaskiy/view_models/base.view_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -24,12 +25,33 @@ class OrderTrackingViewModel extends MyBaseViewModel {
   Map<PolylineId, Polyline> polylines = {};
 
   //
-  FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-  StreamSubscription? driverLocationStream;
+  Timer? driverLocationPollingTimer;
 
   //
   OrderTrackingViewModel(BuildContext context, this.order) {
     this.viewContext = context;
+  }
+
+  LatLng get initialCameraTarget {
+    final destination =
+        order.isPackageDelivery ? order.dropoffLocation : order.deliveryAddress;
+    final destinationLat = destination?.latitude;
+    final destinationLng = destination?.longitude;
+    if (destinationLat != null && destinationLng != null) {
+      return LatLng(destinationLat, destinationLng);
+    }
+
+    if (order.isPackageDelivery && order.pickupLocation != null) {
+      return LatLng(
+        order.pickupLocation!.latitude ?? 0,
+        order.pickupLocation!.longitude ?? 0,
+      );
+    }
+
+    return LatLng(
+      double.tryParse(order.vendor?.latitude ?? '') ?? 0,
+      double.tryParse(order.vendor?.longitude ?? '') ?? 0,
+    );
   }
 
   //
@@ -53,17 +75,20 @@ class OrderTrackingViewModel extends MyBaseViewModel {
     mapMarkers!.add(
       Marker(
         markerId: MarkerId("pickup"),
-        position: pickupLatLng = LatLng(
-            order.isPackageDelivery
-                ? order.pickupLocation!.latitude!
-                : double.parse(order.vendor!.latitude),
-            order.isPackageDelivery
-                ? order.pickupLocation!.longitude!
-                : double.parse(order.vendor!.longitude)),
+        position:
+            pickupLatLng = LatLng(
+              order.isPackageDelivery
+                  ? order.pickupLocation!.latitude!
+                  : double.parse(order.vendor!.latitude),
+              order.isPackageDelivery
+                  ? order.pickupLocation!.longitude!
+                  : double.parse(order.vendor!.longitude),
+            ),
         infoWindow: InfoWindow(
-          title: order.isPackageDelivery
-              ? order.pickupLocation?.name
-              : order.vendor?.name,
+          title:
+              order.isPackageDelivery
+                  ? order.pickupLocation?.name
+                  : order.vendor?.name,
         ),
         icon: vendorIcon,
       ),
@@ -74,18 +99,20 @@ class OrderTrackingViewModel extends MyBaseViewModel {
     mapMarkers!.add(
       Marker(
         markerId: MarkerId("destination"),
-        position: destinationLatLng = LatLng(
-          order.isPackageDelivery
-              ? order.dropoffLocation!.latitude!
-              : order.deliveryAddress!.latitude!,
-          order.isPackageDelivery
-              ? order.dropoffLocation!.longitude!
-              : order.deliveryAddress!.longitude!,
-        ),
+        position:
+            destinationLatLng = LatLng(
+              order.isPackageDelivery
+                  ? order.dropoffLocation!.latitude!
+                  : order.deliveryAddress!.latitude!,
+              order.isPackageDelivery
+                  ? order.dropoffLocation!.longitude!
+                  : order.deliveryAddress!.longitude!,
+            ),
         infoWindow: InfoWindow(
-          title: order.isPackageDelivery
-              ? order.dropoffLocation?.name
-              : order.deliveryAddress?.name,
+          title:
+              order.isPackageDelivery
+                  ? order.dropoffLocation?.name
+                  : order.deliveryAddress?.name,
         ),
         icon: deliveryAddressIcon,
       ),
@@ -100,7 +127,7 @@ class OrderTrackingViewModel extends MyBaseViewModel {
 
   dispose() {
     super.dispose();
-    driverLocationStream?.cancel();
+    driverLocationPollingTimer?.cancel();
   }
 
   //
@@ -108,14 +135,13 @@ class OrderTrackingViewModel extends MyBaseViewModel {
     if (driverLatLng == null || destinationLatLng == null) {
       return;
     }
-    LatLngBounds bound = boundsFromLatLngList(
-      [driverLatLng!, destinationLatLng!],
-    );
+    LatLngBounds bound = boundsFromLatLngList([
+      driverLatLng!,
+      destinationLatLng!,
+    ]);
 
     //
-    controller?.animateCamera(
-      CameraUpdate.newLatLngBounds(bound, 80),
-    );
+    controller?.animateCamera(CameraUpdate.newLatLngBounds(bound, 80));
   }
 
   //
@@ -135,8 +161,9 @@ class OrderTrackingViewModel extends MyBaseViewModel {
       }
     }
     return LatLngBounds(
-        northeast: LatLng(x1 ?? 0.00, y1 ?? 0.00),
-        southwest: LatLng(x0 ?? 0.00, y0 ?? 0.00));
+      northeast: LatLng(x1 ?? 0.00, y1 ?? 0.00),
+      southwest: LatLng(x0 ?? 0.00, y0 ?? 0.00),
+    );
   }
 
   //
@@ -172,51 +199,50 @@ class OrderTrackingViewModel extends MyBaseViewModel {
     notifyListeners();
   }
 
-  //listen to drriver location
+  // Poll the Laravel API because MySQL is the source of truth for driver
+  // locations on shared hosting. This mirrors the stable taxi flow.
   void listenToDriverLocation() {
-    //
-    driverLocationStream = firebaseFirestore
-        .collection("drivers")
-        .doc("${order.driverId}")
-        .snapshots()
-        .listen((event) async {
-      //
+    if (order.driverId == null) return;
+    driverLocationPollingTimer?.cancel();
+    _refreshDriverLocation();
+    driverLocationPollingTimer = Timer.periodic(
+      const Duration(seconds: 5),
+      (_) => _refreshDriverLocation(),
+    );
+  }
+
+  Future<void> _refreshDriverLocation() async {
+    try {
+      final response = await OrderRequest().syncDriverLocation(order.id);
+      if (response.body is! Map || response.body['location'] is! Map) return;
+      final location = DriverLocation.fromJson(response.body['location']);
+      if (!location.isValid) return;
+
+      driverLatLng = LatLng(location.latitude, location.longitude);
       var driverMarker = mapMarkers!.firstOrNullWhere(
-        (e) => e.markerId.value.contains("driverLocation"),
+        (marker) => marker.markerId.value == 'driverLocation',
       );
-
-      //
-      final driverInfo = event.data();
-      driverLatLng = LatLng(
-        driverInfo?["lat"] ?? 0.00,
-        driverInfo?["long"] ?? 0.00,
-      );
-
-      //
       if (driverMarker == null) {
-        //
-        final driverLocationIcon = await markerIcon(AppImages.deliveryBoy);
         driverMarker = Marker(
-          markerId: MarkerId("driverLocation"),
+          markerId: const MarkerId('driverLocation'),
           position: driverLatLng!,
           infoWindow: InfoWindow.noText,
-          icon: driverLocationIcon,
+          rotation: location.rotation,
+          icon: await markerIcon(AppImages.deliveryBoy),
         );
       } else {
-        //remove the old one
         mapMarkers!.remove(driverMarker);
-        //
         driverMarker = driverMarker.copyWith(
           positionParam: driverLatLng,
+          rotationParam: location.rotation,
         );
       }
-
-      //adding to list
       mapMarkers!.add(driverMarker);
-      //
       notifyListeners();
       zoomToLatLngBound();
-    });
+    } catch (_) {
+      // The driver may not have sent the first location yet. Keep polling.
+    }
   }
 
   //
