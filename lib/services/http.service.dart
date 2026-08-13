@@ -168,12 +168,21 @@ class HttpService {
 
     //preparing the post options if header is required
     final headers = includeHeaders ? await getHeaders() : null;
-    final mOptions = buildCacheOptions(
-      const Duration(minutes: 5),
-      maxStale: const Duration(days: 30),
-      forceRefresh: forceRefresh,
-      options: Options(headers: headers),
-    );
+    final hasAuthenticatedUser =
+        headers?[HttpHeaders.authorizationHeader]
+            ?.replaceFirst('Bearer ', '')
+            .isNotEmpty ??
+        false;
+    final requestOptions = Options(headers: headers);
+    final mOptions =
+        hasAuthenticatedUser
+            ? requestOptions
+            : buildCacheOptions(
+              const Duration(minutes: 5),
+              maxStale: const Duration(days: 30),
+              forceRefresh: forceRefresh,
+              options: requestOptions,
+            );
 
     Response response;
 
