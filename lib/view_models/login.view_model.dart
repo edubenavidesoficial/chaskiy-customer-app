@@ -17,6 +17,7 @@ import 'package:chaskiy/views/pages/auth/forgot_password.page.dart';
 import 'package:chaskiy/views/pages/auth/register.page.dart';
 import 'package:chaskiy/views/pages/home.page.dart';
 import 'package:chaskiy/views/pages/driver/driver_home.page.dart';
+import 'package:chaskiy/views/pages/profile/edit_profile.page.dart';
 import 'package:chaskiy/widgets/bottomsheets/account_verification_entry.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'base.view_model.dart';
@@ -336,7 +337,25 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
         if (expectedRole == AppRole.driver) {
           viewContext.nextAndRemoveUntilPage(const DriverHomePage());
         } else {
+          //Google y Apple no entregan teléfono, así que la cuenta recién
+          //creada nace sin él y el servidor no deja pedir sin teléfono. Se
+          //pide apenas entra, en vez de dejar que lo descubra al confirmar el
+          //pedido.
+          final needsPhone = user.phone.trim().isEmpty;
+          final navigator = Navigator.of(viewContext);
           viewContext.nextAndRemoveUntilPage(HomePage());
+          if (needsPhone) {
+            await navigator.push(
+              MaterialPageRoute(
+                builder:
+                    (_) => const EditProfilePage(
+                      description:
+                          'Nos falta tu número de teléfono. Sin él no podemos '
+                          'entregarte los pedidos.',
+                    ),
+              ),
+            );
+          }
         }
       }
     } on FirebaseAuthException catch (error) {

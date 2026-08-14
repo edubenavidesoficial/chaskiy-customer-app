@@ -898,5 +898,11 @@
   "No tip": "Sin propina",
   "Other amount": "Otro monto",
   "Any detail the vendor should know": "Algún detalle que el negocio deba saber",
-  "Total to pay": "Total a pagar"
+  "Total to pay": "Total a pagar",
+  "Phone already associated with an account": "Ese teléfono ya está registrado en otra cuenta",
+  "Email already associated with an account": "Ese correo ya está registrado en otra cuenta",
+  "Photo must be equal or less to 2MB": "La foto debe pesar 2 MB o menos",
+  "User profile updated successful": "Tu perfil se actualizó correctamente",
+  "User can't place order. Please complete profile setup": "Para hacer un pedido primero completa tu perfil con tu número de teléfono",
+  "Order placed successfully. You will be notified once order is prepared and ready": "Pedido realizado. Te avisamos apenas esté listo"
 }

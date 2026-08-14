@@ -10,7 +10,13 @@ import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 
 class EditProfilePage extends StatelessWidget {
-  const EditProfilePage({super.key});
+  const EditProfilePage({super.key, this.description});
+
+  /// Texto de la cabecera.
+  ///
+  /// Se personaliza cuando la pantalla se abre por una razón concreta, como
+  /// entrar con Google y quedarse sin teléfono en la cuenta.
+  final String? description;
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +27,7 @@ class EditProfilePage extends StatelessWidget {
           (context, model, child) => AccountFormScaffold(
             title: 'Editar perfil',
             description:
+                description ??
                 'Mantén actualizados tus datos para recibir pedidos y avisos.',
             icon: Icons.manage_accounts_rounded,
             child: Form(

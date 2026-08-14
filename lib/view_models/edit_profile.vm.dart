@@ -115,7 +115,7 @@ class EditProfileViewModel extends MyBaseViewModel {
       AlertService.dynamic(
         type: apiResponse.allGood ? AlertType.success : AlertType.error,
         title: "Profile Update".tr(),
-        text: apiResponse.message,
+        text: apiResponse.localizedMessage,
         onConfirm:
             apiResponse.allGood
                 ? () {

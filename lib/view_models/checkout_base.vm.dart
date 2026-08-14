@@ -433,11 +433,14 @@ class CheckoutBaseViewModel extends PaymentViewModel {
       }
       //cash payment
       else {
-        AlertService.success(text: apiResponse.message);
+        AlertService.success(text: apiResponse.localizedMessage);
         await openNewOrderDetails();
       }
     } else {
-      AlertService.error(title: "Checkout".tr(), text: apiResponse.message);
+      AlertService.error(
+        title: "Checkout".tr(),
+        text: apiResponse.localizedMessage,
+      );
     }
     setBusy(false);
     CartServices.refreshState();
