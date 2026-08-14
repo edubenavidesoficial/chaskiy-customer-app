@@ -1,10 +1,13 @@
 import 'dart:io';
 
-import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/constants/app_taxi_settings.dart';
+import 'package:chaskiy/extensions/string.dart';
 import 'package:chaskiy/models/order.dart';
 import 'package:chaskiy/requests/order.request.dart';
 import 'package:chaskiy/traits/qrcode_scanner.trait.dart';
+import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/widgets/order_status_chip.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:chaskiy/views/pages/driver/driver_signature.page.dart';
@@ -16,8 +19,7 @@ class DriverOrderDetailsPage extends StatefulWidget {
   final Order order;
 
   @override
-  State<DriverOrderDetailsPage> createState() =>
-      _DriverOrderDetailsPageState();
+  State<DriverOrderDetailsPage> createState() => _DriverOrderDetailsPageState();
 }
 
 class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
@@ -27,8 +29,8 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
   late Order _order = widget.order;
   bool _loading = false;
 
-  bool get _isTaxi => _order.taxiOrder != null ||
-      _order.type.toLowerCase().contains('taxi');
+  bool get _isTaxi =>
+      _order.taxiOrder != null || _order.type.toLowerCase().contains('taxi');
 
   bool get _isFinished => const {
     'delivered',
@@ -64,31 +66,32 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
 
     final proof = await showModalBottomSheet<String>(
       context: context,
-      builder: (context) => SafeArea(
-        child: Wrap(
-          children: [
-            const ListTile(
-              title: Text('Evidencia de entrega'),
-              subtitle: Text('Selecciona la evidencia antes de completar.'),
+      builder:
+          (context) => SafeArea(
+            child: Wrap(
+              children: [
+                const ListTile(
+                  title: Text('Evidencia de entrega'),
+                  subtitle: Text('Selecciona la evidencia antes de completar.'),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.camera_alt_outlined),
+                  title: const Text('Tomar fotografía'),
+                  onTap: () => Navigator.pop(context, 'camera'),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.photo_library_outlined),
+                  title: const Text('Elegir de galería'),
+                  onTap: () => Navigator.pop(context, 'gallery'),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.draw_outlined),
+                  title: const Text('Firma del receptor'),
+                  onTap: () => Navigator.pop(context, 'signature'),
+                ),
+              ],
             ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt_outlined),
-              title: const Text('Tomar fotografía'),
-              onTap: () => Navigator.pop(context, 'camera'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('Elegir de galería'),
-              onTap: () => Navigator.pop(context, 'gallery'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.draw_outlined),
-              title: const Text('Firma del receptor'),
-              onTap: () => Navigator.pop(context, 'signature'),
-            ),
-          ],
-        ),
-      ),
+          ),
     );
     if (proof == null) return;
     if (proof == 'signature') {
@@ -116,9 +119,9 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
       'enroute' => 'delivered',
       _ => 'ready',
     };
-    final requiresCode = AppTaxiSettings.requiredBookingCode &&
-        ((next == 'enroute' &&
-                AppTaxiSettings.requiredBookingCodeBeforeTrip) ||
+    final requiresCode =
+        AppTaxiSettings.requiredBookingCode &&
+        ((next == 'enroute' && AppTaxiSettings.requiredBookingCodeBeforeTrip) ||
             (next == 'delivered' &&
                 AppTaxiSettings.requiredBookingCodeAfterTrip));
     if (requiresCode) {
@@ -135,60 +138,62 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
     }
   }
 
-  Future<bool?> _verificationDialog({String title = 'Verificar entrega'}) async {
+  Future<bool?> _verificationDialog({
+    String title = 'Verificar entrega',
+  }) async {
     final controller = TextEditingController();
     String? error;
     return showDialog<bool>(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(title),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: controller,
-                decoration: InputDecoration(
-                  labelText: 'Código del cliente',
-                  errorText: error,
+      builder:
+          (dialogContext) => StatefulBuilder(
+            builder:
+                (context, setDialogState) => AlertDialog(
+                  title: Text(title),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: controller,
+                        decoration: InputDecoration(
+                          labelText: 'Código del cliente',
+                          errorText: error,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextButton.icon(
+                        onPressed: () async {
+                          final code = await openScanner(context);
+                          if (code != null) controller.text = code;
+                        },
+                        icon: const Icon(Icons.qr_code_scanner),
+                        label: const Text('Escanear QR'),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext, false),
+                      child: const Text('Cancelar'),
+                    ),
+                    FilledButton(
+                      onPressed: () {
+                        if (controller.text.trim() !=
+                            _order.verificationCode.trim()) {
+                          setDialogState(() => error = 'El código no coincide');
+                          return;
+                        }
+                        Navigator.pop(dialogContext, true);
+                      },
+                      child: const Text('Verificar'),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 8),
-              TextButton.icon(
-                onPressed: () async {
-                  final code = await openScanner(context);
-                  if (code != null) controller.text = code;
-                },
-                icon: const Icon(Icons.qr_code_scanner),
-                label: const Text('Escanear QR'),
-              ),
-            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancelar'),
-            ),
-            FilledButton(
-              onPressed: () {
-                if (controller.text.trim() != _order.verificationCode.trim()) {
-                  setDialogState(() => error = 'El código no coincide');
-                  return;
-                }
-                Navigator.pop(dialogContext, true);
-              },
-              child: const Text('Verificar'),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
-  Future<void> _submitProof(
-    File file, {
-    required String proofType,
-  }) async {
+  Future<void> _submitProof(File file, {required String proofType}) async {
     setState(() => _loading = true);
     try {
       final order = await _request.submitDriverProof(
@@ -217,97 +222,318 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return Scaffold(
-      appBar: AppBar(title: Text('Pedido #${_order.code}')),
+      backgroundColor: scheme.surfaceContainerLow,
+      appBar: AppBar(
+        //la barra deja de ser un bloque de color y se funde con la pantalla
+        backgroundColor: scheme.surfaceContainerLow,
+        foregroundColor: scheme.onSurface,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        title: Text(
+          'Pedido #${_order.code}',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
       body: RefreshIndicator(
         onRefresh: _refresh,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 120),
-          children: [
-            _StatusCard(order: _order),
-            const SizedBox(height: 16),
-            _InfoCard(
-              title: 'Cliente',
-              icon: Icons.person_outline,
-              lines: [_order.user.name, _order.user.phone],
-              onAction: _order.user.phone.isEmpty
-                  ? null
-                  : () => launchUrlString('tel:${_order.user.phone}'),
-            ),
-            const SizedBox(height: 12),
-            if (_order.deliveryAddress != null)
-              _InfoCard(
-                title: 'Dirección de entrega',
-                icon: Icons.location_on_outlined,
-                lines: [
-                  _order.deliveryAddress?.address ??
-                      _order.deliveryAddress?.name ??
-                      '',
-                ],
-              ),
-            if (_isTaxi && _order.taxiOrder != null) ...[
-              _InfoCard(
-                title: 'Punto de recogida',
-                icon: Icons.my_location_outlined,
-                lines: [_order.taxiOrder!.pickupAddress],
-                actionIcon: Icons.navigation_outlined,
-                onAction: () => _openLocation(
-                  _order.taxiOrder!.pickupLatitude,
-                  _order.taxiOrder!.pickupLongitude,
-                ),
-              ),
-              const SizedBox(height: 12),
-              _InfoCard(
-                title: 'Destino',
-                icon: Icons.flag_outlined,
-                lines: [_order.taxiOrder!.dropoffAddress],
-                actionIcon: Icons.navigation_outlined,
-                onAction: () => _openLocation(
-                  _order.taxiOrder!.dropoffLatitude,
-                  _order.taxiOrder!.dropoffLongitude,
-                ),
-              ),
-              const SizedBox(height: 12),
-            ],
-            const SizedBox(height: 12),
-            _InfoCard(
-              title: 'Resumen',
-              icon: Icons.receipt_long_outlined,
-              lines: [
-                'Estado de pago: ${_order.paymentStatus}',
-                'Total: ${_order.total ?? 0}',
-                if (_order.note.isNotEmpty) 'Nota: ${_order.note}',
-              ],
-            ),
-          ],
+          //el hueco de abajo es para que el botón de acción no tape la última
+          //tarjeta
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
+          children:
+              [
+                _StatusCard(order: _order, isTaxi: _isTaxi),
+                _routeCard(),
+                _customerCard(),
+                if (!_isTaxi) _itemsCard(),
+                _paymentCard(),
+                if (_order.note.isNotEmpty)
+                  _DriverCard(
+                    title: 'Nota del cliente',
+                    icon: Icons.sticky_note_2_outlined,
+                    child: Text(_order.note, style: theme.textTheme.bodyMedium),
+                  ),
+              ].whereType<Widget>().map(_spaced).toList(),
         ),
       ),
-      bottomNavigationBar: _isFinished
-          ? null
-          : SafeArea(
-              minimum: const EdgeInsets.all(16),
-              child: _loading
-                  ? const Center(
-                      child: SizedBox(
-                        width: 28,
-                        height: 28,
-                        child: CircularProgressIndicator(strokeWidth: 3),
-                      ),
-                    )
-                  : _DriverOrderActions(
-                      status: _order.status,
-                      isTaxi: _isTaxi,
-                      onEnroute: () => _changeStatus('enroute'),
-                      onComplete: _startDeliveryVerification,
-                      onTaxiAdvance: _advanceTaxi,
-                    ),
-            ),
+      bottomNavigationBar:
+          _isFinished
+              ? null
+              : Container(
+                decoration: BoxDecoration(
+                  color: scheme.surface,
+                  border: Border(top: BorderSide(color: scheme.outlineVariant)),
+                ),
+                child: SafeArea(
+                  top: false,
+                  minimum: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  child:
+                      _loading
+                          ? const Center(
+                            child: SizedBox(
+                              width: 28,
+                              height: 28,
+                              child: CircularProgressIndicator(strokeWidth: 3),
+                            ),
+                          )
+                          : _DriverOrderActions(
+                            status: _order.status,
+                            isTaxi: _isTaxi,
+                            onEnroute: () => _changeStatus('enroute'),
+                            onComplete: _startDeliveryVerification,
+                            onTaxiAdvance: _advanceTaxi,
+                          ),
+                ),
+              ),
     );
   }
 
+  /// Mismo aire entre todas las tarjetas.
+  Widget _spaced(Widget card) =>
+      Padding(padding: const EdgeInsets.only(bottom: 12), child: card);
+
+  /// De dónde se recoge y a dónde se lleva, en el orden en que el conductor
+  /// las va a necesitar.
+  Widget? _routeCard() {
+    final stops = <_Stop>[];
+
+    if (_isTaxi && _order.taxiOrder != null) {
+      final taxi = _order.taxiOrder!;
+      stops.add(
+        _Stop(
+          label: 'Recoger al pasajero',
+          address: taxi.pickupAddress,
+          latitude: taxi.pickupLatitude,
+          longitude: taxi.pickupLongitude,
+        ),
+      );
+      stops.add(
+        _Stop(
+          label: 'Destino',
+          address: taxi.dropoffAddress,
+          latitude: taxi.dropoffLatitude,
+          longitude: taxi.dropoffLongitude,
+        ),
+      );
+    } else {
+      final vendor = _order.vendor;
+      if (vendor != null && vendor.address.isNotEmpty) {
+        stops.add(
+          _Stop(
+            label: 'Recoger en ${vendor.name}',
+            address: vendor.address,
+            latitude: vendor.latitude,
+            longitude: vendor.longitude,
+          ),
+        );
+      }
+      final address = _order.deliveryAddress;
+      if (address != null) {
+        stops.add(
+          _Stop(
+            label: 'Entregar al cliente',
+            address: address.address ?? address.name ?? '',
+            latitude: '${address.latitude ?? ''}',
+            longitude: '${address.longitude ?? ''}',
+          ),
+        );
+      }
+    }
+
+    if (stops.isEmpty) return null;
+    return _DriverCard(
+      title: 'Ruta',
+      icon: Icons.route_outlined,
+      child: Column(
+        children: [
+          for (var index = 0; index < stops.length; index++)
+            _StopTile(
+              stop: stops[index],
+              isFirst: index == 0,
+              isLast: index == stops.length - 1,
+              onNavigate: () => _openStop(stops[index]),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _customerCard() {
+    final theme = Theme.of(context);
+    final phone = _order.user.phone;
+
+    return _DriverCard(
+      title: _isTaxi ? 'Pasajero' : 'Cliente',
+      icon: Icons.person_outline_rounded,
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _order.user.name,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (phone.isNotEmpty)
+                  Text(
+                    phone,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          if (phone.isNotEmpty)
+            _RoundIconButton(
+              icon: Icons.call_rounded,
+              tooltip: 'Llamar al cliente',
+              onPressed: () => launchUrlString('tel:$phone'),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Qué lleva el pedido. Sin esto el conductor no puede revisar que le
+  /// entregaron todo.
+  Widget? _itemsCard() {
+    final products = _order.orderProducts ?? [];
+    if (products.isEmpty) return null;
+
+    final theme = Theme.of(context);
+    return _DriverCard(
+      title: 'Qué lleva',
+      icon: Icons.shopping_bag_outlined,
+      child: Column(
+        children: [
+          for (final product in products)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: Text(
+                      '${product.quantity}',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: theme.colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          product.product?.name ?? 'Producto',
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                        if ((product.options ?? '').isNotEmpty)
+                          Text(
+                            product.options!,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _paymentCard() {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final currencySymbol = AppStrings.currencySymbol;
+    final mutedStyle = theme.textTheme.bodyMedium?.copyWith(
+      color: scheme.onSurfaceVariant,
+    );
+
+    return _DriverCard(
+      title: 'Cobro',
+      icon: Icons.payments_outlined,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(child: Text('Estado del pago', style: mutedStyle)),
+              OrderStatusChip(_order.paymentStatus),
+            ],
+          ),
+          if (_order.paymentMethod != null) ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(child: Text('Método', style: mutedStyle)),
+                Text(
+                  '${_order.paymentMethod?.name}',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ],
+          Divider(height: 24, color: scheme.outlineVariant),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Total',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Text(
+                //el total salía como "2.12", sin moneda ni formato
+                "$currencySymbol ${_order.total ?? 0}".currencyFormat(
+                  currencySymbol,
+                ),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: scheme.primary,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openStop(_Stop stop) =>
+      _openLocation(stop.latitude, stop.longitude);
+
   Future<void> _openLocation(String latitude, String longitude) async {
-    final uri = 'https://www.google.com/maps/dir/?api=1&destination='
+    final uri =
+        'https://www.google.com/maps/dir/?api=1&destination='
         '$latitude,$longitude';
     if (!await launchUrlString(uri, mode: LaunchMode.externalApplication)) {
       _showError('No se pudo abrir la navegación');
@@ -315,66 +541,239 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
   }
 }
 
-class _StatusCard extends StatelessWidget {
-  const _StatusCard({required this.order});
-  final Order order;
+/// Una parada de la ruta.
+class _Stop {
+  const _Stop({
+    required this.label,
+    required this.address,
+    required this.latitude,
+    required this.longitude,
+  });
+
+  final String label;
+  final String address;
+  final String latitude;
+  final String longitude;
+
+  /// Sin coordenadas el botón de navegar no lleva a ninguna parte.
+  bool get canNavigate {
+    final lat = double.tryParse(latitude) ?? 0;
+    final lng = double.tryParse(longitude) ?? 0;
+    return lat != 0 && lng != 0;
+  }
+}
+
+class _StopTile extends StatelessWidget {
+  const _StopTile({
+    required this.stop,
+    required this.isFirst,
+    required this.isLast,
+    required this.onNavigate,
+  });
+
+  final _Stop stop;
+  final bool isFirst;
+  final bool isLast;
+  final VoidCallback onNavigate;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(18),
-    decoration: BoxDecoration(
-      color: AppColor.primaryColor.withValues(alpha: .09),
-      borderRadius: BorderRadius.circular(22),
-    ),
-    child: Row(
-      children: [
-        const Icon(Icons.local_shipping_outlined),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    //el origen se marca hueco y el destino lleno, como en los mapas
+    final color = isLast ? scheme.primary : scheme.onSurfaceVariant;
+
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
             children: [
-              const Text('Estado', style: TextStyle(fontWeight: FontWeight.w600)),
+              Container(
+                width: 12,
+                height: 12,
+                margin: const EdgeInsets.only(top: 5),
+                decoration: BoxDecoration(
+                  color: isLast ? color : scheme.surface,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: color, width: 2),
+                ),
+              ),
+              if (!isLast)
+                Expanded(
+                  child: Container(width: 2, color: scheme.outlineVariant),
+                ),
+            ],
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(bottom: isLast ? 0 : 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    stop.label,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    stop.address,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (stop.canNavigate)
+            _RoundIconButton(
+              icon: Icons.navigation_rounded,
+              tooltip: 'Abrir en el mapa',
+              onPressed: onNavigate,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusCard extends StatelessWidget {
+  const _StatusCard({required this.order, required this.isTaxi});
+
+  final Order order;
+  final bool isTaxi;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: scheme.outlineVariant),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: scheme.primaryContainer,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              isTaxi
+                  ? Icons.local_taxi_outlined
+                  : Icons.delivery_dining_outlined,
+              color: scheme.onPrimaryContainer,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                //el estado ya no se muestra crudo en inglés
+                OrderStatusChip(order.status),
+                const SizedBox(height: 6),
+                Text(
+                  Utils.orderDate(order.createdAt),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Tarjeta con el mismo aspecto que las del detalle del pedido del cliente.
+class _DriverCard extends StatelessWidget {
+  const _DriverCard({
+    required this.title,
+    required this.icon,
+    required this.child,
+  });
+
+  final String title;
+  final IconData icon;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: scheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 18, color: scheme.onSurfaceVariant),
+              const SizedBox(width: 8),
               Text(
-                order.status,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ],
           ),
-        ),
-      ],
-    ),
-  );
+          const SizedBox(height: 12),
+          child,
+        ],
+      ),
+    );
+  }
 }
 
-class _InfoCard extends StatelessWidget {
-  const _InfoCard({
-    required this.title,
+class _RoundIconButton extends StatelessWidget {
+  const _RoundIconButton({
     required this.icon,
-    required this.lines,
-    this.onAction,
-    this.actionIcon = Icons.call_outlined,
+    required this.onPressed,
+    this.tooltip,
   });
-  final String title;
+
   final IconData icon;
-  final List<String> lines;
-  final VoidCallback? onAction;
-  final IconData actionIcon;
+  final VoidCallback onPressed;
+  final String? tooltip;
 
   @override
-  Widget build(BuildContext context) => Card(
-    elevation: 0,
-    child: ListTile(
-      contentPadding: const EdgeInsets.all(14),
-      leading: Icon(icon),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
-      subtitle: Text(lines.where((line) => line.isNotEmpty).join('\n')),
-      trailing: onAction == null ? null : IconButton(
-        onPressed: onAction,
-        icon: Icon(actionIcon),
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return SizedBox(
+      width: 44,
+      height: 44,
+      child: IconButton(
+        onPressed: onPressed,
+        tooltip: tooltip,
+        icon: Icon(icon, size: 20),
+        style: IconButton.styleFrom(
+          backgroundColor: scheme.primaryContainer,
+          foregroundColor: scheme.onPrimaryContainer,
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _DriverOrderActions extends StatelessWidget {
@@ -385,6 +784,7 @@ class _DriverOrderActions extends StatelessWidget {
     required this.onComplete,
     required this.onTaxiAdvance,
   });
+
   final String status;
   final bool isTaxi;
   final VoidCallback onEnroute;
@@ -393,24 +793,43 @@ class _DriverOrderActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isTaxi) {
-      final action = switch (status.toLowerCase()) {
-        'pending' || 'preparing' => ('Llegué al punto de recogida', Icons.location_on_outlined),
-        'ready' => ('Iniciar viaje', Icons.navigation_outlined),
-        'enroute' => ('Finalizar viaje', Icons.flag_outlined),
-        _ => ('Actualizar viaje', Icons.sync_outlined),
-      };
-      return FilledButton.icon(
-        onPressed: onTaxiAdvance,
-        icon: Icon(action.$2),
-        label: Text(action.$1),
-      );
-    }
-    final enroute = status.toLowerCase() == 'enroute';
-    return FilledButton.icon(
-      onPressed: enroute ? onComplete : onEnroute,
-      icon: Icon(enroute ? Icons.verified_outlined : Icons.navigation_outlined),
-      label: Text(enroute ? 'Completar entrega' : 'Iniciar entrega'),
+    final (String label, IconData icon, VoidCallback action) = _action();
+
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: FilledButton.icon(
+        onPressed: action,
+        icon: Icon(icon),
+        label: Text(
+          label,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+        ),
+        style: FilledButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+      ),
     );
+  }
+
+  (String, IconData, VoidCallback) _action() {
+    if (isTaxi) {
+      return switch (status.toLowerCase()) {
+        'pending' || 'preparing' => (
+          'Llegué al punto de recogida',
+          Icons.location_on_outlined,
+          onTaxiAdvance,
+        ),
+        'ready' => ('Iniciar viaje', Icons.navigation_outlined, onTaxiAdvance),
+        'enroute' => ('Finalizar viaje', Icons.flag_outlined, onTaxiAdvance),
+        _ => ('Actualizar viaje', Icons.sync_outlined, onTaxiAdvance),
+      };
+    }
+    if (status.toLowerCase() == 'enroute') {
+      return ('Completar entrega', Icons.verified_outlined, onComplete);
+    }
+    return ('Iniciar entrega', Icons.navigation_outlined, onEnroute);
   }
 }
