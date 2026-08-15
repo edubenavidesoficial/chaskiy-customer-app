@@ -54,9 +54,16 @@ void main() async {
             messageText: 'Actualizado a las %T',
           );
 
-      // Solo bloquean el primer fotograma los servicios imprescindibles
+      var firebaseReady = false;
+      // Ninguna dependencia externa debe bloquear indefinidamente el primer
+      // fotograma, especialmente durante una instalación limpia.
+      try {
+        await Firebase.initializeApp().timeout(const Duration(seconds: 8));
+        firebaseReady = true;
+      } catch (error) {
+        debugPrint('Firebase startup deferred: $error');
+      }
       await Future.wait([
-        Firebase.initializeApp(),
         translator.init(
           localeType: LocalizationDefaultType.asDefined,
           language: "es",
@@ -67,7 +74,9 @@ void main() async {
       ]);
       await CartServices.getCartItems();
 
-      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+      if (firebaseReady) {
+        FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+      }
       runApp(LocalizedApp(child: MyApp()));
 
       // Estos servicios no deben retrasar la primera pantalla.
@@ -75,7 +84,7 @@ void main() async {
       DeepLinkService().initialize();
     },
     (error, stackTrace) {
-      FirebaseCrashlytics.instance.recordError(error, stackTrace);
+      debugPrint('Startup error: $error');
     },
   );
 }

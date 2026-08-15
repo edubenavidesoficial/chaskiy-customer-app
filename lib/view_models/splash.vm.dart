@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:async';
 
 import 'package:adaptive_theme/adaptive_theme.dart';
 
@@ -29,7 +28,6 @@ class SplashViewModel extends MyBaseViewModel {
 
   //
   SettingsRequest settingsRequest = SettingsRequest();
-  Timer? _retryTimer;
   bool _loadingSettings = false;
   bool _hasNavigated = false;
 
@@ -44,7 +42,6 @@ class SplashViewModel extends MyBaseViewModel {
 
   @override
   void dispose() {
-    _retryTimer?.cancel();
     super.dispose();
   }
 
@@ -94,7 +91,6 @@ class SplashViewModel extends MyBaseViewModel {
         jsonEncode(exchangeRates),
       );
       await AppCurrencySystemService().init(exchangeRates);
-      _retryTimer?.cancel();
       await loadNextPage();
     } catch (error) {
       setError(error);
@@ -105,10 +101,8 @@ class SplashViewModel extends MyBaseViewModel {
         await _restoreSavedSettings();
         await loadNextPage();
       } else {
-        // En la primera instalación todavía no existe contenido local. Se
-        // reintenta silenciosamente sin encerrar al usuario en un diálogo.
-        _retryTimer?.cancel();
-        _retryTimer = Timer(const Duration(seconds: 8), loadAppSettings);
+        // En una instalación limpia mostramos un error recuperable. Un
+        // reintento silencioso infinito deja al usuario atrapado en el splash.
       }
     } finally {
       _loadingSettings = false;
@@ -175,7 +169,6 @@ class SplashViewModel extends MyBaseViewModel {
   loadNextPage() async {
     if (_hasNavigated) return;
     _hasNavigated = true;
-    _retryTimer?.cancel();
     //
     await Utils.setJiffyLocale();
     //

@@ -15,6 +15,7 @@ class SplashPage extends StatelessWidget {
         viewModelBuilder: () => SplashViewModel(context),
         onViewModelReady: (vm) => vm.initialise(),
         builder: (context, model, child) {
+          final hasStartupError = model.hasError && !model.isBusy;
           return VStack(
             [
               //
@@ -25,14 +26,24 @@ class SplashPage extends StatelessWidget {
                   .roundedSM
                   .makeCentered()
                   .py12(),
-              //linear progress indicator
-              LinearProgressIndicator(
-                minHeight: 2,
-                backgroundColor: Colors.grey.shade300,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  context.theme.primaryColor,
+              if (hasStartupError) ...[
+                const Text(
+                  'No pudimos conectar con Chaskiy. Revisa tu conexión e inténtalo nuevamente.',
+                  textAlign: TextAlign.center,
+                ).px24(),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: model.loadAppSettings,
+                  child: const Text('Reintentar'),
                 ),
-              ).wOneThird(context).centered(),
+              ] else
+                LinearProgressIndicator(
+                  minHeight: 2,
+                  backgroundColor: Colors.grey.shade300,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    context.theme.primaryColor,
+                  ),
+                ).wOneThird(context).centered(),
             ],
             crossAlignment: CrossAxisAlignment.center,
             alignment: MainAxisAlignment.center,
