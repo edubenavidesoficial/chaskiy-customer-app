@@ -10,6 +10,14 @@ import 'package:chaskiy/services/http.service.dart';
 import 'package:chaskiy/enums/app_role.dart';
 
 class AuthRequest extends HttpService {
+  Future<ApiResponse> sendPasswordResetEmail(String email) async {
+    final apiResult = await post(Api.forgotPasswordEmail, {
+      "email": email.trim().toLowerCase(),
+    });
+
+    return ApiResponse.fromResponse(apiResult);
+  }
+
   //
   Future<ApiResponse> loginRequest({
     required String email,

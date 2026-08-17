@@ -1,8 +1,6 @@
-import 'package:flag/flag.dart';
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_images.dart';
 import 'package:chaskiy/services/validator.service.dart';
-import 'package:chaskiy/utils/ui_spacer.dart';
 
 import 'package:chaskiy/view_models/forgot_password.view_model.dart';
 import 'package:chaskiy/widgets/base.page.dart';
@@ -42,6 +40,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   [
                     //
                     "Forgot Password".tr().text.xl2.semiBold.make(),
+                    "Enter your email and we will send you a secure password reset link."
+                        .tr()
+                        .text
+                        .gray600
+                        .make()
+                        .py8(),
 
                     //form
                     Form(
@@ -50,34 +54,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         [
                           //
                           CustomTextFormField(
-                            prefixIcon: HStack(
-                              [
-                                //icon/flag
-                                Flag.fromString(
-                                  model.selectedCountry?.countryCode ?? "us",
-                                  width: 20,
-                                  height: 20,
-                                ),
-                                UiSpacer.horizontalSpace(space: 5),
-                                //text
-                                ("+" +
-                                        (model.selectedCountry?.phoneCode ??
-                                            "1"))
-                                    .text
-                                    .make(),
-                              ],
-                            ).px8().onInkTap(model.showCountryDialPicker),
-                            labelText: "Phone Number".tr(),
-                            hintText: "",
-                            keyboardType: TextInputType.phone,
-                            textEditingController: model.phoneTEC,
-                            validator: FormValidator.validatePhone,
+                            labelText: "Email".tr(),
+                            hintText: "correo@ejemplo.com",
+                            keyboardType: TextInputType.emailAddress,
+                            textEditingController: model.emailTEC,
+                            validator: FormValidator.validateEmail,
                           ).py12(),
                           //
                           CustomButton(
-                            title: "Send OTP".tr(),
-                            loading: model.isBusy ||
-                                model.busy(model.firebaseVerificationId),
+                            title: "Send Password Reset Link".tr(),
+                            loading: model.isBusy,
                             onPressed: model.processForgotPassword,
                           ).h(Vx.dp48).centered().py12(),
                         ],
