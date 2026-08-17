@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
-import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/models/delivery_address.dart';
 import 'package:chaskiy/models/order.dart';
 import 'package:chaskiy/models/payment_method.dart';
@@ -10,8 +9,6 @@ import 'package:chaskiy/models/vehicle_type.dart';
 import 'package:chaskiy/requests/order.request.dart';
 import 'package:chaskiy/requests/payment_method.request.dart';
 import 'package:chaskiy/requests/taxi.request.dart';
-import 'package:chaskiy/services/order_details_websocket.service.dart';
-import 'package:chaskiy/services/order_driver_location_websocket.service.dart';
 import 'package:chaskiy/view_models/taxi_google_map.vm.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
@@ -50,7 +47,6 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     tripPollingTimer?.cancel();
     driverLocationPollingTimer?.cancel();
     driverLocationStream?.cancel();
-    OrderDetailsWebsocketService().disconnect();
     super.dispose();
   }
 
@@ -170,8 +166,6 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
       clearMapData();
       stopAllListeners();
       closeOrderSummary();
-      OrderDetailsWebsocketService().disconnect();
-      OrderDriverLocationWebsocketService().disconnect();
       //check for last trip that requires rating
       setCurrentStep(6);
     }
@@ -208,65 +202,34 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     }
 
     //
-    if (AppStrings.useWebsocketAssignment) {
-      //start websocket listening to ordr events
-      OrderDetailsWebsocketService().connectToOrderChannel(
-        "${onGoingOrderTrip?.id}",
-        (data) async {
+    tripUpdateStream = firebaseFirestore
+        .collection("orders")
+        .doc("${onGoingOrderTrip?.code}")
+        .snapshots()
+        .listen((event) async {
           //once driver is assigned
-          final driverId = data["driver_id"] ?? null;
+
+          final driverId =
+              event.data() != null ? event.data()!["driver_id"] ?? null : null;
           if (driverId != null && onGoingOrderTrip?.driverId == null) {
-            onGoingOrderTrip?.driverId = driverId;
+            onGoingOrderTrip?.driverId = event.data()!["driver_id"];
+            onGoingOrderTrip?.driver = event.data()!["driver"] ?? null;
           }
 
           //
-          if (onGoingOrderTrip?.driver == null && driverId != null) {
+          if (onGoingOrderTrip?.driver == null) {
             await loadDriverDetails();
           }
-          if (onGoingOrderTrip?.driver != null) {
-            startDriverDetailsListener();
-          }
+          startDriverDetailsListener();
 
           //update the rest onGoingTrip details
-          onGoingOrderTrip?.status = data["status"] ?? "failed";
+          if (event.exists) {
+            onGoingOrderTrip?.status = event.data()?["status"] ?? "failed";
+          }
           //
           notifyListeners();
           loadTripUIByOrderStatus();
-        },
-      );
-    } else {
-      //set new on trip step
-      tripUpdateStream = firebaseFirestore
-          .collection("orders")
-          .doc("${onGoingOrderTrip?.code}")
-          .snapshots()
-          .listen((event) async {
-            //once driver is assigned
-
-            final driverId =
-                event.data() != null
-                    ? event.data()!["driver_id"] ?? null
-                    : null;
-            if (driverId != null && onGoingOrderTrip?.driverId == null) {
-              onGoingOrderTrip?.driverId = event.data()!["driver_id"];
-              onGoingOrderTrip?.driver = event.data()!["driver"] ?? null;
-            }
-
-            //
-            if (onGoingOrderTrip?.driver == null) {
-              await loadDriverDetails();
-            }
-            startDriverDetailsListener();
-
-            //update the rest onGoingTrip details
-            if (event.exists) {
-              onGoingOrderTrip?.status = event.data()?["status"] ?? "failed";
-            }
-            //
-            notifyListeners();
-            loadTripUIByOrderStatus();
-          });
-    }
+        });
     //start order details listening stream
   }
 
@@ -274,7 +237,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     tripPollingTimer?.cancel();
     _refreshTripFromApi();
     tripPollingTimer = Timer.periodic(
-      const Duration(seconds: 4),
+      const Duration(seconds: 2),
       (_) => _refreshTripFromApi(),
     );
   }
@@ -297,7 +260,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
       }
       notifyListeners();
     } catch (_) {
-      // The next interval retries. Firestore/WebSocket remain optional hints.
+      // The next interval retries. Firestore remains an optional fast hint.
     } finally {
       _refreshingTrip = false;
     }
@@ -337,37 +300,12 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     if (onGoingOrderTrip?.driverId == null) {
       return;
     }
-    if (AppStrings.useWebsocketAssignment) {
-      OrderDriverLocationWebsocketService().connectToDriverLocationChannel(
-        "${onGoingOrderTrip?.driverId}",
-        (data) async {
-          //
-          final driverLat = data["lat"] ?? null;
-          final driverLng = data["long"] ?? data["lng"] ?? null;
-          final driverRotation = data["rotation"] ?? 0;
-          if (driverLat != null && driverLng != null) {
-            driverPosition = LatLng(
-              driverLat.toString().toDouble(),
-              driverLng.toString().toDouble(),
-            );
-            driverPositionRotation = double.parse((driverRotation).toString());
-            updateDriverMarkerPosition();
-            startZoomFocusDriver();
-          }
-        },
-        onSubscribedSuccess: () {
-          //initiate first sync
-          OrderRequest().syncDriverLocation(onGoingOrderTrip!.id);
-        },
-      );
-    } else {
-      driverLocationPollingTimer?.cancel();
-      _refreshDriverLocationFromApi();
-      driverLocationPollingTimer = Timer.periodic(
-        const Duration(seconds: 5),
-        (_) => _refreshDriverLocationFromApi(),
-      );
-    }
+    driverLocationPollingTimer?.cancel();
+    _refreshDriverLocationFromApi();
+    driverLocationPollingTimer = Timer.periodic(
+      const Duration(seconds: 5),
+      (_) => _refreshDriverLocationFromApi(),
+    );
   }
 
   Future<void> _refreshDriverLocationFromApi() async {
@@ -390,9 +328,6 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   }
 
   stopDriverListener() async {
-    if (AppStrings.useWebsocketAssignment) {
-      await OrderDriverLocationWebsocketService().disconnect();
-    }
     driverLocationStream?.cancel();
     driverLocationPollingTimer?.cancel();
     driverLocationPollingTimer = null;
@@ -470,11 +405,6 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     driverLocationPollingTimer?.cancel();
     driverLocationPollingTimer = null;
     driverLocationStream?.cancel();
-
-    if (AppStrings.useWebsocketAssignment) {
-      await OrderDriverLocationWebsocketService().disconnect();
-      await OrderDetailsWebsocketService().disconnect();
-    }
 
     //when trip is ended
     selectedVehicleType = null;

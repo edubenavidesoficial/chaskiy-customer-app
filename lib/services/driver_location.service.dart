@@ -15,6 +15,7 @@ class DriverLocationService {
   final DriverRequest _request = DriverRequest();
   StreamSubscription<Position>? _subscription;
   Timer? _heartbeatTimer;
+  bool _starting = false;
   bool _syncing = false;
   DateTime? _lastSync;
   Position? _lastPosition;
@@ -23,42 +24,47 @@ class DriverLocationService {
   Position? get lastPosition => _lastPosition;
 
   Future<void> start() async {
-    if (isRunning || !SessionService.isDriver) return;
-    final user = await AuthServices.getCurrentUser();
-    if (!user.isOnline) return;
-
-    if (!await Geolocator.isLocationServiceEnabled()) {
-      throw const DriverLocationException(
-        'Activa el servicio de ubicación para recibir pedidos.',
-      );
-    }
-
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      throw const DriverLocationException(
-        'Chaskiy necesita permiso de ubicación mientras estás disponible.',
-      );
-    }
-
-    final settings = _settings();
-    _subscription = Geolocator.getPositionStream(
-      locationSettings: settings,
-    ).listen(_onPosition, onError: (_) => stop(), cancelOnError: false);
-    _heartbeatTimer = Timer.periodic(const Duration(seconds: 30), (_) {
-      final position = _lastPosition;
-      if (position != null) _onPosition(position);
-    });
-
+    if (_starting || isRunning || !SessionService.isDriver) return;
+    _starting = true;
     try {
-      await _onPosition(
-        await Geolocator.getCurrentPosition(locationSettings: settings),
-      );
-    } catch (_) {
-      // The continuous stream remains responsible for the first valid fix.
+      final user = await AuthServices.getCurrentUser();
+      if (!user.isOnline) return;
+
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        throw const DriverLocationException(
+          'Activa el servicio de ubicación para recibir pedidos.',
+        );
+      }
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        throw const DriverLocationException(
+          'Chaskiy necesita permiso de ubicación mientras estás disponible.',
+        );
+      }
+
+      final settings = _settings();
+      _subscription = Geolocator.getPositionStream(
+        locationSettings: settings,
+      ).listen(_onPosition, onError: (_) => stop(), cancelOnError: false);
+      _heartbeatTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+        final position = _lastPosition;
+        if (position != null) _onPosition(position);
+      });
+
+      try {
+        await _onPosition(
+          await Geolocator.getCurrentPosition(locationSettings: settings),
+        );
+      } catch (_) {
+        // The continuous stream remains responsible for the first valid fix.
+      }
+    } finally {
+      _starting = false;
     }
   }
 
@@ -128,6 +134,7 @@ class DriverLocationService {
     _subscription = null;
     await subscription?.cancel();
     _syncing = false;
+    _starting = false;
     _lastSync = null;
   }
 }

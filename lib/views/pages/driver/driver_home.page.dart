@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/app_routes.dart';
 import 'package:chaskiy/models/user.dart';
@@ -5,6 +7,7 @@ import 'package:chaskiy/services/auth.service.dart';
 import 'package:chaskiy/services/session.service.dart';
 import 'package:chaskiy/services/driver_location.service.dart';
 import 'package:chaskiy/services/driver_assignment.service.dart';
+import 'package:chaskiy/services/setup.service.dart';
 import 'package:chaskiy/views/pages/driver/driver_assigned_orders.page.dart';
 import 'package:chaskiy/views/pages/driver/driver_vehicles.page.dart';
 import 'package:chaskiy/views/pages/driver/driver_documents.page.dart';
@@ -17,8 +20,7 @@ import 'package:flutter/material.dart';
 
 /// Root for every driver-only feature.
 ///
-/// Background location and order assignment are intentionally not started by
-/// this shell. Their lifecycle will be owned by the driver availability module.
+/// Owns the driver runtime while the driver role is active.
 class DriverHomePage extends StatefulWidget {
   const DriverHomePage({super.key});
 
@@ -33,10 +35,10 @@ class _DriverHomePageState extends State<DriverHomePage> {
   @override
   void initState() {
     super.initState();
-    _loadUser();
+    unawaited(_initializeDriverRuntime());
   }
 
-  Future<void> _loadUser() async {
+  Future<void> _initializeDriverRuntime() async {
     final user = await AuthServices.getCurrentUser();
     if (!mounted) return;
 
@@ -47,6 +49,17 @@ class _DriverHomePageState extends State<DriverHomePage> {
       return;
     }
     setState(() => _user = user);
+
+    // El modo conductor no pasa por HomeViewModel. Inicializa aquí FCM y el
+    // sondeo para recibir asignaciones desde cualquier pestaña del módulo.
+    await SetupService.init();
+    if (!user.isOnline || !mounted) return;
+    await DriverAssignmentService.instance.start();
+    try {
+      await DriverLocationService.instance.start();
+    } catch (_) {
+      // La pantalla de pedidos muestra el motivo y permite corregir permisos.
+    }
   }
 
   Future<void> _logout() async {

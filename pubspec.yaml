@@ -93,7 +93,6 @@ dependencies:
   inspection: ^0.0.13
   jiffy: ^6.4.4
   keyboard_dismisser: ^3.0.0
-  laravel_echo_null: ^0.2.0
   localize_and_translate: ^4.1.1
   location: ^8.0.1
   map_launcher: ^4.5.0
@@ -105,7 +104,6 @@ dependencies:
   pinch_zoom: ^2.0.1
   pretty_dio_logger: ^1.4.0
   pull_to_refresh_flutter3: ^2.0.2
-  pusher_client_socket: ^0.0.5
   # 2.2.0 omits the Kotlin Android plugin and fails native compilation.
   qr_code_scanner_plus: 2.1.1
   qr_flutter: ^4.1.0

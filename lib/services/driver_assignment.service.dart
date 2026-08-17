@@ -18,6 +18,7 @@ class DriverAssignmentService {
   final OrderRequest _orderRequest = OrderRequest();
   Timer? _pollTimer;
   StreamSubscription<bool>? _notificationSubscription;
+  bool _starting = false;
   bool _polling = false;
   String? _lastFingerprint;
 
@@ -25,21 +26,28 @@ class DriverAssignmentService {
   bool get isRunning => _pollTimer != null;
 
   Future<void> start() async {
-    if (isRunning || !SessionService.isDriver) return;
-    final user = await AuthServices.getCurrentUser();
-    if (!user.isOnline) return;
-
+    if (_starting || isRunning || !SessionService.isDriver) return;
+    _starting = true;
     try {
-      await FirebaseMessaging.instance.subscribeToTopic('d_${user.id}');
-    } catch (_) {
-      // FCM solo adelanta el aviso. El sondeo API sigue funcionando aunque
-      // no exista token, el permiso esté denegado o APNs aún no esté listo.
+      final user = await AuthServices.getCurrentUser();
+      if (!user.isOnline) return;
+
+      try {
+        await FirebaseMessaging.instance.subscribeToTopic('d_${user.id}');
+      } catch (_) {
+        // FCM solo adelanta el aviso. El sondeo API sigue funcionando aunque
+        // no exista token, el permiso esté denegado o APNs aún no esté listo.
+      }
+      await _poll();
+      _pollTimer = Timer.periodic(const Duration(seconds: 5), (_) => _poll());
+      _notificationSubscription = AppService().refreshAssignedOrders.listen((
+        _,
+      ) {
+        _poll();
+      });
+    } finally {
+      _starting = false;
     }
-    await _poll();
-    _pollTimer = Timer.periodic(const Duration(seconds: 5), (_) => _poll());
-    _notificationSubscription = AppService().refreshAssignedOrders.listen((_) {
-      _poll();
-    });
   }
 
   Future<void> _poll() async {
@@ -79,6 +87,7 @@ class DriverAssignmentService {
     _pollTimer = null;
     await _notificationSubscription?.cancel();
     _notificationSubscription = null;
+    _starting = false;
     _polling = false;
     _lastFingerprint = null;
   }

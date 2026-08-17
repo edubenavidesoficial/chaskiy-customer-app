@@ -53,26 +53,24 @@ class FirebaseService {
   }
 
   setUpFirebaseMessaging() async {
-    //Request for notification permission
-    /*NotificationSettings settings = */
+    // Los listeners y la sincronización del token deben existir aunque el
+    // permiso visual esté desactivado; el conductor sigue recibiendo el evento
+    // en primer plano y el sondeo API funciona como respaldo.
+    FirebaseTokenService().handleDeviceTokenSync();
+
     bool isPermanentlyDenied =
         await Permission.notification.isPermanentlyDenied;
-    if (isPermanentlyDenied) {
-      return;
-    }
     bool isGranted = await Permission.notification.isGranted;
-    if (!isGranted) {
-      return;
+    if (!isPermanentlyDenied && isGranted) {
+      await FirebaseMessaging.instance
+          .setForegroundNotificationPresentationOptions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
     }
-    await FirebaseMessaging.instance
-        .setForegroundNotificationPresentationOptions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
     //subscribing to all topic
     firebaseMessaging.subscribeToTopic("all");
-    FirebaseTokenService().handleDeviceTokenSync();
 
     //on notification tap tp bring app back to life
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -398,7 +396,6 @@ class FirebaseService {
   //refresh orders list if the notification is about assigned order
   void refreshOrdersList(RemoteMessage message) async {
     if (message.data["is_order"] != null) {
-      await Future.delayed(Duration(seconds: 3));
       AppService().refreshAssignedOrders.add(true);
     }
   }

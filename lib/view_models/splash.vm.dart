@@ -14,7 +14,6 @@ import 'package:chaskiy/services/auth.service.dart';
 import 'package:chaskiy/services/firebase.service.dart';
 import 'package:chaskiy/services/session.service.dart';
 import 'package:chaskiy/services/local_storage.service.dart';
-import 'package:chaskiy/services/websocket.service.dart';
 import 'package:chaskiy/utils/utils.dart';
 //import 'package:chaskiy/widgets/cards/language_selector.view.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
@@ -70,13 +69,6 @@ class SplashViewModel extends MyBaseViewModel {
           exchangeRates == null) {
         throw "La configuración recibida no está completa";
       }
-
-      //START: WEBSOCKET SETTINGS
-      final websocketSettings = _settingsMap(settings["websocket"]);
-      if (websocketSettings != null) {
-        await WebsocketService().saveWebsocketDetails(websocketSettings);
-      }
-      //END: WEBSOCKET SETTINGS
 
       //set the app name ffrom package to the app settings
       PackageInfo packageInfo = await PackageInfo.fromPlatform();

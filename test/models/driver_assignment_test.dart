@@ -17,7 +17,7 @@ void main() {
     expect(assignment.isTaxi, isFalse);
   });
 
-  test('recognizes taxi WebSocket assignments', () {
+    test('recognizes taxi assignment payloads', () {
     final assignment = DriverAssignment.fromJson({
       'order_id': 9,
       'vehicle_type_id': 3,

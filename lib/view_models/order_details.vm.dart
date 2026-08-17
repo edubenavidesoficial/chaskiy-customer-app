@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:firestore_chat/firestore_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_routes.dart';
-import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/constants/app_ui_settings.dart';
 import 'package:chaskiy/extensions/dynamic.dart';
 import 'package:chaskiy/models/api_response.dart';
@@ -10,7 +11,6 @@ import 'package:chaskiy/models/payment_method.dart';
 import 'package:chaskiy/requests/order.request.dart';
 import 'package:chaskiy/services/app.service.dart';
 import 'package:chaskiy/services/chat.service.dart';
-import 'package:chaskiy/services/order_details_websocket.service.dart';
 import 'package:chaskiy/view_models/checkout_base.vm.dart';
 import 'package:chaskiy/views/pages/checkout/widgets/payment_methods.view.dart';
 import 'package:chaskiy/widgets/bottomsheets/driver_rating.bottomsheet.dart';
@@ -27,6 +27,8 @@ class OrderDetailsViewModel extends CheckoutBaseViewModel {
   //
   Order order;
   OrderRequest orderRequest = OrderRequest();
+  Timer? _refreshTimer;
+  bool _refreshing = false;
 
   //
   OrderDetailsViewModel(BuildContext context, this.order) {
@@ -36,15 +38,15 @@ class OrderDetailsViewModel extends CheckoutBaseViewModel {
   initialise() async {
     fetchPaymentOptions();
     await fetchOrderDetails();
-    //handle order update through websocket
-    handleWebsocketOrderEvent();
+    _refreshTimer = Timer.periodic(
+      const Duration(seconds: 5),
+      (_) => fetchOrderDetails(silent: true),
+    );
   }
 
   @override
   void dispose() {
-    if (AppStrings.useWebsocketAssignment) {
-      OrderDetailsWebsocketService().disconnect();
-    }
+    _refreshTimer?.cancel();
     super.dispose();
   }
 
@@ -120,36 +122,34 @@ class OrderDetailsViewModel extends CheckoutBaseViewModel {
     ).pushNamed(AppRoutes.chatRoute, arguments: chatEntity);
   }
 
-  Future<void> fetchOrderDetails() async {
-    refreshController.refreshCompleted();
-    notifyListeners();
-    setBusy(true);
+  Future<void> fetchOrderDetails({bool silent = false}) async {
+    if (_refreshing) return;
+    _refreshing = true;
+    if (!silent) {
+      refreshController.refreshCompleted();
+      notifyListeners();
+      setBusy(true);
+    }
     try {
       order = await orderRequest.getOrderDetails(id: order.id);
       clearErrors();
     } catch (error) {
       print("Error ==> $error");
       setError(error);
-      viewContext.showToast(msg: "$error", bgColor: Colors.red);
+      if (!silent) {
+        viewContext.showToast(msg: "$error", bgColor: Colors.red);
+      }
     }
-    setBusy(false);
-  }
-
-  handleWebsocketOrderEvent() {
-    //start websocket listening to ordr events
-    if (AppStrings.useWebsocketAssignment) {
-      OrderDetailsWebsocketService().connectToOrderChannel("${order.id}", (
-        data,
-      ) {
-        fetchOrderDetails();
-      });
+    if (!silent) {
+      setBusy(false);
+    } else {
+      notifyListeners();
     }
+    _refreshing = false;
   }
 
   refreshDataSet() {
-    if (!AppStrings.useWebsocketAssignment) {
-      fetchOrderDetails();
-    }
+    fetchOrderDetails();
   }
 
   //

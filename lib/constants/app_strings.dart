@@ -141,10 +141,6 @@ class AppStrings {
     return env('ui')['google']["searchByCountries"] ?? "";
   }
 
-  static bool get useWebsocketAssignment {
-    return (env('useWebsocketAssignment') ?? false);
-  }
-
   //DONT'T TOUCH
   static const String notificationChannel = "high_importance_channel";
 
