@@ -44,6 +44,7 @@ class CheckoutRequest extends HttpService {
       "coupon_code": checkout.coupon?.code ?? "",
       "pickup_date": checkout.deliverySlotDate,
       "pickup_time": checkout.deliverySlotTime,
+      "pickup": checkout.isPickup == true ? 1 : 0,
       "products": checkout.cartItems?.map((e) => e.toCheckout()).toList(),
       "vendor_id": checkout.cartItems?.first.product?.vendorId,
       "delivery_address_id": checkout.deliveryAddress?.id,

@@ -87,6 +87,7 @@ class CheckoutBaseViewModel extends PaymentViewModel {
     } else if (vendor!.allowOnlyPickup) {
       isPickup = true;
     }
+    checkout?.isPickup = isPickup;
   }
 
   //start of schedule related
@@ -219,6 +220,7 @@ class CheckoutBaseViewModel extends PaymentViewModel {
       value = false;
     }
     isPickup = value ?? false;
+    checkout?.isPickup = isPickup;
     //remove delivery address if pickup
     if (isPickup) {
       checkout?.deliveryAddress = null;
@@ -300,7 +302,7 @@ class CheckoutBaseViewModel extends PaymentViewModel {
       "pickup": isPickup ? 1 : 0,
       "delievryAddressOutOfRange": delievryAddressOutOfRange ? 1 : 0,
       "tip": driverTipTEC.text,
-      "delivery_address_id": deliveryAddress!.id ?? "null",
+      "delivery_address_id": deliveryAddress?.id ?? "null",
       "latlng": "${deliveryAddress?.latitude},${deliveryAddress?.longitude}",
       "coupon_code": checkout!.coupon?.code ?? "",
       "vendor_id": vendor!.id,
