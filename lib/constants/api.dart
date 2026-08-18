@@ -19,7 +19,6 @@ class Api {
   static const driverOnboarding = "/driver/onboarding";
   static const pendingDriverAssignment = "/driver/assignments/pending";
   static const logout = "/logout";
-  static const forgotPassword = "/password/reset/init";
   static const forgotPasswordEmail = "/password/reset/email";
   static const verifyPhoneAccount = "/verify/phone";
   static const updateProfile = "/profile/update";

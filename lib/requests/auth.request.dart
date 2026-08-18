@@ -49,23 +49,6 @@ class AuthRequest extends HttpService {
   }
 
   //
-  Future<ApiResponse> resetPasswordRequest({
-    required String phone,
-    required String password,
-    String? firebaseToken,
-    String? customToken,
-  }) async {
-    final apiResult = await post(Api.forgotPassword, {
-      "phone": phone,
-      "password": password,
-      "firebase_id_token": firebaseToken,
-      "verification_token": customToken,
-    });
-
-    return ApiResponse.fromResponse(apiResult);
-  }
-
-  //
   Future<ApiResponse> registerRequest({
     required String name,
     required String email,
