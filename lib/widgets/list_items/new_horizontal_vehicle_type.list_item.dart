@@ -30,17 +30,17 @@ class NewHorizontalVehicleTypeListItem extends StatelessWidget {
               ? AppColor.primaryColor.withOpacity(.12)
               : colors.surfaceContainerHighest.withOpacity(.55),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(8),
         side: BorderSide(
           color: selected ? AppColor.primaryColor : colors.outlineVariant,
           width: selected ? 2 : 1,
         ),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(8),
         onTap: () => vm.changeSelectedVehicleType(vehicleType),
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(12),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -50,7 +50,7 @@ class NewHorizontalVehicleTypeListItem extends StatelessWidget {
                   boxFit: BoxFit.contain,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Text(
                 '$symbol ${vehicleType.total.convertIf(vehicleType.currency == null).currencyValueFormat()}',
                 maxLines: 1,

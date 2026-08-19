@@ -18,12 +18,12 @@ class NewTaxiVehicleTypeListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final cardWidth = (width * .31).clamp(112.0, 142.0);
+    final cardWidth = (width * .34).clamp(124.0, 154.0);
 
     return LoadingIndicator(
       loading: vm.busy(vm.vehicleTypes),
       child: SizedBox(
-        height: 142,
+        height: 154,
         child:
             vm.vehicleTypes.isEmpty
                 ? Center(

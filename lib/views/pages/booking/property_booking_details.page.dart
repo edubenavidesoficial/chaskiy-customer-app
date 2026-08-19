@@ -12,6 +12,7 @@ import 'package:chaskiy/widgets/base.page.dart';
 import 'package:chaskiy/widgets/buttons/custom_button.dart';
 import 'package:chaskiy/widgets/buttons/custom_text_button.dart';
 import 'package:chaskiy/widgets/custom_image.view.dart';
+import 'package:chaskiy/widgets/order_status_chip.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:stacked/stacked.dart';
@@ -118,14 +119,7 @@ class PropertyBookingDetailsPage extends StatelessWidget {
                 color: AppColor.primaryColor,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child:
-                  "${model.order.status}"
-                      .allWordsCapitilize()
-                      .text
-                      .white
-                      .bold
-                      .xs
-                      .make(),
+              child: OrderStatusChip(model.order.status),
             ),
           ),
         ],
@@ -420,18 +414,7 @@ class PropertyBookingDetailsPage extends StatelessWidget {
           HStack([
             "Status".tr().text.sm.gray500.make(),
             Spacer(),
-            "${model.order.paymentStatus}"
-                .tr()
-                .allWordsCapitilize()
-                .text
-                .sm
-                .color(
-                  model.order.paymentStatus == "successful"
-                      ? Colors.green
-                      : Colors.orange,
-                )
-                .semiBold
-                .make(),
+            OrderStatusChip(model.order.paymentStatus),
           ]),
         ]),
       ),

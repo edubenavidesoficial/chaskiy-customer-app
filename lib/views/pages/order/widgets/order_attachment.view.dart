@@ -21,13 +21,16 @@ class OrderAttachmentView extends StatelessWidget {
       noScrollPhysics: true,
       itemBuilder: (ctx, index) {
         final attachment = vm.order.attachments![index];
-        return CustomImage(
-          imageUrl: attachment.link!,
-          canZoom: true,
-          width: double.infinity,
-          height: ctx.percentHeight * 14,
-          boxFit: BoxFit.cover,
-        ).cornerRadius(12);
+        return AspectRatio(
+          aspectRatio: 1,
+          child: CustomImage(
+            imageUrl: attachment.link!,
+            canZoom: true,
+            width: double.infinity,
+            height: double.infinity,
+            boxFit: BoxFit.cover,
+          ).cornerRadius(8),
+        );
       },
     );
   }

@@ -24,7 +24,7 @@ class NewTaxiOrderSummaryCollapsed extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: colors.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           boxShadow: const [
             BoxShadow(
               color: Color(0x240F2A4D),
@@ -39,22 +39,22 @@ class NewTaxiOrderSummaryCollapsed extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 10, 12, 8),
+                padding: const EdgeInsets.fromLTRB(16, 12, 12, 8),
                 child: Row(
                   children: [
-                    IconButton.filledTonal(
+                    IconButton(
                       tooltip: 'Volver',
                       onPressed: () => vm.closeOrderSummary(clear: false),
                       icon: const Icon(Icons.arrow_back_rounded),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Elige tu viaje',
-                            style: Theme.of(context).textTheme.titleLarge
+                            style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(fontWeight: FontWeight.w800),
                           ),
                           Text(
@@ -74,7 +74,7 @@ class NewTaxiOrderSummaryCollapsed extends StatelessWidget {
               ),
               NewTaxiVehicleTypeListView(vm: vm),
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
                 child: Row(
                   children: [
                     Expanded(

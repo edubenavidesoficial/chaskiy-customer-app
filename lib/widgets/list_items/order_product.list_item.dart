@@ -32,9 +32,9 @@ class OrderProductListItem extends StatelessWidget {
       children: [
         CustomImage(
           imageUrl: orderProduct.product?.photo,
-          width: 52,
-          height: 52,
-        ).cornerRadius(12),
+          width: 60,
+          height: 60,
+        ).cornerRadius(8),
         const SizedBox(width: 12),
         Expanded(
           child: Column(

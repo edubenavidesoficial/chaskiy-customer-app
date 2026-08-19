@@ -25,14 +25,16 @@ class OrderStatusHeader extends StatelessWidget {
         children: [
           CustomImage(
             imageUrl: vm.order.vendor?.logo,
-            width: 56,
-            height: 56,
-          ).cornerRadius(14),
-          const SizedBox(width: 12),
+            width: 64,
+            height: 64,
+          ).cornerRadius(8),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                OrderStatusChip(vm.order.status),
+                const SizedBox(height: 6),
                 Text(
                   vm.order.vendor?.name ?? "",
                   maxLines: 1,
@@ -42,10 +44,11 @@ class OrderStatusHeader extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text("#${vm.order.code}", style: mutedStyle),
-                Text(Utils.orderDate(vm.order.updatedAt), style: mutedStyle),
-                const SizedBox(height: 10),
-                OrderStatusChip(vm.order.status),
+                Text(
+                  '${Utils.orderDate(vm.order.updatedAt)} · #${vm.order.code}',
+                  maxLines: 2,
+                  style: mutedStyle,
+                ),
               ],
             ),
           ),
@@ -54,9 +57,13 @@ class OrderStatusHeader extends StatelessWidget {
             IconButton(
               onPressed: vm.showVerificationQRCode,
               icon: const Icon(FlutterIcons.qrcode_ant, size: 22),
+              tooltip: 'Código QR',
               style: IconButton.styleFrom(
                 backgroundColor: theme.colorScheme.surfaceContainerHigh,
                 foregroundColor: theme.colorScheme.onSurface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
             ),
         ],

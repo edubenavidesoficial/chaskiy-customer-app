@@ -3,7 +3,6 @@ import 'package:chaskiy/models/driver.dart';
 import 'package:chaskiy/models/order.dart';
 import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:flutter/material.dart';
-import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class TaxiDriverInfoView extends StatelessWidget {
@@ -170,21 +169,23 @@ class TaxiDriverInfoView extends StatelessWidget {
   String driverTripStatus(Order order) {
     switch (order.status) {
       case 'pending':
-        return 'Searching for driver'.tr();
+        return 'Buscando conductor';
       case 'preparing':
-        return 'Driver on the way to you'.tr();
+        return 'El conductor va hacia ti';
       case 'ready':
-        return 'Driver has arrived your pickup location'.tr();
+        return 'El conductor llegó al punto de recogida';
       case 'enroute':
-        return 'Driver enroute to dropoff location'.tr();
+        return 'El conductor va rumbo al destino';
       case 'delivered':
-        return 'Driver has dropped you'.tr();
+        return 'Llegaste a tu destino';
       case 'completed':
-        return 'Trip completed'.tr();
+        return 'Viaje completado';
       case 'failed':
-        return 'Trip failed'.tr();
+        return 'No se pudo completar el viaje';
+      case 'cancelled':
+        return 'Viaje cancelado';
       default:
-        return 'Driver is on the way'.tr();
+        return 'El conductor está en camino';
     }
   }
 }

@@ -52,7 +52,7 @@ class OrderDetailsDriverInfoView extends StatelessWidget {
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
-            child: OutlinedButton.icon(
+            child: FilledButton.tonalIcon(
               onPressed: vm.rateDriver,
               icon: const Icon(FlutterIcons.rate_review_mdi, size: 18),
               label: Text("Rate The Driver".tr()),

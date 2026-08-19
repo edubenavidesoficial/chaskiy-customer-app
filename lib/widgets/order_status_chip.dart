@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_semantic_colors.dart';
-import 'package:localize_and_translate/localize_and_translate.dart';
-import 'package:velocity_x/velocity_x.dart';
+import 'package:chaskiy/utils/order_status_localizer.dart';
 
 /// Estado del pedido como pastilla de color.
 ///
@@ -19,7 +18,7 @@ class OrderStatusChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final palette = _paletteFor(theme);
-    final label = status.tr();
+    final label = spanishOrderStatus(status);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -28,7 +27,7 @@ class OrderStatusChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(100),
       ),
       child: Text(
-        label.isEmpty ? label : label.capitalized,
+        label,
         style: theme.textTheme.labelMedium?.copyWith(
           color: palette.foreground,
           fontWeight: FontWeight.w700,

@@ -39,12 +39,12 @@ class NewTaxiOrderEntryPanel extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                IconButton.filledTonal(
+                                IconButton(
                                   tooltip: 'Cerrar',
                                   onPressed: taxiNewOrderViewModel.closePanel,
                                   icon: const Icon(Icons.close_rounded),
                                 ),
-                                const SizedBox(width: 12),
+                                const SizedBox(width: 8),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
@@ -54,7 +54,7 @@ class NewTaxiOrderEntryPanel extends StatelessWidget {
                                         'Tu ruta',
                                         style: Theme.of(
                                           context,
-                                        ).textTheme.titleLarge?.copyWith(
+                                        ).textTheme.titleMedium?.copyWith(
                                           fontWeight: FontWeight.w800,
                                         ),
                                       ),
@@ -81,7 +81,7 @@ class NewTaxiOrderEntryPanel extends StatelessWidget {
                                   ),
                               ],
                             ),
-                            const SizedBox(height: 18),
+                            const SizedBox(height: 16),
                             Container(
                               padding: const EdgeInsets.fromLTRB(
                                 12,
@@ -92,7 +92,7 @@ class NewTaxiOrderEntryPanel extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: colors.surfaceContainerHighest
                                     .withOpacity(.55),
-                                borderRadius: BorderRadius.circular(22),
+                                borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,

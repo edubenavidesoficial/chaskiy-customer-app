@@ -11,6 +11,7 @@ import 'package:chaskiy/services/app.service.dart';
 import 'package:chaskiy/services/auth.service.dart';
 import 'package:chaskiy/services/driver_location.service.dart';
 import 'package:chaskiy/services/driver_assignment.service.dart';
+import 'package:chaskiy/widgets/order_status_chip.dart';
 import 'package:chaskiy/views/pages/driver/driver_order_details.page.dart';
 import 'package:flutter/material.dart';
 
@@ -252,26 +253,66 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final order = _orders[index];
-                    return Card(
-                      elevation: 0,
-                      child: ListTile(
+                    return Material(
+                      color: Theme.of(context).colorScheme.surfaceContainerLow,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                        ),
+                      ),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(8),
                         onTap: () => _openOrder(order),
-                        contentPadding: const EdgeInsets.all(14),
-                        leading: CircleAvatar(
-                          backgroundColor: AppColor.primaryColor.withValues(
-                            alpha: .1,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: AppColor.primaryColor.withValues(
+                                    alpha: .1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.local_shipping_outlined,
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '#${order.code}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    OrderStatusChip(order.status),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      order.formattedDate,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall?.copyWith(
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Icon(Icons.chevron_right_rounded),
+                            ],
                           ),
-                          child: const Icon(Icons.local_shipping_outlined),
                         ),
-                        title: Text(
-                          '#${order.code}',
-                          style: const TextStyle(fontWeight: FontWeight.w800),
-                        ),
-                        subtitle: Text(
-                          '${order.status}\n${order.formattedDate}',
-                        ),
-                        isThreeLine: true,
-                        trailing: const Icon(Icons.chevron_right),
                       ),
                     );
                   },
@@ -401,7 +442,10 @@ class _AvailabilityCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: (isOnline ? Colors.green : Colors.grey).withValues(alpha: .1),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: (isOnline ? Colors.green : Colors.grey).withValues(alpha: .25),
+        ),
       ),
       child: Row(
         children: [

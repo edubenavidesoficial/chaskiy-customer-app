@@ -25,10 +25,10 @@ class OrderDetailsCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
       child: Column(
@@ -48,7 +48,7 @@ class OrderDetailsCard extends StatelessWidget {
                 if (action != null) action!,
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
           ],
           child,
         ],

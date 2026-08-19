@@ -1,6 +1,7 @@
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/utils/utils.dart';
+import 'package:chaskiy/utils/order_status_localizer.dart';
 import 'package:chaskiy/widgets/buttons/custom_button.dart';
 import 'package:chaskiy/widgets/order_status_chip.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
@@ -8,7 +9,6 @@ import 'package:timelines_plus/timelines_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:chaskiy/view_models/order_details.vm.dart';
 import 'package:jiffy/jiffy.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 class OrderStatusView extends StatelessWidget {
   const OrderStatusView(this.vm, {Key? key}) : super(key: key);
@@ -67,29 +67,29 @@ class OrderStatusView extends StatelessWidget {
           ),
         ],
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         Timeline.tileBuilder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           builder: TimelineTileBuilder.connected(
             contentsAlign: ContentsAlign.basic,
             nodePositionBuilder: (context, index) => 0.00,
-            indicatorPositionBuilder: (context, index) => 0.20,
+            indicatorPositionBuilder: (context, index) => 0.14,
             indicatorBuilder: (context, index) {
               final orderStatus = vm.order.totalStatuses[index];
               return (orderStatus.passed ?? true)
                   ? DotIndicator(
                     color: theme.colorScheme.primary,
-                    size: 20,
+                    size: 24,
                     child: Icon(
                       FlutterIcons.check_ant,
-                      size: 11,
+                      size: 13,
                       color: theme.colorScheme.onPrimary,
                     ),
                   )
                   : OutlinedDotIndicator(
                     color: theme.colorScheme.outline,
-                    size: 20,
+                    size: 24,
                   );
             },
             connectorBuilder:
@@ -102,14 +102,14 @@ class OrderStatusView extends StatelessWidget {
               final passed = orderStatus.passed ?? true;
 
               return Padding(
-                padding: const EdgeInsets.only(left: 12, bottom: 18),
+                padding: const EdgeInsets.only(left: 14, bottom: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${orderStatus.name}".tr().capitalized,
+                      spanishOrderStatus('${orderStatus.name}'),
                       style: theme.textTheme.bodyLarge?.copyWith(
-                        fontWeight: passed ? FontWeight.w600 : FontWeight.w400,
+                        fontWeight: passed ? FontWeight.w700 : FontWeight.w500,
                         color:
                             passed
                                 ? theme.colorScheme.onSurface

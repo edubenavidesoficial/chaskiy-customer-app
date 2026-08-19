@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:chaskiy/constants/app_colors.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 class TaxiCustomTextFormField extends StatelessWidget {
   const TaxiCustomTextFormField({
@@ -22,38 +20,41 @@ class TaxiCustomTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return TextFormField(
-          decoration: InputDecoration(
-            hintText: hintText,
-            border: InputBorder.none,
-            contentPadding: EdgeInsets.symmetric(horizontal: 12),
-            suffix:
-                clear
-                    ? Icon(
-                      FlutterIcons.close_ant,
-                      color: Colors.red.shade300,
-                    ).onInkTap(() {
-                      controller.clear();
-                      onClearPressed();
-                    })
-                    : null,
-          ),
-          autofocus: false,
-          maxLines: 1,
-          controller: controller,
-          focusNode: focusNode,
-          onChanged: onChanged,
-        ).box
-        // .color(
-        //   focusNode.hasFocus ? context.theme.colorScheme.surface : Colors.grey.shade200,
-        // )
-        .withRounded(value: 5)
-        .clip(Clip.antiAlias)
-        .border(
-          color:
-              focusNode.hasFocus ? AppColor.primaryColor : Colors.grey.shade200,
-          width: 1.5,
-        )
-        .make();
+      decoration: InputDecoration(
+        hintText: hintText,
+        filled: true,
+        fillColor: colors.surface,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 15,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: colors.outlineVariant),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: AppColor.primaryColor, width: 2),
+        ),
+        suffixIcon:
+            clear && controller.text.isNotEmpty
+                ? IconButton(
+                  tooltip: 'Limpiar',
+                  onPressed: () {
+                    controller.clear();
+                    onClearPressed();
+                  },
+                  icon: const Icon(Icons.close_rounded),
+                )
+                : null,
+      ),
+      autofocus: false,
+      maxLines: 1,
+      controller: controller,
+      focusNode: focusNode,
+      onChanged: onChanged,
+    );
   }
 }
