@@ -59,12 +59,42 @@ class _OrdersPageState extends State<OrdersPage>
           return VStack([
             //
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
-              child: Text(
-                "My Orders".tr(),
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+              padding: const EdgeInsets.fromLTRB(20, 18, 12, 4),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "My Orders".tr(),
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          vm.orders.isEmpty
+                              ? 'Compras y viajes en un solo lugar'.tr()
+                              : '${vm.orders.length} ${vm.orders.length == 1 ? 'pedido' : 'pedidos'}',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Actualizar'.tr(),
+                    onPressed: vm.isBusy ? null : vm.fetchMyOrders,
+                    icon: const Icon(Icons.refresh_rounded),
+                    style: IconButton.styleFrom(
+                      backgroundColor: theme.colorScheme.surface,
+                      foregroundColor: theme.colorScheme.primary,
+                      side: BorderSide(color: theme.colorScheme.outlineVariant),
+                    ),
+                  ),
+                ],
               ),
             ),
             //

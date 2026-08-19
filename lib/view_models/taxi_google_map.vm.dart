@@ -186,6 +186,7 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     Uint8List? iconByteData = await MapUtils.imageToUint8List(
       base64String: vehicleType.iconBase64,
       url: vehicleType.icon,
+      targetWidth: 72,
     );
     if (iconByteData != null) {
       driverIcon = await BitmapDescriptor.fromBytes(iconByteData);

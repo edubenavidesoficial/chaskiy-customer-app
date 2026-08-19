@@ -22,6 +22,8 @@ class OrdersViewModel extends PaymentViewModel {
   int queryPage = 1;
   StreamSubscription? homePageChangeStream;
   StreamSubscription? refreshOrderStream;
+  Timer? _autoRefreshTimer;
+  bool _isFetching = false;
 
   void initialise() async {
     await fetchMyOrders();
@@ -36,6 +38,12 @@ class OrdersViewModel extends PaymentViewModel {
         fetchMyOrders();
       }
     });
+
+    _autoRefreshTimer?.cancel();
+    _autoRefreshTimer = Timer.periodic(
+      const Duration(seconds: 15),
+      (_) => refreshMyOrdersSilently(),
+    );
   }
 
   //
@@ -43,10 +51,13 @@ class OrdersViewModel extends PaymentViewModel {
     super.dispose();
     homePageChangeStream?.cancel();
     refreshOrderStream?.cancel();
+    _autoRefreshTimer?.cancel();
   }
 
   //
   fetchMyOrders({bool initialLoading = true}) async {
+    if (_isFetching) return;
+    _isFetching = true;
     if (initialLoading) {
       setBusy(true);
       queryPage = 1;
@@ -68,10 +79,32 @@ class OrdersViewModel extends PaymentViewModel {
     }
 
     setBusy(false);
+    _isFetching = false;
+  }
+
+  Future<void> refreshMyOrdersSilently() async {
+    if (_isFetching || !isAuthenticated()) return;
+    _isFetching = true;
+
+    try {
+      final latestOrders = await orderRequest.getOrders(page: 1);
+      final latestIds = latestOrders.map((order) => order.id).toSet();
+
+      orders = [
+        ...latestOrders,
+        ...orders.where((order) => !latestIds.contains(order.id)),
+      ];
+      clearErrors();
+      notifyListeners();
+    } catch (error) {
+      debugPrint('Silent order refresh failed: $error');
+    } finally {
+      _isFetching = false;
+    }
   }
 
   refreshDataSet() {
-    initialise();
+    fetchMyOrders();
   }
 
   openOrderDetails(Order order) async {

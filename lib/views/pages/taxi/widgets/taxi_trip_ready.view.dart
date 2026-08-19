@@ -1,123 +1,243 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/app_ui_settings.dart';
-import 'package:chaskiy/constants/sizes.dart';
-import 'package:chaskiy/utils/ui_spacer.dart';
-import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/view_models/taxi.vm.dart';
 import 'package:chaskiy/views/pages/order/widgets/taxi_order_trip_verification.view.dart';
 import 'package:chaskiy/views/pages/taxi/widgets/driver_info.view.dart';
 import 'package:chaskiy/views/pages/taxi/widgets/safety.view.dart';
 import 'package:chaskiy/widgets/buttons/call.button.dart';
 import 'package:chaskiy/widgets/buttons/custom_text_button.dart';
+import 'package:flutter/material.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:measure_size/measure_size.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 class TaxiTripReadyView extends StatelessWidget {
-  const TaxiTripReadyView(this.vm, {Key? key}) : super(key: key);
+  const TaxiTripReadyView(this.vm, {super.key});
+
   final TaxiViewModel vm;
+
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final trip = vm.onGoingOrderTrip!;
+
     return SlidingUpPanel(
       backdropColor: Colors.transparent,
-      minHeight: 300,
-      maxHeight: context.percentHeight * 70,
-      // borderRadius: BorderRadius.only(
-      //   topRight: Radius.circular(Sizes.radiusSmall),
-      //   topLeft: Radius.circular(Sizes.radiusSmall),
-      // ),
-      panelBuilder: (sc) {
+      minHeight: 310,
+      maxHeight: MediaQuery.sizeOf(context).height * 0.72,
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      panelBuilder: (scrollController) {
         return MeasureSize(
-          onChange: (size) {
-            vm.updateGoogleMapPadding(height: 320);
-          },
-          child: VStack(
-            [
-              UiSpacer.swipeIndicator(),
-              20.heightBox,
-              //driver info
-              TaxiDriverInfoView(
-                vm.onGoingOrderTrip!.driver!,
-                order: vm.onGoingOrderTrip!,
-              ),
-              //contact info
-              HStack(
-                [
-                  //message box
-                  if (AppUISettings.canDriverChat)
-                    Icon(
-                      FlutterIcons.message1_ant,
-                      size: 24,
-                      color: Utils.textColorByColor(AppColor.primaryColor),
-                    )
-                        .p8()
-                        .box
-                        .color(AppColor.primaryColor)
-                        .roundedFull
-                        .make()
-                        .onInkTap(vm.openTripChat),
-
-                  //call button
-                  if (AppUISettings.canCallDriver)
-                    CallButton(
-                      null,
-                      phone: vm.onGoingOrderTrip?.driver!.phone,
+          onChange: (_) => vm.updateGoogleMapPadding(height: 330),
+          child: Material(
+            color: scheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            clipBehavior: Clip.antiAlias,
+            child: ListView(
+              controller: scrollController,
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
+              children: [
+                Center(
+                  child: Container(
+                    width: 44,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: scheme.outlineVariant,
+                      borderRadius: BorderRadius.circular(3),
                     ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TaxiDriverInfoView(trip.driver!, order: trip),
+                const SizedBox(height: 14),
+                _ContactActions(vm: vm),
+                const SizedBox(height: 22),
+                Divider(height: 1, color: scheme.outlineVariant),
+                const SizedBox(height: 20),
+                _TripRoute(
+                  pickup: '${trip.taxiOrder?.pickupAddress}',
+                  dropoff: '${trip.taxiOrder?.dropoffAddress}',
+                ),
+                const SizedBox(height: 20),
+                Divider(height: 1, color: scheme.outlineVariant),
+                const SizedBox(height: 18),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: TaxiOrderTripVerificationView(trip)),
+                    Container(
+                      width: 1,
+                      height: 92,
+                      color: scheme.outlineVariant,
+                    ),
+                    const Expanded(child: SafetyView()),
+                  ],
+                ),
+                if (trip.canCancelTaxi) ...[
+                  const SizedBox(height: 18),
+                  Divider(height: 1, color: scheme.outlineVariant),
+                  const SizedBox(height: 8),
+                  CustomTextButton(
+                    title: 'Cancel Booking'.tr(),
+                    titleColor: AppColor.getStausColor('failed'),
+                    loading: vm.busy(trip),
+                    onPressed: vm.cancelTrip,
+                  ),
                 ],
-                crossAlignment: CrossAxisAlignment.center,
-                alignment: MainAxisAlignment.center,
-                spacing: 20,
-              ).wFull(context).py16(),
-
-              UiSpacer.divider().py12(),
-              //trip location details
-              "Pickup Location".tr().text.sm.light.make(),
-              "${vm.onGoingOrderTrip?.taxiOrder?.pickupAddress}"
-                  .text
-                  .lg
-                  .medium
-                  .make(),
-              UiSpacer.verticalSpace(),
-              "Dropoff Location".tr().text.sm.light.make(),
-              "${vm.onGoingOrderTrip?.taxiOrder?.dropoffAddress}"
-                  .text
-                  .lg
-                  .medium
-                  .make(),
-              UiSpacer.divider().py12(),
-              //trip codes
-              TaxiOrderTripVerificationView(vm.onGoingOrderTrip!),
-              //emergency
-              SafetyView(),
-              // UiSpacer.verticalSpace(),
-              UiSpacer.divider().py12(),
-              //cancel order button
-              //only show if driver is yet to be assigned
-              Visibility(
-                visible: vm.onGoingOrderTrip?.canCancelTaxi ?? false,
-                child: CustomTextButton(
-                  title: "Cancel Booking".tr(),
-                  titleColor: AppColor.getStausColor("failed"),
-                  loading: vm.busy(vm.onGoingOrderTrip),
-                  onPressed: vm.cancelTrip,
-                ).centered(),
-              ),
-            ],
-          )
-              .p20()
-              .scrollVertical(controller: sc)
-              .box
-              .color(context.theme.colorScheme.surface)
-              .topRounded(value: Sizes.radiusSmall)
-              .shadow5xl
-              .make(),
+              ],
+            ),
+          ),
         );
       },
-      // panel:,
-      // ),
+    );
+  }
+}
+
+class _ContactActions extends StatelessWidget {
+  const _ContactActions({required this.vm});
+
+  final TaxiViewModel vm;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (AppUISettings.canDriverChat)
+          _ActionButton(
+            icon: Icons.chat_bubble_outline_rounded,
+            label: 'Chat'.tr(),
+            onPressed: vm.openTripChat,
+          ),
+        if (AppUISettings.canDriverChat && AppUISettings.canCallDriver)
+          const SizedBox(width: 14),
+        if (AppUISettings.canCallDriver)
+          Column(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: scheme.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: CallButton(
+                  null,
+                  phone: vm.onGoingOrderTrip?.driver?.phone,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text('Llamar'.tr(), style: Theme.of(context).textTheme.bodySmall),
+            ],
+          ),
+      ],
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Column(
+      children: [
+        IconButton.filled(
+          onPressed: onPressed,
+          icon: Icon(icon),
+          style: IconButton.styleFrom(
+            fixedSize: const Size(48, 48),
+            backgroundColor: scheme.primary,
+            foregroundColor: scheme.onPrimary,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(label, style: Theme.of(context).textTheme.bodySmall),
+      ],
+    );
+  }
+}
+
+class _TripRoute extends StatelessWidget {
+  const _TripRoute({required this.pickup, required this.dropoff});
+
+  final String pickup;
+  final String dropoff;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: Column(
+            children: [
+              Icon(Icons.radio_button_checked, color: scheme.primary, size: 18),
+              Container(width: 2, height: 45, color: scheme.outlineVariant),
+              Icon(Icons.location_on_rounded, color: scheme.error, size: 20),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _RoutePoint(label: 'Pickup Location'.tr(), address: pickup),
+              const SizedBox(height: 18),
+              _RoutePoint(label: 'Dropoff Location'.tr(), address: dropoff),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RoutePoint extends StatelessWidget {
+  const _RoutePoint({required this.label, required this.address});
+
+  final String label;
+  final String address;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          address,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+            height: 1.25,
+          ),
+        ),
+      ],
     );
   }
 }

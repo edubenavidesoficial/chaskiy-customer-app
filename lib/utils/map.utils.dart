@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -35,6 +34,7 @@ class MapUtils {
   static Future<Uint8List?> imageToUint8List({
     String? url,
     String? base64String,
+    int? targetWidth,
   }) async {
     try {
       Uint8List imageData;
@@ -54,15 +54,17 @@ class MapUtils {
         throw Exception('Either URL or base64 string must be provided');
       }
 
-      // Decode the image to get its dimensions
-      final Completer<ui.Image> completer = Completer();
-      ui.decodeImageFromList(imageData, (ui.Image img) {
-        completer.complete(img);
-      });
-      ui.Image img = await completer.future;
+      final codec = await ui.instantiateImageCodec(
+        imageData,
+        targetWidth: targetWidth,
+      );
+      final frame = await codec.getNextFrame();
+      final img = frame.image;
 
       // Convert the image to ByteData
       ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+      img.dispose();
+      codec.dispose();
 
       // Return the data as Uint8List
       return byteData?.buffer.asUint8List();

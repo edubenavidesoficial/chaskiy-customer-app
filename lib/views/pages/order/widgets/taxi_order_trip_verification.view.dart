@@ -1,22 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:chaskiy/models/order.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 class TaxiOrderTripVerificationView extends StatelessWidget {
-  TaxiOrderTripVerificationView(this.order, {Key? key}) : super(key: key);
+  const TaxiOrderTripVerificationView(this.order, {super.key});
 
   final Order order;
 
   @override
   Widget build(BuildContext context) {
-    //
-    return VStack(
-      [
-        "Booking/Verification Code".tr().text.light.italic.lg.make(),
-        "${order.verificationCode}".text.xl2.semiBold.make(),
+    final theme = Theme.of(context);
+    return Column(
+      children: [
+        Icon(Icons.pin_outlined, color: theme.colorScheme.primary, size: 25),
+        const SizedBox(height: 6),
+        Text(
+          'Código de verificación'.tr(),
+          textAlign: TextAlign.center,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          '${order.verificationCode}',
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0,
+          ),
+        ),
       ],
-      crossAlignment: CrossAxisAlignment.center,
-    ).wFull(context);
+    );
   }
 }

@@ -1,134 +1,113 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/models/order.dart';
-import 'package:chaskiy/utils/ui_spacer.dart';
-import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/widgets/buttons/custom_button.dart';
 import 'package:chaskiy/widgets/custom_image.view.dart';
+import 'package:flutter/material.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class OrderDriverInfoView extends StatelessWidget {
-  OrderDriverInfoView(
+  const OrderDriverInfoView(
     this.order, {
     required this.rateDriverAction,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final Order order;
   final Function rateDriverAction;
 
   @override
   Widget build(BuildContext context) {
-    double avatarSize = context.percentWidth * 14;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final driver = order.driver;
 
-    //
-    return order.driver != null
-        ? VxBox(
-            child: VStack(
-              [
-                //driver info
-                HStack(
-                  [
-                    //driver profile
-                    Stack(
-                      children: [
-                        CustomImage(
-                          imageUrl: order.driver!.photo,
-                          width: avatarSize,
-                          height: avatarSize,
-                        ),
-                        //rating
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          child: HStack(
-                            [
-                              Icon(
-                                FlutterIcons.star_ant,
-                                size: 14,
-                                color: Utils.textColorByTheme(),
-                              ),
-                              UiSpacer.hSpace(2),
-                              //
-                              "${order.driver?.rating}"
-                                  .text
-                                  .sm
-                                  .color(Utils.textColorByTheme())
-                                  .make(),
-                            ],
-                            crossAlignment: CrossAxisAlignment.center,
-                            alignment: MainAxisAlignment.center,
-                          )
-                              .pSymmetric(v: 2, h: 6)
-                              .box
-                              .roundedLg
-                              .color(AppColor.ratingColor)
-                              .makeCentered(),
-                        ),
-                      ],
+    if (driver == null) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            CustomImage(
+              imageUrl: driver.photo,
+              width: 58,
+              height: 58,
+            ).box.roundedFull.clip(Clip.antiAlias).make(),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${driver.name}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
                     ),
-                    UiSpacer.hSpace(12),
-
-                    VStack(
-                      [
-                        "${order.driver?.name}".text.medium.xl.make(),
-                        VxRating(
-                          isSelectable: false,
-                          onRatingUpdate: (value) {},
-                          maxRating: 5.0,
-                          count: 5,
-                          value: order.driver?.rating ?? 0.0,
-                          selectionColor: AppColor.ratingColor,
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.star_rounded,
+                        size: 18,
+                        color: AppColor.ratingColor,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        driver.rating.toStringAsFixed(1),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
                         ),
-                      ],
-                    ).expand(),
-                  ],
-                  crossAlignment: CrossAxisAlignment.center,
-                ),
-                //vehicle info
-                Visibility(
-                  visible: order.driver?.vehicle != null,
-                  child: VStack(
-                    [
-                      UiSpacer.divider().py8(),
-                      HStack(
-                        [
-                          "${order.driver?.vehicle?.carMake} - ${order.driver?.vehicle?.carModel}"
-                              .text
-                              .medium
-                              .make(),
-                          UiSpacer.expandedSpace(),
-                          "${order.driver?.vehicle?.reg_no}"
-                              .text
-                              .lg
-                              .semiBold
-                              .make(),
-                        ],
                       ),
                     ],
                   ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        if (driver.vehicle != null) ...[
+          const SizedBox(height: 14),
+          Divider(height: 1, color: scheme.outlineVariant),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Icon(
+                Icons.directions_car_outlined,
+                size: 20,
+                color: scheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Text(
+                  '${driver.vehicle?.carMake} ${driver.vehicle?.carModel}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium,
                 ),
-
-                //has driver been rated
-                Visibility(
-                  visible: order.canRateDriver,
-                  child: VStack(
-                    [
-                      //rate driver button with action
-                      UiSpacer.divider().py8(),
-                      CustomButton(
-                        title: "Rate Driver".tr(),
-                        onPressed: rateDriverAction,
-                      ),
-                    ],
-                  ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '${driver.vehicle?.reg_no}',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
                 ),
-              ],
-            ).px20().py12(),
-          ).shadowXs.color(context.theme.colorScheme.surface).make()
-        : 0.heightBox;
+              ),
+            ],
+          ),
+        ],
+        if (order.canRateDriver) ...[
+          const SizedBox(height: 14),
+          CustomButton(
+            title: 'Rate Driver'.tr(),
+            height: 46,
+            onPressed: rateDriverAction,
+          ),
+        ],
+      ],
+    );
   }
 }

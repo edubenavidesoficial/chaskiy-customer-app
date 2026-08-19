@@ -18,7 +18,6 @@ import 'package:chaskiy/widgets/cards/order_summary.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/constants/sizes.dart';
 
 import 'widgets/taxi_trip_map.preview.dart';
@@ -51,12 +50,9 @@ class _TaxiOrderDetailPageState extends State<TaxiOrderDetailPage> {
           showAppBar: true,
           showLeadingAction: true,
           isLoading: vm.isBusy,
-          appBarColor: context.primaryColor,
-          appBarItemColor: Utils.textColorByPrimaryColor(),
-          backgroundColor:
-              context.isDarkMode
-                  ? context.theme.scaffoldBackgroundColor
-                  : Colors.grey.shade50,
+          appBarColor: context.theme.colorScheme.surfaceContainerLow,
+          appBarItemColor: context.theme.colorScheme.onSurface,
+          backgroundColor: context.theme.colorScheme.surfaceContainerLow,
           body:
               VStack([
                 //taxi trip map preview

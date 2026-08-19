@@ -1,107 +1,146 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/extensions/string.dart';
 import 'package:chaskiy/models/order.dart';
 import 'package:chaskiy/utils/utils.dart';
-import 'package:chaskiy/widgets/currency_hstack.dart';
-import 'package:intl/intl.dart';
+import 'package:chaskiy/widgets/order_status_chip.dart';
+import 'package:flutter/material.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
-import 'package:timelines_plus/timelines_plus.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 class BasicTaxiTripInfoView extends StatelessWidget {
-  BasicTaxiTripInfoView(this.order, {Key? key}) : super(key: key);
+  const BasicTaxiTripInfoView(this.order, {super.key});
 
   final Order order;
 
   @override
   Widget build(BuildContext context) {
-    return VStack([
-      //date, code, amount
-      HStack([
-        VStack([
-          "${DateFormat("dd MMM y 'at' H:m a").format(order.createdAt)}"
-              .text
-              .medium
-              .lg
-              .make(),
-          order.Taxistatus.tr().text
-              .color(AppColor.getStausColor(order.status))
-              .medium
-              .xl
-              .make(),
-        ]).expand(),
-        //total amount
-        VStack(
-          [
-            "#${order.code}".text.light.make(),
-            CurrencyHStack([
-              "${order.taxiOrder!.currency != null ? order.taxiOrder!.currency!.symbol : AppStrings.currencySymbol}"
-                  .text
-                  .semiBold
-                  .xl
-                  .make(),
-              "${(order.total ?? 0.00).currencyValueFormat()}".text.semiBold.xl2
-                  .make(),
-            ]),
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final currency =
+        order.taxiOrder?.currency?.symbol ?? AppStrings.currencySymbol;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    Utils.orderDate(order.createdAt),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 7),
+                  OrderStatusChip(order.Taxistatus),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '#${order.code}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '$currency ${order.total}'.currencyFormat(currency),
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
           ],
-          crossAlignment: CrossAxisAlignment.end,
-          alignment: MainAxisAlignment.end,
         ),
-      ], crossAlignment: CrossAxisAlignment.start),
-      //pickup/dropoff
-      Timeline.tileBuilder(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        builder: TimelineTileBuilder.connected(
-          itemCount: 2,
-          contentsAlign: ContentsAlign.basic,
-          nodePositionBuilder: (context, index) => 0.00,
-          indicatorBuilder: (context, index) {
-            return DotIndicator(
-              color: AppColor.primaryColor,
-              size: 28,
-              child:
-                  Icon(
-                    index == 0
-                        ? FlutterIcons.my_location_mdi
-                        : FlutterIcons.location_pin_ent,
-                    size: 20,
-                    color: Utils.textColorByTheme(),
-                  ).p4(),
-            );
-          },
-          connectorBuilder: (context, index, connectorType) {
-            return DashedLineConnector(
-              color: Colors.grey.shade600,
-              gap: 5,
-              space: 5,
-              indent: 5,
-            );
-          },
-          contentsBuilder: (context, index) {
-            return VStack([
-              //if created at is not null
-              Text(
-                index == 0 ? "Pickup Location".tr() : "Drop Off Location".tr(),
-                style: context.textTheme.bodySmall!.copyWith(
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              Text(
-                index == 0
-                    ? order.taxiOrder!.pickupAddress
-                    : order.taxiOrder!.dropoffAddress,
-                style: context.textTheme.bodyLarge!.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ]).p(Vx.dp20);
-          },
+        const SizedBox(height: 18),
+        Divider(height: 1, color: scheme.outlineVariant),
+        const SizedBox(height: 18),
+        _Route(
+          pickup: order.taxiOrder?.pickupAddress ?? '',
+          dropoff: order.taxiOrder?.dropoffAddress ?? '',
         ),
+      ],
+    );
+  }
+}
+
+class _Route extends StatelessWidget {
+  const _Route({required this.pickup, required this.dropoff});
+
+  final String pickup;
+  final String dropoff;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 3),
+          child: Column(
+            children: [
+              Icon(Icons.radio_button_checked, size: 18, color: scheme.primary),
+              Container(width: 2, height: 48, color: scheme.outlineVariant),
+              Icon(Icons.location_on_rounded, size: 20, color: scheme.error),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            children: [
+              _RoutePoint(label: 'Pickup Location'.tr(), address: pickup),
+              const SizedBox(height: 16),
+              _RoutePoint(label: 'Drop Off Location'.tr(), address: dropoff),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RoutePoint extends StatelessWidget {
+  const _RoutePoint({required this.label, required this.address});
+
+  final String label;
+  final String address;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            address,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              height: 1.25,
+            ),
+          ),
+        ],
       ),
-    ]);
+    );
   }
 }
