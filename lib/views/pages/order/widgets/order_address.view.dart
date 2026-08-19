@@ -30,6 +30,7 @@ class OrderAddressesView extends StatelessWidget {
     }
 
     //recorrido del pedido: de dónde sale y a dónde llega
+    final deliveryStops = vm.order.orderStops ?? [];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -39,7 +40,23 @@ class OrderAddressesView extends StatelessWidget {
           label: 'Recogida',
           address: "${vm.order.vendor?.address}",
         ),
-        if (vm.order.deliveryAddress != null) ...[
+        if (deliveryStops.isNotEmpty)
+          for (var index = 0; index < deliveryStops.length; index++) ...[
+            Container(
+              width: 2,
+              height: 18,
+              margin: const EdgeInsets.only(left: 9),
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+            _point(
+              context,
+              icon: AppImages.dropoffLocation,
+              label: 'Entrega ${index + 1}',
+              address: '${deliveryStops[index].deliveryAddress?.address ?? ''}',
+              name: deliveryStops[index].deliveryAddress?.name,
+            ),
+          ]
+        else if (vm.order.deliveryAddress != null) ...[
           Container(
             width: 2,
             height: 18,

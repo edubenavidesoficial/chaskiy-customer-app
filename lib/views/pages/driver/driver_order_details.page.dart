@@ -61,6 +61,11 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
   }
 
   Future<void> _startDeliveryVerification() async {
+    final stops = _order.orderStops ?? [];
+    if (stops.length > 1 && stops.any((stop) => !stop.verified)) {
+      _showError('Confirma cada parada antes de completar la ruta.');
+      return;
+    }
     final verified = await _verificationDialog();
     if (verified != true || !mounted) return;
 
@@ -109,6 +114,39 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
     );
     if (picked == null) return;
     await _submitProof(File(picked.path), proofType: 'delivery_photo');
+  }
+
+  Future<void> _verifyStop(int stopId) async {
+    final accepted = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Confirmar entrega'),
+            content: const Text(
+              'Confirma que entregaste los productos indicados en esta dirección.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Confirmar'),
+              ),
+            ],
+          ),
+    );
+    if (accepted != true) return;
+    setState(() => _loading = true);
+    try {
+      final order = await _request.verifyDeliveryStop(stopId: stopId);
+      if (mounted) setState(() => _order = order);
+    } catch (error) {
+      _showError(error);
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   Future<void> _advanceTaxi() async {
@@ -334,16 +372,46 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
           ),
         );
       }
-      final address = _order.deliveryAddress;
-      if (address != null) {
-        stops.add(
-          _Stop(
-            label: 'Entregar al cliente',
-            address: address.address ?? address.name ?? '',
-            latitude: '${address.latitude ?? ''}',
-            longitude: '${address.longitude ?? ''}',
-          ),
-        );
+      final deliveryStops = _order.orderStops ?? [];
+      if (deliveryStops.isNotEmpty) {
+        for (var index = 0; index < deliveryStops.length; index++) {
+          final address = deliveryStops[index].deliveryAddress;
+          if (address == null) continue;
+          stops.add(
+            _Stop(
+              label: 'Entrega ${index + 1}',
+              address: address.address ?? address.name ?? '',
+              latitude: '${address.latitude ?? ''}',
+              longitude: '${address.longitude ?? ''}',
+              stopId: deliveryStops[index].id,
+              verified: deliveryStops[index].verified,
+              items:
+                  deliveryStops[index].items.map((item) {
+                    final lineIndex =
+                        int.tryParse('${item['line_index']}') ?? -1;
+                    final quantity = int.tryParse('${item['quantity']}') ?? 0;
+                    final products = _order.orderProducts ?? [];
+                    final name =
+                        lineIndex >= 0 && lineIndex < products.length
+                            ? products[lineIndex].product?.name ?? 'Producto'
+                            : 'Producto';
+                    return '$quantity× $name';
+                  }).toList(),
+            ),
+          );
+        }
+      } else {
+        final address = _order.deliveryAddress;
+        if (address != null) {
+          stops.add(
+            _Stop(
+              label: 'Entregar al cliente',
+              address: address.address ?? address.name ?? '',
+              latitude: '${address.latitude ?? ''}',
+              longitude: '${address.longitude ?? ''}',
+            ),
+          );
+        }
       }
     }
 
@@ -359,6 +427,10 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
               isFirst: index == 0,
               isLast: index == stops.length - 1,
               onNavigate: () => _openStop(stops[index]),
+              onVerify:
+                  stops[index].stopId == null || stops[index].verified
+                      ? null
+                      : () => _verifyStop(stops[index].stopId!),
             ),
         ],
       ),
@@ -548,12 +620,18 @@ class _Stop {
     required this.address,
     required this.latitude,
     required this.longitude,
+    this.stopId,
+    this.verified = false,
+    this.items = const [],
   });
 
   final String label;
   final String address;
   final String latitude;
   final String longitude;
+  final int? stopId;
+  final bool verified;
+  final List<String> items;
 
   /// Sin coordenadas el botón de navegar no lleva a ninguna parte.
   bool get canNavigate {
@@ -569,12 +647,14 @@ class _StopTile extends StatelessWidget {
     required this.isFirst,
     required this.isLast,
     required this.onNavigate,
+    this.onVerify,
   });
 
   final _Stop stop;
   final bool isFirst;
   final bool isLast;
   final VoidCallback onNavigate;
+  final VoidCallback? onVerify;
 
   @override
   Widget build(BuildContext context) {
@@ -625,10 +705,34 @@ class _StopTile extends StatelessWidget {
                       color: scheme.onSurfaceVariant,
                     ),
                   ),
+                  if (stop.items.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    for (final item in stop.items)
+                      Text(
+                        item,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                  ],
+                  if (stop.verified)
+                    Text(
+                      'Entregado',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: Colors.green.shade700,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                 ],
               ),
             ),
           ),
+          if (onVerify != null)
+            TextButton.icon(
+              onPressed: onVerify,
+              icon: const Icon(Icons.check_circle_outline, size: 18),
+              label: const Text('Entregar'),
+            ),
           if (stop.canNavigate)
             _RoundIconButton(
               icon: Icons.navigation_rounded,

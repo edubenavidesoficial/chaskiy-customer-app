@@ -120,6 +120,15 @@ class OrderRequest extends HttpService {
     return Order.fromJson(response.body['order']);
   }
 
+  Future<Order> verifyDeliveryStop({required int stopId}) async {
+    final result = await post('/package/order/stop/verify/$stopId', {});
+    final response = ApiResponse.fromResponse(result);
+    if (!response.allGood) {
+      throw response.message ?? 'No se pudo confirmar la entrega';
+    }
+    return Order.fromJson(response.body['order']);
+  }
+
   Future<Order> acceptDriverAssignment({
     required int orderId,
     required int driverId,

@@ -11,6 +11,7 @@ import 'package:chaskiy/views/pages/checkout/widgets/checkout_section.view.dart'
 import 'package:chaskiy/views/pages/checkout/widgets/driver_cash_delivery_note.view.dart';
 import 'package:chaskiy/views/pages/checkout/widgets/driver_tip.view.dart';
 import 'package:chaskiy/views/pages/checkout/widgets/order_delivery_address.view.dart';
+import 'package:chaskiy/views/pages/checkout/widgets/multi_delivery.view.dart';
 import 'package:chaskiy/views/pages/checkout/widgets/payment_methods.view.dart';
 import 'package:chaskiy/views/pages/checkout/widgets/schedule_order.view.dart';
 import 'package:chaskiy/widgets/base.page.dart';
@@ -47,6 +48,10 @@ class CheckoutPage extends StatelessWidget {
             if (vm.vendor!.allowScheduleOrder)
               UiSpacer.verticalSpace(space: 16),
             OrderDeliveryAddressPickerView(vm),
+            if (vm.canUseMultiDelivery) ...[
+              UiSpacer.verticalSpace(space: 16),
+              MultiDeliveryView(vm),
+            ],
 
             //propina
             if (!vm.isPickup) ...[

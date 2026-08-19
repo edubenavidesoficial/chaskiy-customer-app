@@ -25,6 +25,8 @@ class Vendor {
     required this.description,
     required this.baseDeliveryFee,
     required this.deliveryFee,
+    required this.allowMultiDelivery,
+    required this.perDeliveryFee,
     required this.deliveryRange,
     required this.distance,
     required this.tax,
@@ -83,6 +85,8 @@ class Vendor {
   String description;
   double baseDeliveryFee;
   double deliveryFee;
+  bool allowMultiDelivery;
+  double perDeliveryFee;
   double deliveryRange;
   double? distance;
   String tax;
@@ -160,6 +164,10 @@ class Vendor {
           json["delivery_fee"] == null
               ? 0.00
               : double.parse(json["delivery_fee"].toString()),
+      allowMultiDelivery:
+          json["allow_multi_delivery"] == true ||
+          json["allow_multi_delivery"].toString() == "1",
+      perDeliveryFee: double.tryParse(json["per_delivery_fee"].toString()) ?? 0,
       deliveryRange:
           json["delivery_range"] == null
               ? 0
@@ -311,6 +319,8 @@ class Vendor {
     "description": description,
     "base_delivery_fee": baseDeliveryFee,
     "delivery_fee": deliveryFee,
+    "allow_multi_delivery": allowMultiDelivery,
+    "per_delivery_fee": perDeliveryFee,
     "delivery_range": deliveryRange,
     "distance": distance,
     "tax": tax,

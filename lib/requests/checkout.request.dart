@@ -48,6 +48,11 @@ class CheckoutRequest extends HttpService {
       "products": checkout.cartItems?.map((e) => e.toCheckout()).toList(),
       "vendor_id": checkout.cartItems?.first.product?.vendorId,
       "delivery_address_id": checkout.deliveryAddress?.id,
+      if (checkout.useMultiDelivery)
+        "deliveries":
+            checkout.deliveries
+                .map((e) => e.toPayload(checkout.cartItems ?? []))
+                .toList(),
       "payment_method_id": checkout.paymentMethod?.id,
       "sub_total": checkout.subTotal,
       "discount": checkout.discount,
@@ -57,10 +62,7 @@ class CheckoutRequest extends HttpService {
       "total": checkout.total,
       "token": checkout.token,
     };
-    final apiResult = await post(
-      Api.orders,
-      payload,
-    );
+    final apiResult = await post(Api.orders, payload);
     //
     return ApiResponse.fromResponse(apiResult);
   }
@@ -90,10 +92,7 @@ class CheckoutRequest extends HttpService {
     if (kDebugMode) {
       log("Multiple Vendor Order Payload: ${jsonEncode(orderPayload)}");
     }
-    final apiResult = await post(
-      Api.orders,
-      orderPayload,
-    );
+    final apiResult = await post(Api.orders, orderPayload);
     //
     return ApiResponse.fromResponse(apiResult);
   }
@@ -116,11 +115,7 @@ class CheckoutRequest extends HttpService {
       }
 
       //
-      feesObjects.add({
-        "id": fee.id,
-        "name": feeName,
-        "amount": calFee,
-      });
+      feesObjects.add({"id": fee.id, "name": feeName, "amount": calFee});
       //
     }
 
@@ -132,9 +127,10 @@ class CheckoutRequest extends HttpService {
       "vendor_id": packageCheckout.vendor?.id,
       "pickup_date": packageCheckout.date,
       "pickup_time": packageCheckout.time,
-      "stops": packageCheckout.allStops?.map((e) {
-        return e?.toJson();
-      }).toList(),
+      "stops":
+          packageCheckout.allStops?.map((e) {
+            return e?.toJson();
+          }).toList(),
       "recipient_name": packageCheckout.recipientName,
       "recipient_phone": packageCheckout.recipientPhone,
       "weight": packageCheckout.weight,
@@ -157,10 +153,7 @@ class CheckoutRequest extends HttpService {
       log("Package Order Payload: ${jsonEncode(payload)}");
     }
 
-    final apiResult = await post(
-      Api.orders,
-      payload,
-    );
+    final apiResult = await post(Api.orders, payload);
     //
     return ApiResponse.fromResponse(apiResult);
   }
@@ -183,9 +176,10 @@ class CheckoutRequest extends HttpService {
       "pickup_date": checkout.deliverySlotDate,
       "pickup_time": checkout.deliverySlotTime,
       "hours": service.selectedQty,
-      "service_price": service_amount != null
-          ? service_amount
-          : service.showDiscount
+      "service_price":
+          service_amount != null
+              ? service_amount
+              : service.showDiscount
               ? service.discountPrice
               : service.price,
       "payment_method_id": checkout.paymentMethod?.id,
@@ -220,10 +214,7 @@ class CheckoutRequest extends HttpService {
       });
     }
     //
-    final apiResult = await post(
-      Api.orders,
-      params,
-    );
+    final apiResult = await post(Api.orders, params);
     //
     return ApiResponse.fromResponse(apiResult);
   }
@@ -255,10 +246,7 @@ class CheckoutRequest extends HttpService {
         //file size in kb
         final fileSize = file!.lengthSync() / 1024;
         if (fileSize > AppFileLimit.prescriptionFileSizeLimit) {
-          file = await Utils.compressFile(
-            file: file,
-            quality: 60,
-          );
+          file = await Utils.compressFile(file: file, quality: 60);
         }
         //
         formData.files.add(
@@ -268,10 +256,7 @@ class CheckoutRequest extends HttpService {
     }
 
     //make api request
-    final apiResult = await postWithFiles(
-      Api.orders,
-      formData,
-    );
+    final apiResult = await postWithFiles(Api.orders, formData);
     //
     return ApiResponse.fromResponse(apiResult);
   }
@@ -301,10 +286,7 @@ class CheckoutRequest extends HttpService {
 
   Future<CheckOut> orderSummary(Map payload) async {
     //
-    final apiResult = await post(
-      Api.generalOrderSummary,
-      payload,
-    );
+    final apiResult = await post(Api.generalOrderSummary, payload);
 
     final apiResponse = ApiResponse.fromResponse(apiResult);
     if (apiResponse.allGood) {
@@ -316,10 +298,7 @@ class CheckoutRequest extends HttpService {
 
   Future<CheckOut> serviceOrderSummary(Map payload) async {
     //
-    final apiResult = await post(
-      Api.serviceOrderSummary,
-      payload,
-    );
+    final apiResult = await post(Api.serviceOrderSummary, payload);
 
     final apiResponse = ApiResponse.fromResponse(apiResult);
     if (apiResponse.allGood) {

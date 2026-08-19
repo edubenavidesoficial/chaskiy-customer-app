@@ -23,10 +23,15 @@ class OrderDetailsItemsView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        //paradas del envío de paquete
-        if (vm.order.isPackageDelivery) ...[
+        if ((vm.order.orderStops?.isNotEmpty ?? false) &&
+            (vm.order.isPackageDelivery ||
+                vm.order.orderStops!.length > 1)) ...[
           OrderStopsView(vm),
           const SizedBox(height: 12),
+        ],
+
+        //medidas del envío de paquete
+        if (vm.order.isPackageDelivery) ...[
           AmountTile("Package Type".tr(), "${vm.order.packageType?.name}"),
           AmountTile("Width".tr(), "${vm.order.width} cm"),
           AmountTile("Length".tr(), "${vm.order.length} cm"),

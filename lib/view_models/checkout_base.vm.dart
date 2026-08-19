@@ -7,6 +7,7 @@ import 'package:chaskiy/models/checkout.dart';
 import 'package:chaskiy/models/delivery_address.dart';
 import 'package:chaskiy/models/vendor.dart';
 import 'package:chaskiy/models/payment_method.dart';
+import 'package:chaskiy/models/multi_delivery.dart';
 import 'package:chaskiy/requests/checkout.request.dart';
 import 'package:chaskiy/requests/delivery_address.request.dart';
 import 'package:chaskiy/requests/order.request.dart';
@@ -198,6 +199,17 @@ class CheckoutBaseViewModel extends PaymentViewModel {
           onSelectDeliveryAddress: (deliveryAddress) {
             this.deliveryAddress = deliveryAddress;
             checkout?.deliveryAddress = deliveryAddress;
+            if (checkout?.useMultiDelivery == true &&
+                checkout!.deliveries.isNotEmpty) {
+              final current = checkout!.deliveries.first;
+              checkout!.deliveries[0] = MultiDelivery(
+                deliveryAddress: deliveryAddress,
+                quantities: Map<int, int>.from(current.quantities),
+                recipientName: current.recipientName,
+                recipientPhone: current.recipientPhone,
+                note: current.note,
+              );
+            }
             //
             checkDeliveryRange();
             updateTotalOrderSummary();
@@ -211,6 +223,119 @@ class CheckoutBaseViewModel extends PaymentViewModel {
     return mDeliveryAddress;
   }
 
+  int get totalCartQuantity => CartServices.productsInCart.fold(
+    0,
+    (total, cart) => total + (cart.selectedQty ?? 0),
+  );
+
+  bool get canUseMultiDelivery =>
+      vendor?.allowMultiDelivery == true && totalCartQuantity > 1 && !isPickup;
+
+  void toggleMultiDelivery(bool enabled) {
+    if (!enabled || !canUseMultiDelivery) {
+      checkout?.useMultiDelivery = false;
+      checkout?.deliveries = [];
+      updateTotalOrderSummary();
+      notifyListeners();
+      return;
+    }
+    if (deliveryAddress == null) {
+      AlertService.error(
+        title: 'Dirección de entrega',
+        text: 'Selecciona primero la dirección de la primera entrega.',
+      );
+      return;
+    }
+
+    checkout?.useMultiDelivery = true;
+    checkout?.deliveries = [
+      MultiDelivery(
+        deliveryAddress: deliveryAddress!,
+        quantities: {
+          for (
+            var index = 0;
+            index < CartServices.productsInCart.length;
+            index++
+          )
+            index: CartServices.productsInCart[index].selectedQty ?? 0,
+        },
+      ),
+    ];
+    notifyListeners();
+  }
+
+  Future<void> addMultiDeliveryAddress() async {
+    final selected = await showModalBottomSheet<DeliveryAddress>(
+      context: viewContext,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder:
+          (context) => DeliveryAddressPicker(
+            onSelectDeliveryAddress:
+                (address) => Navigator.pop(context, address),
+          ),
+    );
+    if (selected == null) return;
+    if (checkout!.deliveries.any(
+      (item) => item.deliveryAddress.id == selected.id,
+    )) {
+      AlertService.error(
+        title: 'Dirección repetida',
+        text: 'Cada dirección debe aparecer una sola vez en la ruta.',
+      );
+      return;
+    }
+    checkout!.deliveries.add(MultiDelivery(deliveryAddress: selected));
+    notifyListeners();
+  }
+
+  void removeMultiDelivery(int index) {
+    if (index == 0) return;
+    checkout!.deliveries.removeAt(index);
+    if (multiDeliveryDistributionIsValid) updateTotalOrderSummary();
+    notifyListeners();
+  }
+
+  int assignedQuantityForLine(int lineIndex, {int? excludingStop}) {
+    var total = 0;
+    for (var index = 0; index < (checkout?.deliveries.length ?? 0); index++) {
+      if (index != excludingStop) {
+        total += checkout!.deliveries[index].quantityFor(lineIndex);
+      }
+    }
+    return total;
+  }
+
+  int maxQuantityForLine(int stopIndex, int lineIndex) {
+    final purchased = CartServices.productsInCart[lineIndex].selectedQty ?? 0;
+    return purchased -
+        assignedQuantityForLine(lineIndex, excludingStop: stopIndex);
+  }
+
+  void changeDeliveryQuantity(int stopIndex, int lineIndex, int quantity) {
+    if (quantity <= 0) {
+      checkout!.deliveries[stopIndex].quantities.remove(lineIndex);
+    } else {
+      checkout!.deliveries[stopIndex].quantities[lineIndex] = quantity;
+    }
+    if (multiDeliveryDistributionIsValid) updateTotalOrderSummary();
+    notifyListeners();
+  }
+
+  bool get multiDeliveryDistributionIsValid {
+    if (checkout?.useMultiDelivery != true) return true;
+    final deliveries = checkout!.deliveries;
+    if (deliveries.length < 2 ||
+        deliveries.any((item) => item.totalQuantity < 1)) {
+      return false;
+    }
+    for (var index = 0; index < CartServices.productsInCart.length; index++) {
+      final expected = CartServices.productsInCart[index].selectedQty ?? 0;
+      if (assignedQuantityForLine(index) != expected) return false;
+    }
+    return true;
+  }
+
   //
   togglePickupStatus(bool? value) {
     //
@@ -221,6 +346,10 @@ class CheckoutBaseViewModel extends PaymentViewModel {
     }
     isPickup = value ?? false;
     checkout?.isPickup = isPickup;
+    if (isPickup && checkout?.useMultiDelivery == true) {
+      checkout?.useMultiDelivery = false;
+      checkout?.deliveries = [];
+    }
     //remove delivery address if pickup
     if (isPickup) {
       checkout?.deliveryAddress = null;
@@ -308,6 +437,12 @@ class CheckoutBaseViewModel extends PaymentViewModel {
       "vendor_id": vendor!.id,
       "products":
           CartServices.productsInCart.map((e) => e.toCheckout()).toList(),
+      "deliveries":
+          checkout?.useMultiDelivery == true
+              ? checkout!.deliveries
+                  .map((e) => e.toPayload(CartServices.productsInCart))
+                  .toList()
+              : null,
     };
 
     setBusy(true);
@@ -372,6 +507,12 @@ class CheckoutBaseViewModel extends PaymentViewModel {
       AlertService.error(
         title: "Delivery address".tr(),
         text: "Please select delivery address".tr(),
+      );
+    } else if (!multiDeliveryDistributionIsValid) {
+      AlertService.error(
+        title: 'Distribución de entregas',
+        text:
+            'Asigna todas las unidades y deja al menos un producto en cada dirección.',
       );
     } else if (delievryAddressOutOfRange && !isPickup) {
       //

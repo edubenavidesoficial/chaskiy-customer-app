@@ -5,6 +5,7 @@ import 'package:chaskiy/models/coupon.dart';
 import 'package:chaskiy/models/delivery_address.dart';
 import 'package:chaskiy/models/fee.dart';
 import 'package:chaskiy/models/payment_method.dart';
+import 'package:chaskiy/models/multi_delivery.dart';
 
 class CheckOut {
   double subTotal;
@@ -30,6 +31,8 @@ class CheckOut {
   String? deliveryFeeToken;
   List<Fee> fees = [];
   double totalFee;
+  bool useMultiDelivery;
+  List<MultiDelivery> deliveries;
 
   //
   CheckOut({
@@ -56,6 +59,8 @@ class CheckOut {
     this.deliveryFeeToken,
     this.fees = const [],
     this.totalFee = 0,
+    this.useMultiDelivery = false,
+    this.deliveries = const [],
   });
 
   //
@@ -66,38 +71,46 @@ class CheckOut {
   //from json
   factory CheckOut.fromJson(Map<String, dynamic> json) {
     return CheckOut(
-      subTotal: json["sub_total"] == null
-          ? 0.00
-          : double.parse(json["sub_total"].toString()),
-      discount: json["discount"] == null
-          ? 0.00
-          : double.parse(json["discount"].toString()),
-      deliveryDiscount: json["delivery_discount"] == null
-          ? 0.00
-          : double.parse(json["delivery_discount"].toString()),
-      deliveryFee: json["delivery_fee"] == null
-          ? 0.00
-          : double.parse(json["delivery_fee"].toString()),
+      subTotal:
+          json["sub_total"] == null
+              ? 0.00
+              : double.parse(json["sub_total"].toString()),
+      discount:
+          json["discount"] == null
+              ? 0.00
+              : double.parse(json["discount"].toString()),
+      deliveryDiscount:
+          json["delivery_discount"] == null
+              ? 0.00
+              : double.parse(json["delivery_discount"].toString()),
+      deliveryFee:
+          json["delivery_fee"] == null
+              ? 0.00
+              : double.parse(json["delivery_fee"].toString()),
       tax: json["tax"] == null ? 0.00 : double.parse(json["tax"].toString()),
       tax_rate: double.tryParse(json["tax_rate"].toString()),
       total:
           json["total"] == null ? 0.00 : double.parse(json["total"].toString()),
-      totalWithTip: json["total_with_tip"] == null
-          ? 0.00
-          : double.parse(json["total_with_tip"].toString()),
+      totalWithTip:
+          json["total_with_tip"] == null
+              ? 0.00
+              : double.parse(json["total_with_tip"].toString()),
       isPickup: json["is_pickup"] == null ? false : json["is_pickup"],
       isScheduled: json["is_scheduled"] == null ? false : json["is_scheduled"],
       pickupDate: json["pickup_date"] == null ? "" : json["pickup_date"],
       pickupTime: json["pickup_time"] == null ? "" : json["pickup_time"],
-      deliveryAddress: json["delivery_address"] == null
-          ? null
-          : DeliveryAddress.fromJson(json["delivery_address"]),
-      paymentMethod: json["payment_method"] == null
-          ? null
-          : PaymentMethod.fromJson(json["payment_method"]),
-      cartItems: json["products"] == null
-          ? null
-          : List<Cart>.from(json["products"].map((x) => Cart.fromJson(x))),
+      deliveryAddress:
+          json["delivery_address"] == null
+              ? null
+              : DeliveryAddress.fromJson(json["delivery_address"]),
+      paymentMethod:
+          json["payment_method"] == null
+              ? null
+              : PaymentMethod.fromJson(json["payment_method"]),
+      cartItems:
+          json["products"] == null
+              ? null
+              : List<Cart>.from(json["products"].map((x) => Cart.fromJson(x))),
       deliverySlotDate:
           json["delivery_slot_date"] == null ? "" : json["delivery_slot_date"],
       deliverySlotTime:
@@ -105,16 +118,19 @@ class CheckOut {
       photo: json["photo"] == null ? null : File(json["photo"]),
       coupon: json["coupon"] == null ? null : Coupon.fromJson(json["coupon"]),
       token: json["token"] == null ? null : json["token"],
-      deliveryFeeToken: json["delivery_fee_token"] == null
-          ? null
-          : json["delivery_fee_token"],
+      deliveryFeeToken:
+          json["delivery_fee_token"] == null
+              ? null
+              : json["delivery_fee_token"],
       //
-      fees: json["fees"] == null
-          ? []
-          : List<Fee>.from(json["fees"].map((x) => Fee.fromJson(x))),
-      totalFee: json["total_fee"] == null
-          ? 0.00
-          : double.parse(json["total_fee"].toString()),
+      fees:
+          json["fees"] == null
+              ? []
+              : List<Fee>.from(json["fees"].map((x) => Fee.fromJson(x))),
+      totalFee:
+          json["total_fee"] == null
+              ? 0.00
+              : double.parse(json["total_fee"].toString()),
     );
   }
 
@@ -143,6 +159,9 @@ class CheckOut {
       "delivery_fee_token": deliveryFeeToken,
       "fees": fees.map((x) => x.toJson()).toList(),
       "total_fee": totalFee,
+      "use_multi_delivery": useMultiDelivery,
+      "deliveries":
+          deliveries.map((e) => e.toPayload(cartItems ?? [])).toList(),
     };
   }
 
