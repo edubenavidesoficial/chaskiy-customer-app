@@ -76,7 +76,7 @@ class _BasePageState extends State<BasePage> {
         textDirection: Utils.isArabic ? TextDirection.rtl : TextDirection.ltr,
         child: KeyboardDismisser(
           child: Scaffold(
-            resizeToAvoidBottomInset: false,
+            resizeToAvoidBottomInset: true,
             // backgroundColor: widget.backgroundColor ?? AppColor.faintBgColor,
             backgroundColor: widget.backgroundColor ?? context.backgroundColor,
             extendBodyBehindAppBar: widget.extendBodyBehindAppBar ?? false,

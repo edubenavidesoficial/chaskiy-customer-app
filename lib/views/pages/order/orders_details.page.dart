@@ -67,13 +67,14 @@ class OrderDetailsPage extends StatelessWidget {
                   : SmartRefresher(
                     controller: vm.refreshController,
                     onRefresh: vm.fetchOrderDetails,
-                    child: SingleChildScrollView(
+                    child: ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 720),
-                          child: Column(
+                      children: [
+                        Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 720),
+                            child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children:
                                 [
@@ -157,9 +158,10 @@ class OrderDetailsPage extends StatelessWidget {
                                     ),
                                   ),
                                 ].map(_spaced).toList(),
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
           bottomSheet: isOrderTracking ? null : OrderBottomSheet(vm),

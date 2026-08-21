@@ -253,7 +253,9 @@ class _AccountVerificationEntryState extends State<AccountVerificationEntry> {
             ).py12(),
           ),
         ],
-      ).p20().hFull(context),
+      ).p20().scrollVertical(
+        physics: const AlwaysScrollableScrollPhysics(),
+      ),
     );
   }
 

@@ -40,23 +40,24 @@ class OrderStatusChip extends StatelessWidget {
   ({Color background, Color foreground}) _paletteFor(ThemeData theme) {
     final scheme = theme.colorScheme;
     final semantics = theme.semantics;
+    final normalizedStatus = status.trim().toLowerCase();
 
     //entregado
-    if (["delivered", "completed", "successful"].contains(status)) {
+    if (["delivered", "completed", "successful"].contains(normalizedStatus)) {
       return (
         background: semantics.successContainer,
         foreground: semantics.onSuccessContainer,
       );
     }
     //no llegó a completarse
-    if (["failed", "fail", "cancelled", "cancel"].contains(status)) {
+    if (["failed", "fail", "cancelled", "cancel"].contains(normalizedStatus)) {
       return (
         background: scheme.errorContainer,
         foreground: scheme.onErrorContainer,
       );
     }
     //todavía no lo toma el negocio
-    if (["pending", "scheduled"].contains(status)) {
+    if (["pending", "scheduled"].contains(normalizedStatus)) {
       return (
         background: semantics.warningContainer,
         foreground: semantics.onWarningContainer,
