@@ -57,37 +57,60 @@ class _WalletPageState extends State<WalletPage> with WidgetsBindingObserver {
             onRefresh: () => vm.loadWalletData(),
             onLoad: () => vm.getWalletTransactions(initialLoading: false),
             dataset: [],
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
             separator: 0.heightBox,
             loading: vm.isBusy,
             child: SingleChildScrollView(
-              child: VStack(
-                [
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: VStack([
                   //
                   WalletManagementView(
                     viewmodel: vm,
                     breif: false,
+                    padding: EdgeInsets.zero,
                   ),
 
                   //transactions list
-                  VStack(
-                    [
-                      "Wallet Transactions".tr().text.bold.xl.make(),
-                      CustomListView(
-                        noScrollPhysics: true,
-                        isLoading: vm.busy(vm.walletTransactions),
-                        dataSet: vm.walletTransactions,
-                        itemBuilder: (context, index) {
-                          return WalletTransactionListItem(
-                              vm.walletTransactions[index]);
-                        },
-                        separatorBuilder: (_, __) => 10.heightBox,
-                      ),
-                    ],
-                    spacing: 10,
-                  ).px20(),
-                ],
-                spacing: 10,
+                  VStack([
+                    Row(
+                      children: [
+                        Expanded(
+                          child: MediaQuery.withClampedTextScaling(
+                            maxScaleFactor: 1.3,
+                            child: Text(
+                              "Wallet Transactions".tr(),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.titleLarge
+                                  ?.copyWith(fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '${vm.walletTransactions.length}',
+                          style: Theme.of(
+                            context,
+                          ).textTheme.labelLarge?.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                    CustomListView(
+                      noScrollPhysics: true,
+                      isLoading: vm.busy(vm.walletTransactions),
+                      dataSet: vm.walletTransactions,
+                      itemBuilder: (context, index) {
+                        return WalletTransactionListItem(
+                          vm.walletTransactions[index],
+                        );
+                      },
+                      separatorBuilder: (_, __) => 10.heightBox,
+                    ),
+                  ], spacing: 12),
+                ], spacing: 24),
               ),
             ),
           );

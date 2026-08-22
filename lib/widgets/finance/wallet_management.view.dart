@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/constants/app_ui_settings.dart';
 import 'package:chaskiy/constants/sizes.dart';
@@ -71,11 +72,9 @@ class _WalletManagementViewState extends State<WalletManagementView>
     final textColor = Utils.textColorByColor(bgColor);
     //
     return Padding(
-      padding: widget.padding ??
-          const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 16,
-          ),
+      padding:
+          widget.padding ??
+          const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: ViewModelBuilder<WalletViewModel>.reactive(
         viewModelBuilder: () => mViewmodel!,
         disposeViewModel: widget.viewmodel == null,
@@ -84,156 +83,91 @@ class _WalletManagementViewState extends State<WalletManagementView>
             stream: AuthServices.listenToAuthState(),
             builder: (ctx, snapshot) {
               //
-              if (!snapshot.hasData) {
+              if (!snapshot.hasData && widget.breif) {
                 return UiSpacer.emptySpace();
               }
               //view for full info
               if (!widget.breif) {
-                return VStack(
-                  [
-                    //
-                    Visibility(
-                      visible: vm.isBusy,
-                      child: BusyIndicator(),
-                    ),
+                final colorScheme = Theme.of(context).colorScheme;
+                final primary = AppColor.primaryColor;
+                final balance =
+                    "${AppStrings.currencySymbol} ${vm.wallet?.balance ?? 0.00}"
+                        .currencyFormat();
 
-                    VStack(
-                      [
-                        //
-                        "${AppStrings.currencySymbol} ${vm.wallet != null ? vm.wallet?.balance : 0.00}"
-                            .currencyFormat()
-                            .text
-                            .color(textColor)
-                            .xl3
-                            .semiBold
-                            .makeCentered(),
-                        UiSpacer.verticalSpace(space: 5),
-                        "Wallet Balance"
-                            .tr()
-                            .text
-                            .color(textColor)
-                            .makeCentered(),
+                return Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 18),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: colorScheme.outlineVariant),
+                  ),
+                  child: Column(
+                    children: [
+                      if (vm.isBusy) ...[
+                        const SizedBox(height: 2),
+                        BusyIndicator(),
+                        const SizedBox(height: 10),
                       ],
-                    ),
-
-                    UiSpacer.vSpace(10),
-                    //buttons
-                    Visibility(
-                      visible: !vm.isBusy,
-                      child: HStack(
-                        [
-                          //tranfer button
-                          if (AppUISettings.allowWalletTransfer)
-                            CustomButton(
-                              shapeRadius: Sizes.radiusSmall,
-                              onPressed: vm.showWalletTransferEntry,
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: VStack(
-                                  [
-                                    Icon(
-                                      HugeIcons.strokeRoundedMoneySend01,
-                                      color: Utils.textColorByPrimaryColor(),
-                                      size: Sizes.fontSizeExtraLarge,
-                                    ),
-
-                                    //
-                                    "Send"
-                                        .tr()
-                                        .text
-                                        .size(Sizes.fontSizeExtraSmall)
-                                        .color(Utils.textColorByPrimaryColor())
-                                        .make(),
-                                  ],
-                                  crossAlignment: CrossAxisAlignment.center,
-                                  alignment: MainAxisAlignment.center,
-                                  spacing: 1,
-                                ).py(0),
-                              ),
-                            ).expand(flex: 2),
-
-                          //topup button
-                          CustomButton(
-                            shapeRadius: Sizes.radiusSmall,
-                            onPressed: vm.showAmountEntry,
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: VStack(
-                                [
-                                  Icon(
-                                    // Icons.add,
-                                    HugeIcons.strokeRoundedMoneyAdd01,
-                                    color: Utils.textColorByPrimaryColor(),
-                                    size: Sizes.fontSizeExtraLarge,
-                                  ),
-                                  //
-                                  "Top Up"
-                                      .tr()
-                                      .text
-                                      .size(Sizes.fontSizeExtraSmall)
-                                      .color(Utils.textColorByPrimaryColor())
-                                      .make(),
-                                ],
-                                crossAlignment: CrossAxisAlignment.center,
-                                alignment: MainAxisAlignment.center,
-                                spacing: 1,
-                              ).py(0),
-                            ),
-                          ).expand(flex: 3),
-
-                          //tranfer button
-                          if (AppUISettings.allowWalletTransfer)
-                            CustomButton(
-                              shapeRadius: Sizes.radiusSmall,
-                              onPressed: vm.showMyWalletAddress,
-                              loading: vm.busy(vm.showMyWalletAddress),
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: VStack(
-                                  [
-                                    Icon(
-                                      HugeIcons.strokeRoundedMoneyReceive01,
-                                      color: Utils.textColorByPrimaryColor(),
-                                      size: Sizes.fontSizeExtraLarge,
-                                    ),
-
-                                    //
-                                    "Receive"
-                                        .tr()
-                                        .text
-                                        .size(Sizes.fontSizeExtraSmall)
-                                        .color(Utils.textColorByPrimaryColor())
-                                        .make(),
-                                  ],
-                                  crossAlignment: CrossAxisAlignment.center,
-                                  alignment: MainAxisAlignment.center,
-                                  spacing: 1,
-                                ).py(0),
-                              ),
-                            ).expand(flex: 2),
-                        ],
-                        spacing: 10,
-                        alignment: MainAxisAlignment.center,
-                        crossAlignment: CrossAxisAlignment.center,
+                      Text(
+                        'Saldo disponible'.tr(),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
-                    ),
-                  ],
-                  alignment: MainAxisAlignment.center,
-                  crossAlignment: CrossAxisAlignment.center,
-                )
-                    .p12()
-                    .box
-                    .shadowXs
-                    .color(bgColor)
-                    .withRounded(value: Sizes.radiusSmall)
-                    .make()
-                    .wFull(context);
+                      const SizedBox(height: 6),
+                      Text(
+                        balance,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 22),
+                      if (!vm.isBusy)
+                        Row(
+                          children: [
+                            if (AppUISettings.allowWalletTransfer) ...[
+                              Expanded(
+                                child: _WalletAction(
+                                  icon: HugeIcons.strokeRoundedMoneySend01,
+                                  label: 'Send'.tr(),
+                                  color: primary,
+                                  onTap: vm.showWalletTransferEntry,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                            ],
+                            Expanded(
+                              child: _WalletAction(
+                                icon: HugeIcons.strokeRoundedMoneyAdd01,
+                                label: 'Top Up'.tr(),
+                                color: primary,
+                                onTap: vm.showAmountEntry,
+                              ),
+                            ),
+                            if (AppUISettings.allowWalletTransfer) ...[
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _WalletAction(
+                                  icon: HugeIcons.strokeRoundedMoneyReceive01,
+                                  label: 'Receive'.tr(),
+                                  color: primary,
+                                  onTap: vm.showMyWalletAddress,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                    ],
+                  ),
+                );
               }
 
-              return VStack(
-                [
-                  HStack(
-                    [
+              return VStack([
+                    HStack([
                       //loading
                       if (vm.isBusy) BusyIndicator(),
                       //
@@ -283,18 +217,14 @@ class _WalletManagementViewState extends State<WalletManagementView>
                           ),
                         ),
                       ),
-                    ],
-                    spacing: 20,
-                  ),
-                  "Tap for more info/action"
-                      .tr()
-                      .text
-                      .color(textColor)
-                      .sm
-                      .makeCentered(),
-                ],
-                spacing: 3,
-              )
+                    ], spacing: 20),
+                    "Tap for more info/action"
+                        .tr()
+                        .text
+                        .color(textColor)
+                        .sm
+                        .makeCentered(),
+                  ], spacing: 3)
                   .p12()
                   .box
                   .shadowXs
@@ -302,14 +232,58 @@ class _WalletManagementViewState extends State<WalletManagementView>
                   .withRounded(value: Sizes.radiusSmall)
                   .make()
                   .wFull(context)
-                  .onInkTap(
-                () {
-                  context.nextPage(WalletPage());
-                },
-              );
+                  .onInkTap(() {
+                    context.nextPage(WalletPage());
+                  });
             },
           );
         },
+      ),
+    );
+  }
+}
+
+class _WalletAction extends StatelessWidget {
+  const _WalletAction({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 76),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: .08),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color, size: 25),
+            const SizedBox(height: 7),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                color: color,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

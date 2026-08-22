@@ -6,7 +6,6 @@ import 'package:velocity_x/velocity_x.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/constants/app_ui_settings.dart';
 import 'package:chaskiy/extensions/string.dart';
-import 'package:chaskiy/services/app.service.dart';
 import 'package:chaskiy/services/auth.service.dart';
 import 'package:chaskiy/view_models/wallet.vm.dart';
 import 'package:chaskiy/views/pages/wallet/wallet.page.dart';
@@ -158,35 +157,6 @@ class _GojekWalletCardState extends State<GojekWalletCard>
                                   : vm.showAmountEntry,
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 10),
-                    Divider(
-                      color: Colors.white.withValues(alpha: .22),
-                      height: 1,
-                    ),
-                    InkWell(
-                      onTap: () => AppService().homePageIndex.add(3),
-                      child: const Padding(
-                        padding: EdgeInsets.only(top: 9),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'Completar verificación (KYC)',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
-                            Icon(
-                              Icons.chevron_right_rounded,
-                              color: Colors.white,
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
                   ],
                 ),
