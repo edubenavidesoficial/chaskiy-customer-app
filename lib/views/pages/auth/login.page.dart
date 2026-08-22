@@ -40,10 +40,8 @@ class _LoginPageState extends State<LoginPage> {
     return DynamicStatusBar(
       baseColor: context.backgroundColor,
       child: ViewModelBuilder<LoginViewModel>.reactive(
-        viewModelBuilder: () => LoginViewModel(
-          context,
-          expectedRole: widget.expectedRole,
-        ),
+        viewModelBuilder:
+            () => LoginViewModel(context, expectedRole: widget.expectedRole),
         onViewModelReady: (model) => model.initialise(),
         builder: (context, model, child) {
           return PopScope(
@@ -73,102 +71,99 @@ class _LoginPageState extends State<LoginPage> {
               body: SafeArea(
                 top: true,
                 bottom: false,
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    bottom: context.mq.viewInsets.bottom,
-                  ),
-                  child:
+                child:
+                    VStack([
+                      //
                       VStack([
                         //
-                        VStack([
-                          //
-                          HStack([
-                            VStack([
-                              (widget.expectedRole == AppRole.driver
-                                      ? "Acceso para conductores"
-                                      : "Welcome Back".tr())
-                                  .text
-                                  .xl2
-                                  .semiBold
-                                  .make(),
-                              (widget.expectedRole == AppRole.driver
-                                      ? "Conductor o motorizado"
-                                      : "Login to continue".tr())
-                                  .text
-                                  .light
-                                  .make(),
-                            ]).expand(),
-                            Image.asset(AppImages.appLogo)
-                                .h(60)
-                                .w(60)
-                                .box
-                                .withRounded(value: Sizes.radiusSmall)
-                                .clip(Clip.antiAlias)
-                                .make(),
-                          ]),
-
-                          //LOGIN Section
-                          //both login type
-                          if (AppStrings.enableOTPLogin &&
-                              AppStrings.enableEmailLogin)
-                            CombinedLoginTypeView(
-                              model,
-                              radius: Sizes.radiusLarge,
-                            ),
-                          //only email login
-                          if (AppStrings.enableEmailLogin &&
-                              !AppStrings.enableOTPLogin)
-                            EmailLoginView(model),
-                          //only otp login
-                          if (AppStrings.enableOTPLogin &&
-                              !AppStrings.enableEmailLogin)
-                            OTPLoginView(model),
-                        ]).wFull(context).px20().pOnly(top: Vx.dp20),
-                        //
-                        //register
                         HStack([
-                            UiSpacer.divider().expand(),
-                            "OR".tr().text.light.make().px8(),
-                            UiSpacer.divider().expand(),
-                          ]).py8().px20(),
-                        (widget.expectedRole == AppRole.driver
-                                ? '¿Nuevo conductor?'
-                                : "New user?".tr())
-                            .richText
-                            .withTextSpanChildren([
-                              " ".textSpan.make(),
-                              (widget.expectedRole == AppRole.driver
-                                      ? 'Crear cuenta de conductor'
-                                      : "Create An Account".tr())
-                                  .textSpan
-                                  .semiBold
-                                  .color(AppColor.primaryColor)
-                                  .make(),
-                            ])
-                            .makeCentered()
-                            .py12()
-                              .onInkTap(model.openRegister),
-                        if (widget.expectedRole == AppRole.customer)
-                          SocialMediaView(model, bottomPadding: 10),
-                        ScanLoginView(model),
-                        if (widget.expectedRole == AppRole.customer)
                           VStack([
-                            _DriverAccessCard(
-                              onTap: () => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => LoginPage(
-                                    expectedRole: AppRole.driver,
+                            (widget.expectedRole == AppRole.driver
+                                    ? "Acceso para conductores"
+                                    : "Welcome Back".tr())
+                                .text
+                                .xl2
+                                .semiBold
+                                .make(),
+                            (widget.expectedRole == AppRole.driver
+                                    ? "Conductor o motorizado"
+                                    : "Login to continue".tr())
+                                .text
+                                .light
+                                .make(),
+                          ]).expand(),
+                          Image.asset(AppImages.appLogo)
+                              .h(60)
+                              .w(60)
+                              .box
+                              .withRounded(value: Sizes.radiusSmall)
+                              .clip(Clip.antiAlias)
+                              .make(),
+                        ]),
+
+                        //LOGIN Section
+                        //both login type
+                        if (AppStrings.enableOTPLogin &&
+                            AppStrings.enableEmailLogin)
+                          CombinedLoginTypeView(
+                            model,
+                            radius: Sizes.radiusLarge,
+                          ),
+                        //only email login
+                        if (AppStrings.enableEmailLogin &&
+                            !AppStrings.enableOTPLogin)
+                          EmailLoginView(model),
+                        //only otp login
+                        if (AppStrings.enableOTPLogin &&
+                            !AppStrings.enableEmailLogin)
+                          OTPLoginView(model),
+                      ]).wFull(context).px20().pOnly(top: Vx.dp20),
+                      //
+                      //register
+                      HStack([
+                        UiSpacer.divider().expand(),
+                        "OR".tr().text.light.make().px8(),
+                        UiSpacer.divider().expand(),
+                      ]).py8().px20(),
+                      (widget.expectedRole == AppRole.driver
+                              ? '¿Nuevo conductor?'
+                              : "New user?".tr())
+                          .richText
+                          .withTextSpanChildren([
+                            " ".textSpan.make(),
+                            (widget.expectedRole == AppRole.driver
+                                    ? 'Crear cuenta de conductor'
+                                    : "Create An Account".tr())
+                                .textSpan
+                                .semiBold
+                                .color(AppColor.primaryColor)
+                                .make(),
+                          ])
+                          .makeCentered()
+                          .py12()
+                          .onInkTap(model.openRegister),
+                      if (widget.expectedRole == AppRole.customer)
+                        SocialMediaView(model, bottomPadding: 10),
+                      ScanLoginView(model),
+                      if (widget.expectedRole == AppRole.customer)
+                        VStack([
+                          _DriverAccessCard(
+                            onTap:
+                                () => Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) => LoginPage(
+                                          expectedRole: AppRole.driver,
+                                        ),
                                   ),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            _VendorAccessCard(
-                              onTap: () => _openVendorLogin(context),
-                            ),
-                          ]).px20().py16(),
-                      ]).scrollVertical(),
-                ),
+                          ),
+                          const SizedBox(height: 10),
+                          _VendorAccessCard(
+                            onTap: () => _openVendorLogin(context),
+                          ),
+                        ]).px20().py16(),
+                    ]).scrollVertical(),
               ),
             ),
           );
@@ -202,9 +197,7 @@ class _DriverAccessCard extends StatelessWidget {
       color: AppColor.primaryColor.withValues(alpha: .08),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(Sizes.radiusLarge),
-        side: BorderSide(
-          color: AppColor.primaryColor.withValues(alpha: .18),
-        ),
+        side: BorderSide(color: AppColor.primaryColor.withValues(alpha: .18)),
       ),
       child: ListTile(
         onTap: onTap,
@@ -236,9 +229,7 @@ class _VendorAccessCard extends StatelessWidget {
       color: AppColor.primaryColor.withValues(alpha: .08),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(Sizes.radiusLarge),
-        side: BorderSide(
-          color: AppColor.primaryColor.withValues(alpha: .18),
-        ),
+        side: BorderSide(color: AppColor.primaryColor.withValues(alpha: .18)),
       ),
       child: ListTile(
         onTap: onTap,

@@ -124,6 +124,7 @@ dependencies:
   upgrader: ^12.5.0
   url_launcher: ^6.3.2
   velocity_x: ^4.3.1
+  video_player: ^2.12.0
   what3words: ^3.2.0
 
 dependency_overrides:
@@ -164,5 +165,6 @@ flutter:
   assets:
     - assets/images/
     - assets/images/icons/
+    - assets/videos/
     - assets/json/
     - assets/lang/

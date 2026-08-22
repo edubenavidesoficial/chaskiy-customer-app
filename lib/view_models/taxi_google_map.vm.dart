@@ -335,37 +335,102 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
   }
 
   //setupCurrentLocationAsPickuplocation()
-  setupCurrentLocationAsPickuplocation() async {
+  Future<void> setupCurrentLocationAsPickuplocation() async {
+    final cachedAddress = LocationService.currenctAddress;
+    final cachedLatitude = cachedAddress?.coordinates?.latitude;
+    final cachedLongitude = cachedAddress?.coordinates?.longitude;
+    if (_validCoordinates(cachedLatitude, cachedLongitude)) {
+      _setPickupLocation(
+        latitude: cachedLatitude!,
+        longitude: cachedLongitude!,
+        address: cachedAddress?.addressLine,
+        name: cachedAddress?.featureName,
+      );
+      return;
+    }
+
     try {
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        await _restorePickupLocation();
+        return;
+      }
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        await _restorePickupLocation();
+        return;
+      }
+
       Position currentLocation = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
           timeLimit: Duration(seconds: 12),
         ),
       );
-      final address = await GeocoderService().findAddressesFromCoordinates(
-        Coordinates(currentLocation.latitude, currentLocation.longitude),
-      );
-      final label =
-          address.isNotEmpty
-              ? (address.first.addressLine ?? address.first.featureName)
-              : null;
-      pickupLocation = DeliveryAddress(
-        name:
-            address.isNotEmpty ? address.first.featureName : 'Ubicación actual',
-        address: label?.isNotEmpty == true ? label : 'Ubicación actual',
+
+      // Preserve the valid GPS position even when reverse geocoding fails.
+      _setPickupLocation(
         latitude: currentLocation.latitude,
         longitude: currentLocation.longitude,
       );
-      pickupLocationTEC.text = pickupLocation?.address ?? "";
-      notifyListeners();
-    } catch (_) {
-      final saved = await LocationService.restoreSelectedAddress();
-      if (saved != null && saved.latitude != null && saved.longitude != null) {
-        pickupLocation = saved;
-        pickupLocationTEC.text = saved.address ?? 'Ubicación actual';
-        notifyListeners();
+
+      try {
+        final addresses = await GeocoderService().findAddressesFromCoordinates(
+          Coordinates(currentLocation.latitude, currentLocation.longitude),
+        );
+        if (addresses.isNotEmpty) {
+          final address = addresses.first;
+          _setPickupLocation(
+            latitude: currentLocation.latitude,
+            longitude: currentLocation.longitude,
+            address: address.addressLine,
+            name: address.featureName,
+          );
+        }
+      } catch (_) {
+        // The coordinates already provide a valid pickup point.
       }
+    } catch (_) {
+      await _restorePickupLocation();
+    }
+  }
+
+  bool _validCoordinates(double? latitude, double? longitude) {
+    return latitude != null &&
+        longitude != null &&
+        !(latitude == 0 && longitude == 0);
+  }
+
+  void _setPickupLocation({
+    required double latitude,
+    required double longitude,
+    String? address,
+    String? name,
+  }) {
+    final label = address?.trim();
+    pickupLocation = DeliveryAddress(
+      name: name?.trim().isNotEmpty == true ? name : 'Ubicación actual',
+      address: label?.isNotEmpty == true ? label : 'Ubicación actual',
+      latitude: latitude,
+      longitude: longitude,
+    );
+    pickupLocationTEC.text = pickupLocation!.address!;
+    notifyListeners();
+  }
+
+  Future<void> _restorePickupLocation() async {
+    final saved = await LocationService.restoreSelectedAddress();
+    if (_validCoordinates(saved?.latitude, saved?.longitude)) {
+      _setPickupLocation(
+        latitude: saved!.latitude!,
+        longitude: saved.longitude!,
+        address: saved.address,
+        name: saved.name,
+      );
     }
   }
 
