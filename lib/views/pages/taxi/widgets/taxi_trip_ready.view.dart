@@ -58,6 +58,47 @@ class TaxiTripReadyView extends StatelessWidget {
                   pickup: '${trip.taxiOrder?.pickupAddress}',
                   dropoff: '${trip.taxiOrder?.dropoffAddress}',
                 ),
+                if (const {
+                  'pending',
+                  'preparing',
+                  'ready',
+                  'enroute',
+                }.contains(trip.status.toLowerCase())) ...[
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: vm.busy(trip) ? null : vm.changeTripDestination,
+                    icon: const Icon(Icons.edit_location_alt_outlined),
+                    label: Text('Cambiar destino'.tr()),
+                  ),
+                ],
+                if (trip.status.toLowerCase() == 'enroute') ...[
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: scheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.info_outline_rounded,
+                          color: scheme.onPrimaryContainer,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Al llegar, comparte tu código con el conductor. Él finalizará el viaje y podrás calificarlo enseguida.'
+                                .tr(),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: scheme.onPrimaryContainer),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 20),
                 Divider(height: 1, color: scheme.outlineVariant),
                 const SizedBox(height: 18),
@@ -78,7 +119,7 @@ class TaxiTripReadyView extends StatelessWidget {
                   Divider(height: 1, color: scheme.outlineVariant),
                   const SizedBox(height: 8),
                   CustomTextButton(
-                    title: 'Cancel Booking'.tr(),
+                    title: 'Cancelar viaje'.tr(),
                     titleColor: AppColor.getStausColor('failed'),
                     loading: vm.busy(trip),
                     onPressed: vm.cancelTrip,

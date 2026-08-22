@@ -55,7 +55,21 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
       _refreshInterval,
       (_) => _load(silent: true),
     );
-    _load();
+    _loadCachedThenRefresh();
+  }
+
+  Future<void> _loadCachedThenRefresh() async {
+    final user = await AuthServices.getCurrentUser();
+    final params = {'driver_id': user.id, 'type': 'assigned'};
+    final cached = await _orderRequest.getCachedOrders(params: params);
+    if (mounted && cached.isNotEmpty) {
+      setState(() {
+        _user = user;
+        _orders = cached;
+        _loading = false;
+      });
+    }
+    await _load(silent: cached.isNotEmpty);
   }
 
   @override

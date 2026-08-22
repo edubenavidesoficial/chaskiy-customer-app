@@ -6,6 +6,7 @@ import 'package:chaskiy/widgets/buttons/custom_text_button.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:measure_size/measure_size.dart';
 import 'package:velocity_x/velocity_x.dart';
+import 'package:chaskiy/views/pages/order/widgets/taxi_order_trip_verification.view.dart';
 
 class TripDriverSearch extends StatelessWidget {
   const TripDriverSearch(this.vm, {Key? key}) : super(key: key);
@@ -20,30 +21,43 @@ class TripDriverSearch extends StatelessWidget {
         onChange: (size) {
           vm.updateGoogleMapPadding(height: size.height);
         },
-        child: VStack(
-          [
-            //cancel order button
-            "Searching for a driver. Please wait...".tr().text.makeCentered(),
-            //loading indicator
-            BusyIndicator().centered().py12(),
-            //only show if driver is yet to be assigned
-            Visibility(
-              visible: vm.onGoingOrderTrip?.canCancelTaxi ?? false,
-              child: CustomTextButton(
-                title: "Cancel Booking".tr(),
-                titleColor: AppColor.getStausColor("failed"),
-                loading: vm.busy(vm.onGoingOrderTrip),
-                onPressed: vm.cancelTrip,
-              ).centered(),
-            ),
-          ],
-        )
-            .p20()
-            .box
-            .color(context.theme.colorScheme.surface)
-            .roundedSM
-            .outerShadow2Xl
-            .make(),
+        child:
+            VStack([
+                  //cancel order button
+                  "Buscando un conductor disponible"
+                      .tr()
+                      .text
+                      .semiBold
+                      .makeCentered(),
+                  "Puedes compartir el código cuando el conductor llegue"
+                      .tr()
+                      .text
+                      .color(context.theme.colorScheme.onSurfaceVariant)
+                      .sm
+                      .makeCentered()
+                      .py8(),
+                  if (vm.onGoingOrderTrip != null)
+                    TaxiOrderTripVerificationView(vm.onGoingOrderTrip!).py8(),
+                  //loading indicator
+                  BusyIndicator().centered().py8(),
+                  //only show if driver is yet to be assigned
+                  Visibility(
+                    visible: vm.onGoingOrderTrip?.canCancelTaxi ?? false,
+                    child:
+                        CustomTextButton(
+                          title: "Cancelar viaje".tr(),
+                          titleColor: AppColor.getStausColor("failed"),
+                          loading: vm.busy(vm.onGoingOrderTrip),
+                          onPressed: vm.cancelTrip,
+                        ).centered(),
+                  ),
+                ])
+                .p20()
+                .box
+                .color(context.theme.colorScheme.surface)
+                .roundedSM
+                .outerShadow2Xl
+                .make(),
       ),
     );
   }

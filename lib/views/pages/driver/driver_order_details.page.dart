@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:chaskiy/constants/app_strings.dart';
@@ -28,6 +29,21 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
   final ImagePicker _imagePicker = ImagePicker();
   late Order _order = widget.order;
   bool _loading = false;
+  Timer? _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (!_loading && !_isFinished) _refresh(silent: true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
 
   bool get _isTaxi =>
       _order.taxiOrder != null || _order.type.toLowerCase().contains('taxi');
@@ -39,9 +55,13 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
     'failed',
   }.contains(_order.status.toLowerCase());
 
-  Future<void> _refresh() async {
-    final order = await _request.getOrderDetails(id: _order.id);
-    if (mounted) setState(() => _order = order);
+  Future<void> _refresh({bool silent = false}) async {
+    try {
+      final order = await _request.getOrderDetails(id: _order.id);
+      if (mounted) setState(() => _order = order);
+    } catch (error) {
+      if (!silent) _showError(error);
+    }
   }
 
   Future<void> _changeStatus(String status) async {

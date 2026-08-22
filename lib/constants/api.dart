@@ -92,6 +92,7 @@ class Api {
   static const driverEarning = "/earning/user";
   static const newTaxiBooking = "/taxi/book/order";
   static const currentTaxiBooking = "/taxi/current/order";
+  static const updateTaxiDestination = "/taxi/order";
   static const lastRatebleTaxiBooking = "/taxi/rateable/order";
   static const cancelTaxiBooking = "/taxi/order/cancel";
   static const acceptDriverAssignment = "/taxi/order/asignment/accept";

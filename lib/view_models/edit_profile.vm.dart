@@ -58,7 +58,13 @@ class EditProfileViewModel extends MyBaseViewModel {
 
   //
   void changePhoto() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1600,
+      maxHeight: 1600,
+      imageQuality: 82,
+      requestFullMetadata: false,
+    );
     if (pickedFile != null) {
       newPhoto = File(pickedFile.path);
     } else {

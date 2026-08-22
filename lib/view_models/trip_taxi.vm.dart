@@ -87,6 +87,84 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     setBusyForObject(onGoingOrderTrip, false);
   }
 
+  Future<void> changeTripDestination() async {
+    final trip = onGoingOrderTrip;
+    final previousDestination = dropoffLocation;
+    if (trip == null || previousDestination == null) return;
+
+    final destination = await showDeliveryAddressPicker();
+    if (destination.latitude == null ||
+        destination.longitude == null ||
+        (destination.address ?? '').trim().isEmpty) {
+      dropoffLocation = previousDestination;
+      checkout?.deliveryAddress = previousDestination;
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: viewContext,
+      builder:
+          (context) => AlertDialog(
+            title: Text('Cambiar destino'.tr()),
+            content: Text(
+              '${destination.address}\n\nLa ruta y la tarifa se recalcularán antes de continuar.'
+                  .tr(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text('Volver'.tr()),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text('Confirmar destino'.tr()),
+              ),
+            ],
+          ),
+    );
+    if (confirmed != true) {
+      dropoffLocation = previousDestination;
+      checkout?.deliveryAddress = previousDestination;
+      return;
+    }
+
+    setBusyForObject(trip, true);
+    try {
+      final response = await taxiRequest.updateDestination(
+        trip.id,
+        destination,
+      );
+      if (!response.allGood || response.body is! Map) {
+        throw response.message ?? 'No se pudo cambiar el destino'.tr();
+      }
+      final source = response.body['order'];
+      if (source is! Map) {
+        throw 'El servidor no devolvió el viaje actualizado'.tr();
+      }
+      onGoingOrderTrip = Order.fromJson(Map<String, dynamic>.from(source));
+      dropoffLocation = DeliveryAddress(
+        address: onGoingOrderTrip?.taxiOrder?.dropoffAddress,
+        latitude: onGoingOrderTrip?.taxiOrder?.dropoffLatitude.toDoubleOrNull(),
+        longitude:
+            onGoingOrderTrip?.taxiOrder?.dropoffLongitude.toDoubleOrNull(),
+      );
+      checkout?.deliveryAddress = dropoffLocation;
+      await drawTripPolyLines();
+      toastSuccessful(
+        response.message ??
+            'Destino actualizado. La ruta y la tarifa fueron recalculadas.'
+                .tr(),
+      );
+      notifyListeners();
+    } catch (error) {
+      dropoffLocation = previousDestination;
+      checkout?.deliveryAddress = previousDestination;
+      toastError(error.toString());
+    } finally {
+      setBusyForObject(trip, false);
+    }
+  }
+
   //
   loadTripUIByOrderStatus({bool initial = false}) {
     //
@@ -249,7 +327,14 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
       final previousDriverId = onGoingOrderTrip?.driverId;
       final previousStatus = onGoingOrderTrip?.status;
       final refreshedTrip = await taxiRequest.getOnGoingTrip();
-      if (refreshedTrip == null) return;
+      if (refreshedTrip == null) {
+        // El endpoint de viaje activo deja de devolver la orden apenas el
+        // conductor la completa. Esa respuesta es una transición real, no un
+        // error: debe abrir la calificación en lugar de dejar la vista vieja.
+        onGoingOrderTrip = null;
+        loadTripUIByOrderStatus();
+        return;
+      }
       onGoingOrderTrip = refreshedTrip;
       final driverAssigned =
           previousDriverId == null && refreshedTrip.driverId != null;

@@ -39,7 +39,10 @@ class DriverAssignmentService {
         // no exista token, el permiso esté denegado o APNs aún no esté listo.
       }
       await _poll();
-      _pollTimer = Timer.periodic(const Duration(seconds: 5), (_) => _poll());
+      // FCM wakes this service immediately when available. A short API poll is
+      // the deterministic fallback for shared hosting, restricted networks and
+      // devices where push delivery is delayed.
+      _pollTimer = Timer.periodic(const Duration(seconds: 2), (_) => _poll());
       _notificationSubscription = AppService().refreshAssignedOrders.listen((
         _,
       ) {

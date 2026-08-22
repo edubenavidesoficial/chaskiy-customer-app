@@ -125,6 +125,19 @@ class TaxiRequest extends HttpService {
     return ApiResponse.fromResponse(apiResult);
   }
 
+  Future<ApiResponse> updateDestination(
+    int orderId,
+    DeliveryAddress destination,
+  ) async {
+    final apiResult =
+        await patch('${Api.updateTaxiDestination}/$orderId/destination', {
+          'address': destination.address,
+          'latitude': destination.latitude,
+          'longitude': destination.longitude,
+        });
+    return ApiResponse.fromResponse(apiResult);
+  }
+
   //
   Future<Driver> getDriverInfo(int id) async {
     //la asignación del conductor también es información en tiempo real

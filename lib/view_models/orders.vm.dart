@@ -26,7 +26,14 @@ class OrdersViewModel extends PaymentViewModel {
   bool _isFetching = false;
 
   void initialise() async {
-    await fetchMyOrders();
+    final cachedOrders = await orderRequest.getCachedOrders();
+    if (cachedOrders.isNotEmpty) {
+      orders = cachedOrders;
+      notifyListeners();
+      await refreshMyOrdersSilently();
+    } else {
+      await fetchMyOrders();
+    }
 
     homePageChangeStream = AppService().homePageIndex.stream.listen((index) {
       //
