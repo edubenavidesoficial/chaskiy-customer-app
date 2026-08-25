@@ -21,10 +21,26 @@ class FeaturedVendorListItem extends StatelessWidget {
 
   // Escala de grises para negocios cerrados (más elegante que el tinte rojo)
   static const _grayscaleFilter = ColorFilter.matrix(<double>[
-    0.2126, 0.7152, 0.0722, 0, 0,
-    0.2126, 0.7152, 0.0722, 0, 0,
-    0.2126, 0.7152, 0.0722, 0, 0,
-    0, 0, 0, 1, 0,
+    0.2126,
+    0.7152,
+    0.0722,
+    0,
+    0,
+    0.2126,
+    0.7152,
+    0.0722,
+    0,
+    0,
+    0.2126,
+    0.7152,
+    0.0722,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
   ]);
 
   @override
@@ -192,10 +208,11 @@ class FeaturedVendorListItem extends StatelessWidget {
     if (vendor.categories.isNotEmpty) {
       return vendor.categories.take(2).map((c) => c.name).join(' · ');
     }
-    final description = vendor.description
-        .replaceAll('&nbsp;', ' ')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
+    final description =
+        vendor.description
+            .replaceAll('&nbsp;', ' ')
+            .replaceAll(RegExp(r'\s+'), ' ')
+            .trim();
     return description.isNotEmpty ? description : vendor.vendorType.name;
   }
 
@@ -238,17 +255,18 @@ class FeaturedVendorListItem extends StatelessWidget {
     if (vendor.delivery == 1) {
       // el costo real lo calcula el backend al ordenar (base + por km),
       // así que solo se presume "gratis" cuando todos los cargos son cero
-      final free = vendor.deliveryFee <= 0 &&
+      final free =
+          vendor.deliveryFee <= 0 &&
           vendor.baseDeliveryFee <= 0 &&
           vendor.chargePerKm <= 0;
-      label = free ? 'Envío gratis' : 'Envío a domicilio';
+      label = free ? 'Envío gratis' : 'A domicilio';
       color = _successColor;
     } else {
-      label = 'Solo recoger';
+      label = 'Recoger';
       color = const Color(0xFFB4552D);
     }
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
         color: color.withOpacity(.11),
         borderRadius: BorderRadius.circular(9),
@@ -258,7 +276,7 @@ class FeaturedVendorListItem extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          fontSize: 11.5,
+          fontSize: 9.5,
           fontWeight: FontWeight.w800,
           color: color,
         ),
@@ -268,30 +286,28 @@ class FeaturedVendorListItem extends StatelessWidget {
 }
 
 class _StatusPill extends StatelessWidget {
-  const _StatusPill.open()
-      : open = true,
-        centered = false;
+  const _StatusPill.open() : open = true, centered = false;
 
-  const _StatusPill.closed()
-      : open = false,
-        centered = true;
+  const _StatusPill.closed() : open = false, centered = true;
 
   final bool open;
   final bool centered;
 
   @override
   Widget build(BuildContext context) {
-    final color = open
-        ? FeaturedVendorListItem._successColor
-        : FeaturedVendorListItem._closedColor;
+    final color =
+        open
+            ? FeaturedVendorListItem._successColor
+            : FeaturedVendorListItem._closedColor;
     return ClipRRect(
       borderRadius: BorderRadius.circular(30),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
         child: Container(
-          padding: centered
-              ? const EdgeInsets.symmetric(horizontal: 14, vertical: 8)
-              : const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+          padding:
+              centered
+                  ? const EdgeInsets.symmetric(horizontal: 14, vertical: 8)
+                  : const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
           color: Colors.black.withOpacity(.30),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -299,8 +315,7 @@ class _StatusPill extends StatelessWidget {
               Container(
                 width: centered ? 8 : 7,
                 height: centered ? 8 : 7,
-                decoration:
-                    BoxDecoration(color: color, shape: BoxShape.circle),
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               ),
               SizedBox(width: centered ? 6 : 5),
               Text(

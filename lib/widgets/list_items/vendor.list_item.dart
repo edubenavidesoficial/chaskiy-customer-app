@@ -24,10 +24,26 @@ class VendorListItem extends StatelessWidget {
 
   // escala de grises para negocios cerrados
   static const _grayscaleFilter = ColorFilter.matrix(<double>[
-    0.2126, 0.7152, 0.0722, 0, 0,
-    0.2126, 0.7152, 0.0722, 0, 0,
-    0.2126, 0.7152, 0.0722, 0, 0,
-    0, 0, 0, 1, 0,
+    0.2126,
+    0.7152,
+    0.0722,
+    0,
+    0,
+    0.2126,
+    0.7152,
+    0.0722,
+    0,
+    0,
+    0.2126,
+    0.7152,
+    0.0722,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
   ]);
 
   @override
@@ -53,10 +69,7 @@ class VendorListItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildBanner(),
-                  _buildInfo(theme),
-                ],
+                children: [_buildBanner(), _buildInfo(theme)],
               ),
             ),
           ),
@@ -140,10 +153,7 @@ class VendorListItem extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: Colors.black.withOpacity(.06)),
               boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(.08),
-                  blurRadius: 6,
-                ),
+                BoxShadow(color: Colors.black.withOpacity(.08), blurRadius: 6),
               ],
             ),
             child: ClipOval(
@@ -243,17 +253,18 @@ class VendorListItem extends StatelessWidget {
     final String label;
     final Color color;
     if (vendor.delivery == 1) {
-      final free = vendor.deliveryFee <= 0 &&
+      final free =
+          vendor.deliveryFee <= 0 &&
           vendor.baseDeliveryFee <= 0 &&
           vendor.chargePerKm <= 0;
-      label = free ? 'Envío gratis' : 'Envío a domicilio';
+      label = free ? 'Envío gratis' : 'A domicilio';
       color = _successColor;
     } else {
-      label = 'Solo recoger';
+      label = 'Recoger';
       color = const Color(0xFFB4552D);
     }
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
         color: color.withOpacity(.11),
         borderRadius: BorderRadius.circular(9),
@@ -263,7 +274,7 @@ class VendorListItem extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          fontSize: 11,
+          fontSize: 9.5,
           fontWeight: FontWeight.w800,
           color: color,
         ),
@@ -277,10 +288,11 @@ class VendorListItem extends StatelessWidget {
     if (vendor.categories.isNotEmpty) {
       return vendor.categories.take(2).map((c) => c.name).join(' · ');
     }
-    final description = vendor.description
-        .replaceAll('&nbsp;', ' ')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
+    final description =
+        vendor.description
+            .replaceAll('&nbsp;', ' ')
+            .replaceAll(RegExp(r'\s+'), ' ')
+            .trim();
     return description.isNotEmpty ? description : vendor.vendorType.name;
   }
 
@@ -318,17 +330,17 @@ class _StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = open
-        ? VendorListItem._successColor
-        : VendorListItem._closedColor;
+    final color =
+        open ? VendorListItem._successColor : VendorListItem._closedColor;
     return ClipRRect(
       borderRadius: BorderRadius.circular(30),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
         child: Container(
-          padding: big
-              ? const EdgeInsets.symmetric(horizontal: 14, vertical: 8)
-              : const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+          padding:
+              big
+                  ? const EdgeInsets.symmetric(horizontal: 14, vertical: 8)
+                  : const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
           color: Colors.black.withOpacity(.30),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -336,8 +348,7 @@ class _StatusPill extends StatelessWidget {
               Container(
                 width: big ? 8 : 7,
                 height: big ? 8 : 7,
-                decoration:
-                    BoxDecoration(color: color, shape: BoxShape.circle),
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               ),
               SizedBox(width: big ? 6 : 5),
               Text(

@@ -47,7 +47,10 @@ class WelcomeViewModel extends MyBaseViewModel {
     currentLocSub = LocationService.currenctDeliveryAddressSubject.listen((
       event,
     ) {
-      initialise(initial: false);
+      // La dirección sí puede cambiar la oferta disponible, pero no debe
+      // desmontar Inicio ni volver a mostrar el esqueleto. Conservamos el
+      // contenido actual y actualizamos los datos silenciosamente.
+      getVendorTypes(showLoading: false);
     });
   }
 
@@ -66,15 +69,16 @@ class WelcomeViewModel extends MyBaseViewModel {
     super.dispose();
   }
 
-  getVendorTypes() async {
-    setBusy(true);
+  getVendorTypes({bool showLoading = true}) async {
+    if (showLoading) setBusy(true);
     try {
       vendorTypes = await vendorTypeRequest.index();
       clearErrors();
+      if (!showLoading) notifyListeners();
     } catch (error) {
       setError(error);
     }
-    setBusy(false);
+    if (showLoading) setBusy(false);
   }
 
   openFeaturedVendors() async {
