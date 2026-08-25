@@ -37,6 +37,7 @@ import 'package:chaskiy/views/pages/wallet/wallet.page.dart';
 import 'package:chaskiy/views/shared/location_fetch.page.dart';
 import 'package:chaskiy/views/pages/booking/property_details.page.dart';
 import 'package:chaskiy/views/pages/booking/property_search.page.dart';
+import 'package:chaskiy/views/pages/chat/order_chat.page.dart';
 import 'package:chaskiy/models/property.dart';
 import 'package:chaskiy/models/vendor_type.dart';
 
@@ -121,7 +122,11 @@ Route<dynamic>? generateRoute(RouteSettings settings) {
       );
     //chat page
     case AppRoutes.chatRoute:
-      return FirestoreChat().chatPageWidget(settings.arguments as ChatEntity);
+      return MaterialPageRoute(
+        settings: settings,
+        builder:
+            (_) => OrderChatPage(chatEntity: settings.arguments as ChatEntity),
+      );
 
     //
     case AppRoutes.editProfileRoute:

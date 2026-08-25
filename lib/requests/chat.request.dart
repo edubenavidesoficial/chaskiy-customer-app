@@ -4,6 +4,18 @@ import 'package:chaskiy/models/api_response.dart';
 import 'package:chaskiy/services/http.service.dart';
 
 class ChatRequest extends HttpService {
+  Future<ApiResponse> getMessages(String orderCode) async {
+    final result = await get('${Api.taxiChat}/$orderCode', forceRefresh: true);
+    return ApiResponse.fromResponse(result);
+  }
+
+  Future<ApiResponse> sendMessage(String orderCode, String message) async {
+    final result = await post('${Api.taxiChat}/$orderCode', {
+      'message': message,
+    });
+    return ApiResponse.fromResponse(result);
+  }
+
   //
   Future<ApiResponse> sendNotification({
     required String title,

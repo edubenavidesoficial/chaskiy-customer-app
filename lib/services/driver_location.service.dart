@@ -51,7 +51,7 @@ class DriverLocationService {
       _subscription = Geolocator.getPositionStream(
         locationSettings: settings,
       ).listen(_onPosition, onError: (_) => stop(), cancelOnError: false);
-      _heartbeatTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      _heartbeatTimer = Timer.periodic(const Duration(seconds: 15), (_) {
         final position = _lastPosition;
         if (position != null) _onPosition(position);
       });
@@ -72,8 +72,8 @@ class DriverLocationService {
     if (Platform.isAndroid) {
       return AndroidSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: 20,
-        intervalDuration: const Duration(seconds: 15),
+        distanceFilter: 5,
+        intervalDuration: const Duration(seconds: 5),
         foregroundNotificationConfig: const ForegroundNotificationConfig(
           notificationTitle: 'Chaskiy conductor activo',
           notificationText: 'Compartiendo ubicación para recibir pedidos',
@@ -85,7 +85,7 @@ class DriverLocationService {
     if (Platform.isIOS) {
       return AppleSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: 20,
+        distanceFilter: 5,
         activityType: ActivityType.automotiveNavigation,
         allowBackgroundLocationUpdates: true,
         pauseLocationUpdatesAutomatically: false,
@@ -94,7 +94,7 @@ class DriverLocationService {
     }
     return const LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 20,
+      distanceFilter: 5,
     );
   }
 
@@ -102,7 +102,7 @@ class DriverLocationService {
     _lastPosition = position;
     final now = DateTime.now();
     if (_syncing ||
-        (_lastSync != null && now.difference(_lastSync!).inSeconds < 10)) {
+        (_lastSync != null && now.difference(_lastSync!).inSeconds < 4)) {
       return;
     }
     if (!SessionService.isDriver ||

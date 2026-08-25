@@ -85,7 +85,7 @@ class _TaxiPageState extends State<TaxiPage> with WidgetsBindingObserver {
                         const SizedBox.shrink(),
                       _MapActionButton(
                         icon: Icons.my_location_rounded,
-                        onPressed: vm.zoomToCurrentLocation,
+                        onPressed: vm.focusMapSubject,
                       ),
                     ],
                   ),

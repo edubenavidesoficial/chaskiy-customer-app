@@ -272,26 +272,32 @@ class TaxiViewModel extends TripTaxiViewModel {
 
   //
   openTripChat() {
-    //
+    final trip = onGoingOrderTrip;
+    final driver = trip?.driver;
+    if (trip == null || driver == null) {
+      toastError('Espera a que se asigne un conductor'.tr());
+      return;
+    }
+
     Map<String, PeerUser> peers = {
-      '${onGoingOrderTrip!.userId}': PeerUser(
-        id: '${onGoingOrderTrip!.userId}',
-        name: onGoingOrderTrip!.user.name,
-        image: onGoingOrderTrip!.user.photo,
+      '${trip.userId}': PeerUser(
+        id: '${trip.userId}',
+        name: trip.user.name,
+        image: trip.user.photo,
       ),
-      '${onGoingOrderTrip?.driver?.id}': PeerUser(
-        id: "${onGoingOrderTrip?.driver?.id}",
-        name: onGoingOrderTrip?.driver?.name ?? "Driver".tr(),
-        image: onGoingOrderTrip?.driver?.photo,
+      '${driver.id}': PeerUser(
+        id: '${driver.id}',
+        name: driver.name,
+        image: driver.photo,
       ),
     };
     //
     final chatEntity = ChatEntity(
       onMessageSent: ChatService.sendChatMessage,
-      mainUser: peers['${onGoingOrderTrip?.userId}']!,
+      mainUser: peers['${trip.userId}']!,
       peers: peers,
       //don't translate this
-      path: 'orders/' + onGoingOrderTrip!.code + "/customerDriver/chats",
+      path: 'orders/${trip.code}/customerDriver/chats',
       title: "Chat with driver".tr(),
       supportMedia: AppUISettings.canCustomerChatSupportMedia,
     );

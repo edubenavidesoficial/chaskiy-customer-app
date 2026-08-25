@@ -101,6 +101,7 @@ class Api {
   static const taxiLocationAvailable = "/taxi/location/available";
   static const taxiTripLocationHistory = "/taxi/location/history";
   static const nearbyTaxiDrivers = "/taxi/nearby/drivers";
+  static const taxiChat = "/taxi/chat";
 
   //wallet
   static const walletBalance = "/wallet/balance";

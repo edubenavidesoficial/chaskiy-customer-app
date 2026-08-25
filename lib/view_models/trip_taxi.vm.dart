@@ -27,7 +27,10 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   StreamSubscription? tripUpdateStream;
   Timer? tripPollingTimer;
   Timer? driverLocationPollingTimer;
+  Timer? _driverMarkerAnimationTimer;
   bool _refreshingTrip = false;
+  bool _refreshingDriverLocation = false;
+  bool _driverCameraInitialized = false;
 
   LatLng? driverPosition;
   double driverPositionRotation = 0;
@@ -46,6 +49,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     tripUpdateStream?.cancel();
     tripPollingTimer?.cancel();
     driverLocationPollingTimer?.cancel();
+    _driverMarkerAnimationTimer?.cancel();
     driverLocationStream?.cancel();
     super.dispose();
   }
@@ -65,26 +69,69 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
 
   //cancel trip
   void cancelTrip() async {
-    //
-    setBusyForObject(onGoingOrderTrip, true);
+    final trip = onGoingOrderTrip;
+    if (trip == null) {
+      await _synchronizeTripAfterCancellation();
+      return;
+    }
+
+    setBusyForObject(trip, true);
     try {
-      final apiResponse = await taxiRequest.cancelTrip(onGoingOrderTrip!.id);
-      //
-      if (apiResponse.allGood) {
-        //ya se avisa aquí, que el listener no vuelva a mostrar el aviso
-        notifiedEndedTripCode = onGoingOrderTrip?.code;
+      final apiResponse = await taxiRequest.cancelTrip(trip.id);
+      final tripEnded =
+          apiResponse.body is Map && apiResponse.body['trip_ended'] == true;
+
+      if (apiResponse.allGood || tripEnded) {
+        notifiedEndedTripCode = trip.code;
+        _clearFinishedTrip();
         toastSuccessful(
           apiResponse.message ?? "Viaje cancelado correctamente".tr(),
         );
-        setCurrentStep(1);
-        clearMapData();
       } else {
-        toastError(apiResponse.message ?? "No se pudo cancelar el viaje".tr());
+        final stillActive = await _synchronizeTripAfterCancellation();
+        if (stillActive) {
+          toastError(
+            apiResponse.message ?? "No se pudo cancelar el viaje".tr(),
+          );
+        }
       }
     } catch (error) {
       print("trip ongoing error ==> $error");
+      final stillActive = await _synchronizeTripAfterCancellation();
+      if (stillActive) {
+        toastError("No se pudo cancelar el viaje".tr());
+      }
+    } finally {
+      setBusyForObject(trip, false);
     }
-    setBusyForObject(onGoingOrderTrip, false);
+  }
+
+  Future<bool> _synchronizeTripAfterCancellation() async {
+    try {
+      final serverTrip = await taxiRequest.getOnGoingTrip();
+      if (serverTrip == null || !serverTrip.isOngoing) {
+        _clearFinishedTrip();
+        return false;
+      }
+
+      onGoingOrderTrip = serverTrip;
+      loadTripUIByOrderStatus();
+      notifyListeners();
+      return true;
+    } catch (_) {
+      // Conservatively keep the trip visible when the server cannot be
+      // reached. The normal polling loop will reconcile it on the next pass.
+      return onGoingOrderTrip?.isOngoing ?? false;
+    }
+  }
+
+  void _clearFinishedTrip() {
+    onGoingOrderTrip = null;
+    setCurrentStep(1);
+    clearMapData();
+    stopAllListeners();
+    closeOrderSummary();
+    notifyListeners();
   }
 
   Future<void> changeTripDestination() async {
@@ -388,33 +435,76 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     driverLocationPollingTimer?.cancel();
     _refreshDriverLocationFromApi();
     driverLocationPollingTimer = Timer.periodic(
-      const Duration(seconds: 5),
+      const Duration(seconds: 3),
       (_) => _refreshDriverLocationFromApi(),
     );
   }
 
   Future<void> _refreshDriverLocationFromApi() async {
     final orderId = onGoingOrderTrip?.id;
-    if (orderId == null) return;
+    if (orderId == null || _refreshingDriverLocation) return;
+    _refreshingDriverLocation = true;
     try {
       final response = await OrderRequest().syncDriverLocation(orderId);
+      if (response.body is! Map) return;
       final location = response.body['location'];
       if (location is! Map) return;
       final lat = double.tryParse('${location['lat']}');
       final lng = double.tryParse('${location['lng']}');
       if (lat == null || lng == null) return;
-      driverPosition = LatLng(lat, lng);
-      driverPositionRotation = double.tryParse('${location['rotation']}') ?? 0;
-      updateDriverMarkerPosition();
-      startZoomFocusDriver();
+      final nextPosition = LatLng(lat, lng);
+      final nextRotation = double.tryParse('${location['rotation']}') ?? 0;
+      await _animateDriverMarker(nextPosition, nextRotation);
+      if (!_driverCameraInitialized) {
+        _driverCameraInitialized = true;
+        await startZoomFocusDriver();
+      }
     } catch (_) {
       // The driver may not have published the first location yet.
+    } finally {
+      _refreshingDriverLocation = false;
     }
+  }
+
+  Future<void> _animateDriverMarker(
+    LatLng nextPosition,
+    double nextRotation,
+  ) async {
+    final previous = driverPosition;
+    _driverMarkerAnimationTimer?.cancel();
+    if (previous == null) {
+      driverPosition = nextPosition;
+      driverPositionRotation = nextRotation;
+      updateDriverMarkerPosition();
+      return;
+    }
+
+    const steps = 12;
+    var step = 0;
+    final startRotation = driverPositionRotation;
+    _driverMarkerAnimationTimer = Timer.periodic(
+      const Duration(milliseconds: 80),
+      (timer) {
+        step++;
+        final progress = step / steps;
+        driverPosition = LatLng(
+          previous.latitude +
+              (nextPosition.latitude - previous.latitude) * progress,
+          previous.longitude +
+              (nextPosition.longitude - previous.longitude) * progress,
+        );
+        driverPositionRotation =
+            startRotation + (nextRotation - startRotation) * progress;
+        updateDriverMarkerPosition();
+        if (step >= steps) timer.cancel();
+      },
+    );
   }
 
   stopDriverListener() async {
     driverLocationStream?.cancel();
     driverLocationPollingTimer?.cancel();
+    _driverMarkerAnimationTimer?.cancel();
     driverLocationPollingTimer = null;
     driverLocationStream = null;
     notifyListeners();
@@ -482,13 +572,25 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     updateDriverMarkerPosition();
   }
 
+  /// El botón del mapa sigue al vehículo durante un viaje; fuera del viaje
+  /// conserva el comportamiento habitual de volver a la ubicación del usuario.
+  Future<void> focusMapSubject() async {
+    if (onGoingOrderTrip != null && driverPosition != null) {
+      await startZoomFocusDriver();
+      return;
+    }
+    await zoomToCurrentLocation();
+  }
+
   //
   stopAllListeners() async {
     tripUpdateStream?.cancel();
     tripPollingTimer?.cancel();
     tripPollingTimer = null;
     driverLocationPollingTimer?.cancel();
+    _driverMarkerAnimationTimer?.cancel();
     driverLocationPollingTimer = null;
+    _driverCameraInitialized = false;
     driverLocationStream?.cancel();
 
     //when trip is ended
