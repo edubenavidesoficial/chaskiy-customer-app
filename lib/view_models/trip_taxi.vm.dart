@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:chaskiy/requests/payment_method.request.dart';
 import 'package:chaskiy/requests/taxi.request.dart';
 import 'package:chaskiy/view_models/taxi_google_map.vm.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 
 class TripTaxiViewModel extends TaxiGoogleMapViewModel {
@@ -31,9 +33,18 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   bool _refreshingTrip = false;
   bool _refreshingDriverLocation = false;
   bool _driverCameraInitialized = false;
+  int _routeProgressIndex = 0;
+  DateTime? _lastTrafficEtaAt;
+  LatLng? _lastTrafficEtaPosition;
+  bool _loadingTrafficEta = false;
 
   LatLng? driverPosition;
   double driverPositionRotation = 0;
+  DateTime? driverLocationUpdatedAt;
+  bool driverLocationIsStale = true;
+  bool driverAutoFollowEnabled = true;
+  double? driverDistanceKm;
+  int? driverArrivalMinutes;
 
   //
   List<PaymentMethod> paymentMethods = [];
@@ -453,16 +464,190 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
       final lng = double.tryParse('${location['lng']}');
       if (lat == null || lng == null) return;
       final nextPosition = LatLng(lat, lng);
-      final nextRotation = double.tryParse('${location['rotation']}') ?? 0;
+      var nextRotation = double.tryParse('${location['rotation']}') ?? 0;
+      if (driverPosition != null &&
+          Geolocator.distanceBetween(
+                driverPosition!.latitude,
+                driverPosition!.longitude,
+                nextPosition.latitude,
+                nextPosition.longitude,
+              ) >=
+              3) {
+        nextRotation = _bearingBetween(driverPosition!, nextPosition);
+      }
+      driverLocationUpdatedAt =
+          DateTime.tryParse('${location['updated_at'] ?? ''}')?.toLocal();
+      driverLocationIsStale = location['is_stale'] == true;
+      _updateDriverProgress(nextPosition);
+      unawaited(_refreshTrafficEta(nextPosition));
+      _updateRouteProgress(nextPosition);
       await _animateDriverMarker(nextPosition, nextRotation);
       if (!_driverCameraInitialized) {
         _driverCameraInitialized = true;
         await startZoomFocusDriver();
+      } else {
+        await _keepDriverVisible(nextPosition);
       }
     } catch (_) {
       // The driver may not have published the first location yet.
     } finally {
       _refreshingDriverLocation = false;
+    }
+  }
+
+  double _bearingBetween(LatLng from, LatLng to) {
+    final fromLat = from.latitude * math.pi / 180;
+    final toLat = to.latitude * math.pi / 180;
+    final deltaLng = (to.longitude - from.longitude) * math.pi / 180;
+    final y = math.sin(deltaLng) * math.cos(toLat);
+    final x =
+        math.cos(fromLat) * math.sin(toLat) -
+        math.sin(fromLat) * math.cos(toLat) * math.cos(deltaLng);
+    return (math.atan2(y, x) * 180 / math.pi + 360) % 360;
+  }
+
+  void _updateRouteProgress(LatLng position) {
+    if (onGoingOrderTrip?.status != 'enroute' ||
+        polylineCoordinates.length < 2) {
+      return;
+    }
+    var nearestIndex = _routeProgressIndex.clamp(
+      0,
+      polylineCoordinates.length - 1,
+    );
+    var nearestDistance = double.infinity;
+    for (
+      var index = nearestIndex;
+      index < polylineCoordinates.length;
+      index++
+    ) {
+      final point = polylineCoordinates[index];
+      final distance = Geolocator.distanceBetween(
+        position.latitude,
+        position.longitude,
+        point.latitude,
+        point.longitude,
+      );
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestIndex = index;
+      }
+    }
+    _routeProgressIndex = nearestIndex;
+    final completed = <LatLng>[
+      ...polylineCoordinates.take(nearestIndex + 1),
+      position,
+    ];
+    final remaining = <LatLng>[
+      position,
+      ...polylineCoordinates.skip(nearestIndex + 1),
+    ];
+    gMapPolylines = {
+      if (completed.length > 1)
+        Polyline(
+          polylineId: const PolylineId('routeCompleted'),
+          points: completed,
+          width: 4,
+          color: Colors.blueGrey.withValues(alpha: .45),
+        ),
+      if (remaining.length > 1)
+        Polyline(
+          polylineId: const PolylineId('routeRemaining'),
+          points: remaining,
+          width: 5,
+          color: const Color(0xFF1769AA),
+        ),
+    };
+  }
+
+  void _updateDriverProgress(LatLng position) {
+    final target =
+        onGoingOrderTrip?.canZoomOnPickupLocation == true
+            ? pickupLocation
+            : dropoffLocation;
+    if (target?.latitude == null || target?.longitude == null) return;
+    final meters = Geolocator.distanceBetween(
+      position.latitude,
+      position.longitude,
+      target!.latitude!,
+      target.longitude!,
+    );
+    // La distancia vial suele ser mayor que la línea recta. El factor 1.25 y
+    // 25 km/h producen una aproximación estable hasta recalcular por ruta.
+    driverDistanceKm = meters / 1000;
+    driverArrivalMinutes = ((driverDistanceKm! * 1.25 / 25) * 60).ceil().clamp(
+      1,
+      180,
+    );
+  }
+
+  Future<void> _refreshTrafficEta(LatLng position) async {
+    if (_loadingTrafficEta || driverLocationIsStale) return;
+    final lastAt = _lastTrafficEtaAt;
+    final lastPosition = _lastTrafficEtaPosition;
+    final movedMeters =
+        lastPosition == null
+            ? double.infinity
+            : Geolocator.distanceBetween(
+              lastPosition.latitude,
+              lastPosition.longitude,
+              position.latitude,
+              position.longitude,
+            );
+    if (lastAt != null &&
+        DateTime.now().difference(lastAt) < const Duration(seconds: 30) &&
+        movedMeters < 100) {
+      return;
+    }
+    final target =
+        onGoingOrderTrip?.canZoomOnPickupLocation == true
+            ? pickupLocation
+            : dropoffLocation;
+    if (target?.latitude == null || target?.longitude == null) return;
+    _loadingTrafficEta = true;
+    try {
+      final estimate = await getRouteTravelEstimate(
+        origin: position,
+        destination: LatLng(target!.latitude!, target.longitude!),
+      );
+      if (estimate == null) return;
+      driverDistanceKm = estimate.distanceMeters / 1000;
+      driverArrivalMinutes = (estimate.durationSeconds / 60).ceil().clamp(
+        1,
+        180,
+      );
+      _lastTrafficEtaAt = DateTime.now();
+      _lastTrafficEtaPosition = position;
+      notifyListeners();
+    } finally {
+      _loadingTrafficEta = false;
+    }
+  }
+
+  int? get driverLocationAgeSeconds {
+    final updatedAt = driverLocationUpdatedAt;
+    if (updatedAt == null) return null;
+    return DateTime.now().difference(updatedAt).inSeconds.clamp(0, 86400);
+  }
+
+  Future<void> _keepDriverVisible(LatLng position) async {
+    if (!driverAutoFollowEnabled) return;
+    final controller = googleMapController;
+    if (controller == null) return;
+    try {
+      final bounds = await controller.getVisibleRegion();
+      final visible =
+          position.latitude >= bounds.southwest.latitude &&
+          position.latitude <= bounds.northeast.latitude &&
+          position.longitude >= bounds.southwest.longitude &&
+          position.longitude <= bounds.northeast.longitude;
+      if (!visible) {
+        await controller.animateCamera(
+          CameraUpdate.newLatLngZoom(position, 15.5),
+        );
+      }
+    } catch (_) {
+      // El mapa puede estar cambiando de pantalla; el próximo GPS reintenta.
     }
   }
 
@@ -524,6 +709,8 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
         rotation: driverPositionRotation,
         icon: driverIcon!,
         anchor: Offset(0.5, 0.5),
+        flat: true,
+        zIndexInt: 20,
       );
       gMapMarkers.add(driverMarker);
     } else {
@@ -576,10 +763,22 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   /// conserva el comportamiento habitual de volver a la ubicación del usuario.
   Future<void> focusMapSubject() async {
     if (onGoingOrderTrip != null && driverPosition != null) {
+      driverAutoFollowEnabled = true;
       await startZoomFocusDriver();
+      notifyListeners();
       return;
     }
     await zoomToCurrentLocation();
+  }
+
+  Future<void> toggleDriverAutoFollow() async {
+    if (onGoingOrderTrip == null || driverPosition == null) {
+      await zoomToCurrentLocation();
+      return;
+    }
+    driverAutoFollowEnabled = !driverAutoFollowEnabled;
+    if (driverAutoFollowEnabled) await startZoomFocusDriver();
+    notifyListeners();
   }
 
   //
@@ -591,6 +790,10 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     _driverMarkerAnimationTimer?.cancel();
     driverLocationPollingTimer = null;
     _driverCameraInitialized = false;
+    _routeProgressIndex = 0;
+    _lastTrafficEtaAt = null;
+    _lastTrafficEtaPosition = null;
+    driverAutoFollowEnabled = true;
     driverLocationStream?.cancel();
 
     //when trip is ended

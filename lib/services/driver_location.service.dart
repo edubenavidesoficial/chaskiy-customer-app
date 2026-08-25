@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:chaskiy/requests/driver.request.dart';
-import 'package:chaskiy/services/auth.service.dart';
 import 'package:chaskiy/services/session.service.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -15,8 +14,10 @@ class DriverLocationService {
   final DriverRequest _request = DriverRequest();
   StreamSubscription<Position>? _subscription;
   Timer? _heartbeatTimer;
+  Timer? _restartTimer;
   bool _starting = false;
   bool _syncing = false;
+  bool _shouldRun = false;
   DateTime? _lastSync;
   Position? _lastPosition;
 
@@ -25,11 +26,9 @@ class DriverLocationService {
 
   Future<void> start() async {
     if (_starting || isRunning || !SessionService.isDriver) return;
+    _shouldRun = true;
     _starting = true;
     try {
-      final user = await AuthServices.getCurrentUser();
-      if (!user.isOnline) return;
-
       if (!await Geolocator.isLocationServiceEnabled()) {
         throw const DriverLocationException(
           'Activa el servicio de ubicación para recibir pedidos.',
@@ -50,7 +49,11 @@ class DriverLocationService {
       final settings = _settings();
       _subscription = Geolocator.getPositionStream(
         locationSettings: settings,
-      ).listen(_onPosition, onError: (_) => stop(), cancelOnError: false);
+      ).listen(
+        _onPosition,
+        onError: (_) => _restartAfterSensorError(),
+        cancelOnError: false,
+      );
       _heartbeatTimer = Timer.periodic(const Duration(seconds: 15), (_) {
         final position = _lastPosition;
         if (position != null) _onPosition(position);
@@ -105,8 +108,10 @@ class DriverLocationService {
         (_lastSync != null && now.difference(_lastSync!).inSeconds < 4)) {
       return;
     }
-    if (!SessionService.isDriver ||
-        AuthServices.currentUser?.isOnline != true) {
+    // La disponibilidad controla nuevas solicitudes, no un viaje activo. El
+    // servicio se detiene explícitamente al pasar a no disponible o cerrar
+    // sesión; no debe apagarse por una copia local desactualizada de isOnline.
+    if (!SessionService.isDriver || !_shouldRun) {
       await stop();
       return;
     }
@@ -128,6 +133,9 @@ class DriverLocationService {
   }
 
   Future<void> stop() async {
+    _shouldRun = false;
+    _restartTimer?.cancel();
+    _restartTimer = null;
     _heartbeatTimer?.cancel();
     _heartbeatTimer = null;
     final subscription = _subscription;
@@ -136,6 +144,19 @@ class DriverLocationService {
     _syncing = false;
     _starting = false;
     _lastSync = null;
+  }
+
+  Future<void> _restartAfterSensorError() async {
+    final subscription = _subscription;
+    _subscription = null;
+    await subscription?.cancel();
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
+    if (!_shouldRun || !SessionService.isDriver) return;
+    _restartTimer?.cancel();
+    _restartTimer = Timer(const Duration(seconds: 3), () {
+      if (_shouldRun) start();
+    });
   }
 }
 

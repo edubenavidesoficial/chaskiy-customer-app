@@ -49,6 +49,8 @@ class TaxiTripReadyView extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 TaxiDriverInfoView(trip.driver!, order: trip),
+                const SizedBox(height: 10),
+                _LiveTrackingStatus(vm: vm),
                 const SizedBox(height: 14),
                 _ContactActions(vm: vm),
                 const SizedBox(height: 22),
@@ -130,6 +132,66 @@ class TaxiTripReadyView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _LiveTrackingStatus extends StatelessWidget {
+  const _LiveTrackingStatus({required this.vm});
+
+  final TaxiViewModel vm;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final age = vm.driverLocationAgeSeconds;
+    final stale = vm.driverLocationIsStale || age == null || age > 45;
+    final color = stale ? const Color(0xFFB46A00) : const Color(0xFF16805C);
+    final distance = vm.driverDistanceKm;
+    final eta = vm.driverArrivalMinutes;
+    final details = <String>[
+      if (eta != null) 'Aprox. $eta min',
+      if (distance != null)
+        distance < 1
+            ? '${(distance * 1000).round()} m'
+            : '${distance.toStringAsFixed(1)} km',
+    ];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: .09),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            stale ? Icons.sync_rounded : Icons.sensors_rounded,
+            size: 18,
+            color: color,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              stale
+                  ? 'Actualizando ubicación del conductor…'
+                  : 'En vivo · hace ${age}s',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: color,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          if (details.isNotEmpty)
+            Text(
+              details.join(' · '),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: scheme.onSurfaceVariant,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

@@ -77,8 +77,21 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
 
   void setCurrentStep(int step) {
     currentOrderStep = step;
-    onTrip = false;
+    onTrip = step >= 3 && step <= 5;
+    if (onTrip) {
+      nearbyDriversTimer?.cancel();
+      nearbyDriversTimer = null;
+      _clearNearbyDriverMarkers();
+    } else if (googleMapController != null && nearbyDriversTimer == null) {
+      startNearbyDriversListener();
+    }
     notifyListeners();
+  }
+
+  void _clearNearbyDriverMarkers() {
+    gMapMarkers.removeWhere(
+      (marker) => marker.markerId.value.startsWith('nearbyDriver_'),
+    );
   }
 
   //MAP RELATED FUNCTIONS
@@ -116,9 +129,14 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
         longitude: position.longitude,
         vehicleTypeId: nearbyVehicleTypeId,
       );
-      gMapMarkers.removeWhere(
-        (marker) => marker.markerId.value.startsWith('nearbyDriver_'),
-      );
+      // La solicitud pudo comenzar antes de que se asignara el viaje. No debe
+      // insertar nuevamente automóviles cercanos cuando ya existe conductor.
+      if (onTrip || currentOrderStep > 2) {
+        _clearNearbyDriverMarkers();
+        notifyListeners();
+        return;
+      }
+      _clearNearbyDriverMarkers();
       for (final driver in drivers) {
         final lat = double.tryParse('${driver['latitude']}');
         final lng = double.tryParse('${driver['longitude']}');
@@ -183,14 +201,41 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
 
   //
   updateDriverIconDynamically(VehicleType vehicleType) async {
-    Uint8List? iconByteData = await MapUtils.imageToUint8List(
-      base64String: vehicleType.iconBase64,
-      url: vehicleType.icon,
-      targetWidth: 72,
+    final asset = _mapVehicleAsset(vehicleType);
+    Uint8List? iconByteData = await MapUtils.svgAssetToPng(
+      asset,
+      width: asset == AppImages.mapVehicleMotorcycle ? 52 : 58,
+      height: 86,
     );
     if (iconByteData != null) {
       driverIcon = await BitmapDescriptor.fromBytes(iconByteData);
     }
+  }
+
+  Future<void> updateNearbyDriverIconDynamically(
+    VehicleType vehicleType,
+  ) async {
+    final asset = _mapVehicleAsset(vehicleType);
+    final bytes = await MapUtils.svgAssetToPng(
+      asset,
+      width: asset == AppImages.mapVehicleMotorcycle ? 42 : 46,
+      height: 68,
+    );
+    if (bytes != null) {
+      nearbyDriverIcon = BitmapDescriptor.bytes(bytes);
+      notifyListeners();
+    }
+  }
+
+  String _mapVehicleAsset(VehicleType vehicleType) {
+    final identity = '${vehicleType.slug} ${vehicleType.name}'.toLowerCase();
+    if (identity.contains('moto') ||
+        identity.contains('motor') ||
+        identity.contains('bike')) {
+      return AppImages.mapVehicleMotorcycle;
+    }
+    if (identity.contains('taxi')) return AppImages.mapVehicleTaxi;
+    return AppImages.mapVehicleCar;
   }
 
   //
@@ -590,6 +635,63 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     }
   }
 
+  Future<RouteTravelEstimate?> getRouteTravelEstimate({
+    required LatLng origin,
+    required LatLng destination,
+  }) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse(
+              'https://routes.googleapis.com/directions/v2:computeRoutes',
+            ),
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Goog-Api-Key': AppStrings.googleMapApiKey,
+              'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters',
+            },
+            body: jsonEncode({
+              'origin': {
+                'location': {
+                  'latLng': {
+                    'latitude': origin.latitude,
+                    'longitude': origin.longitude,
+                  },
+                },
+              },
+              'destination': {
+                'location': {
+                  'latLng': {
+                    'latitude': destination.latitude,
+                    'longitude': destination.longitude,
+                  },
+                },
+              },
+              'travelMode': 'DRIVE',
+              'routingPreference': 'TRAFFIC_AWARE',
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+      if (response.statusCode < 200 || response.statusCode >= 300) return null;
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      final routes = body['routes'];
+      if (routes is! List || routes.isEmpty || routes.first is! Map)
+        return null;
+      final route = Map<String, dynamic>.from(routes.first as Map);
+      final distanceMeters = int.tryParse('${route['distanceMeters']}');
+      final durationSeconds = double.tryParse(
+        '${route['duration'] ?? ''}'.replaceAll('s', ''),
+      );
+      if (distanceMeters == null || durationSeconds == null) return null;
+      return RouteTravelEstimate(
+        distanceMeters: distanceMeters,
+        durationSeconds: durationSeconds.ceil(),
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> updateCameraLocation(
     LatLng source,
     LatLng destination,
@@ -667,4 +769,14 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     //
     setupCurrentLocationAsPickuplocation();
   }
+}
+
+class RouteTravelEstimate {
+  const RouteTravelEstimate({
+    required this.distanceMeters,
+    required this.durationSeconds,
+  });
+
+  final int distanceMeters;
+  final int durationSeconds;
 }

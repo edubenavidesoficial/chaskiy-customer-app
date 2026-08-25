@@ -25,7 +25,7 @@ class FeaturedVendorsPage extends StatelessWidget {
         return Scaffold(
           backgroundColor: const Color(0xFFF6F8FC),
           appBar: AppBar(
-            toolbarHeight: 76,
+            toolbarHeight: 58,
             elevation: 0,
             foregroundColor: Colors.white,
             flexibleSpace: Container(
@@ -37,9 +37,9 @@ class FeaturedVendorsPage extends StatelessWidget {
                 ),
               ),
             ),
-            leadingWidth: 72,
+            leadingWidth: 58,
             leading: Padding(
-              padding: const EdgeInsets.only(left: 16),
+              padding: const EdgeInsets.only(left: 10),
               child: _HeaderButton(
                 icon: Icons.arrow_back_rounded,
                 onPressed: () => Navigator.pop(context),
@@ -47,8 +47,11 @@ class FeaturedVendorsPage extends StatelessWidget {
             ),
             title: const Text(
               'Negocios cerca de ti',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 21),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
             ),
+            titleSpacing: 4,
           ),
           body: SafeArea(
             top: false,
@@ -114,9 +117,9 @@ class _HeaderButton extends StatelessWidget {
         onTap: onPressed,
         borderRadius: BorderRadius.circular(13),
         child: SizedBox(
-          width: 44,
-          height: 44,
-          child: Icon(icon, color: Colors.white, size: 22),
+          width: 40,
+          height: 40,
+          child: Icon(icon, color: Colors.white, size: 21),
         ),
       ),
     );

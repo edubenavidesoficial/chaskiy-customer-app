@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firestore_chat/firestore_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_routes.dart';
@@ -174,6 +176,7 @@ class TaxiViewModel extends TripTaxiViewModel {
   changeSelectedVehicleType(VehicleType vehicleType) {
     selectedVehicleType = vehicleType;
     nearbyVehicleTypeId = vehicleType.id;
+    unawaited(updateNearbyDriverIconDynamically(vehicleType));
     loadNearbyDrivers();
     // resortVehicleTypes();
     calculateTotalAmount();

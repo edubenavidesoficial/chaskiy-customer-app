@@ -4,8 +4,27 @@ import 'dart:ui' as ui;
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'dart:convert';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class MapUtils {
+  static Future<Uint8List?> svgAssetToPng(
+    String assetPath, {
+    int width = 64,
+    int height = 96,
+  }) async {
+    try {
+      final pictureInfo = await vg.loadPicture(SvgAssetLoader(assetPath), null);
+      final image = await pictureInfo.picture.toImage(width, height);
+      pictureInfo.picture.dispose();
+      final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+      image.dispose();
+      return bytes?.buffer.asUint8List();
+    } catch (error) {
+      print('No se pudo preparar el icono SVG del mapa: $error');
+      return null;
+    }
+  }
+
   //
   static targetBounds(LatLng locNE, LatLng locSW) {
     var nLat, nLon, sLat, sLon;

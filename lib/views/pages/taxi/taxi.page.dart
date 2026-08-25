@@ -84,8 +84,13 @@ class _TaxiPageState extends State<TaxiPage> with WidgetsBindingObserver {
                       else
                         const SizedBox.shrink(),
                       _MapActionButton(
-                        icon: Icons.my_location_rounded,
-                        onPressed: vm.focusMapSubject,
+                        icon:
+                            vm.onGoingOrderTrip != null
+                                ? (vm.driverAutoFollowEnabled
+                                    ? Icons.gps_fixed_rounded
+                                    : Icons.gps_not_fixed_rounded)
+                                : Icons.my_location_rounded,
+                        onPressed: vm.toggleDriverAutoFollow,
                       ),
                     ],
                   ),

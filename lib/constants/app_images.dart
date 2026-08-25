@@ -29,6 +29,9 @@ class AppImages {
   static const pickupLocation = "assets/images/pickup_location.png";
   static const dropoffLocation = "assets/images/dropoff_location.png";
   static const driverCar = "assets/images/driver_car.png";
+  static const mapVehicleCar = "assets/images/vehicle_car.svg";
+  static const mapVehicleTaxi = "assets/images/vehicle_taxi.svg";
+  static const mapVehicleMotorcycle = "assets/images/vehicle_motorcycle.svg";
   static const refer = "assets/images/refer.png";
 
   //
