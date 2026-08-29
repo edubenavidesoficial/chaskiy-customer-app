@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_colors.dart';
@@ -54,6 +55,8 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
   BitmapDescriptor? destinationIcon;
   BitmapDescriptor? driverIcon;
   BitmapDescriptor? nearbyDriverIcon;
+  BitmapDescriptor? pickupCalloutIcon;
+  BitmapDescriptor? driverCalloutIcon;
   int? nearbyVehicleTypeId;
   //END MAP RELATED VARIABLES
 
@@ -100,12 +103,13 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     notifyListeners();
   }
 
-  void onMapCreated(GoogleMapController controller) {
+  void onMapCreated(GoogleMapController controller) async {
     googleMapController = controller;
     setGoogleMapStyle();
     //start listening to user current location
     startUserLocationListener();
-    setSourceAndDestinationIcons();
+    await setSourceAndDestinationIcons();
+    await _ensureCalloutIcons();
     startNearbyDriversListener();
   }
 
@@ -176,7 +180,7 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
   }
 
   //
-  void setSourceAndDestinationIcons() async {
+  Future<void> setSourceAndDestinationIcons() async {
     sourceIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.5),
       AppImages.pickupLocation,
@@ -197,6 +201,79 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
       width: 38,
       height: 38,
     );
+  }
+
+  Future<void> _ensureCalloutIcons() async {
+    pickupCalloutIcon ??= await _buildMapCallout(
+      'Punto de recogida',
+      AppColor.primaryColor,
+    );
+    driverCalloutIcon ??= await _buildMapCallout(
+      'Tu conductor',
+      const Color(0xFF10233F),
+    );
+    notifyListeners();
+  }
+
+  Future<BitmapDescriptor> _buildMapCallout(String label, Color accent) async {
+    const scale = 2.5;
+    const logicalWidth = 164.0;
+    const bubbleHeight = 48.0;
+    const logicalHeight = 88.0;
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder)..scale(scale);
+    final bubble = RRect.fromRectAndRadius(
+      const Rect.fromLTWH(2, 2, logicalWidth - 4, bubbleHeight),
+      const Radius.circular(14),
+    );
+    canvas.drawShadow(
+      Path()..addRRect(bubble),
+      Colors.black.withValues(alpha: .28),
+      7,
+      true,
+    );
+    canvas.drawRRect(bubble, Paint()..color = Colors.white);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(9, 12, 24, 24),
+        const Radius.circular(8),
+      ),
+      Paint()..color = accent,
+    );
+    final pinPainter = TextPainter(
+      text: const TextSpan(
+        text: '●',
+        style: TextStyle(color: Colors.white, fontSize: 14),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    pinPainter.paint(canvas, const Offset(15, 14));
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: label,
+        style: const TextStyle(
+          color: Color(0xFF172033),
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      maxLines: 1,
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: logicalWidth - 52);
+    textPainter.paint(canvas, const Offset(42, 15));
+    final pointer =
+        Path()
+          ..moveTo(logicalWidth / 2 - 8, bubbleHeight - 1)
+          ..lineTo(logicalWidth / 2, bubbleHeight + 9)
+          ..lineTo(logicalWidth / 2 + 8, bubbleHeight - 1)
+          ..close();
+    canvas.drawPath(pointer, Paint()..color = Colors.white);
+    final image = await recorder.endRecording().toImage(
+      (logicalWidth * scale).round(),
+      (logicalHeight * scale).round(),
+    );
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    return BitmapDescriptor.bytes(byteData!.buffer.asUint8List());
   }
 
   //
@@ -381,22 +458,11 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
 
   //setupCurrentLocationAsPickuplocation()
   Future<void> setupCurrentLocationAsPickuplocation() async {
-    final cachedAddress = LocationService.currenctAddress;
-    final cachedLatitude = cachedAddress?.coordinates?.latitude;
-    final cachedLongitude = cachedAddress?.coordinates?.longitude;
-    if (_validCoordinates(cachedLatitude, cachedLongitude)) {
-      _setPickupLocation(
-        latitude: cachedLatitude!,
-        longitude: cachedLongitude!,
-        address: cachedAddress?.addressLine,
-        name: cachedAddress?.featureName,
-      );
-      return;
-    }
-
     try {
       if (!await Geolocator.isLocationServiceEnabled()) {
-        await _restorePickupLocation();
+        _requireManualPickup(
+          'Activa la ubicación o selecciona manualmente el punto de partida.',
+        );
         return;
       }
 
@@ -406,7 +472,9 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
       }
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        await _restorePickupLocation();
+        _requireManualPickup(
+          'Permite el acceso a tu ubicación o selecciona manualmente el punto de partida.',
+        );
         return;
       }
 
@@ -440,14 +508,17 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
         // The coordinates already provide a valid pickup point.
       }
     } catch (_) {
-      await _restorePickupLocation();
+      _requireManualPickup(
+        'No pudimos confirmar tu ubicación actual. Selecciona el punto de partida en el mapa.',
+      );
     }
   }
 
-  bool _validCoordinates(double? latitude, double? longitude) {
-    return latitude != null &&
-        longitude != null &&
-        !(latitude == 0 && longitude == 0);
+  void _requireManualPickup(String message) {
+    pickupLocation = null;
+    pickupLocationTEC.clear();
+    notifyListeners();
+    toastError(message);
   }
 
   void _setPickupLocation({
@@ -467,18 +538,6 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     notifyListeners();
   }
 
-  Future<void> _restorePickupLocation() async {
-    final saved = await LocationService.restoreSelectedAddress();
-    if (_validCoordinates(saved?.latitude, saved?.longitude)) {
-      _setPickupLocation(
-        latitude: saved!.latitude!,
-        longitude: saved.longitude!,
-        address: saved.address,
-        name: saved.name,
-      );
-    }
-  }
-
   //plylines
   drawTripPolyLines() async {
     if (pickupLocation == null || dropoffLocation == null) {
@@ -489,6 +548,7 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     if (pickupLocation!.latitude == null || pickupLocation!.longitude == null) {
       return;
     }
+    await _ensureCalloutIcons();
     // source pin
     gMapMarkers = {};
     gMapMarkers.add(
@@ -499,6 +559,15 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
             sourceIcon ??
             BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
         anchor: Offset(0.5, 0.5),
+      ),
+    );
+    gMapMarkers.add(
+      Marker(
+        markerId: const MarkerId('pickupCallout'),
+        position: LatLng(pickupLocation!.latitude!, pickupLocation!.longitude!),
+        icon: pickupCalloutIcon!,
+        anchor: const Offset(0.5, 1),
+        zIndexInt: 12,
       ),
     );
 

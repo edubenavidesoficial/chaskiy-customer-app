@@ -52,11 +52,11 @@ class ApiResponse {
 
     if (successfulStatus && validJsonBody) {
       if (body is Map && body["message"] != null) {
-        message = body["message"].toString();
+        message = _safeMessage(body["message"].toString());
       }
     } else {
       if (body is Map && body["message"] != null) {
-        message = body["message"].toString();
+        message = _safeMessage(body["message"].toString());
       } else {
         message = unavailableMessage;
       }
@@ -69,5 +69,16 @@ class ApiResponse {
       body: body,
       errors: errors,
     );
+  }
+
+  static String _safeMessage(String source) {
+    final normalized = source.toLowerCase();
+    final infrastructureMessage =
+        normalized.contains('imunify360') ||
+        normalized.contains('bot-protection') ||
+        normalized.contains('access denied') ||
+        normalized.contains('<html') ||
+        normalized.contains('<!doctype');
+    return infrastructureMessage ? unavailableMessage : source;
   }
 }

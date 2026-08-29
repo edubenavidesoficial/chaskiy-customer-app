@@ -61,5 +61,19 @@ void main() {
       expect(result.allGood, isFalse);
       expect(result.message, 'Datos inválidos');
     });
+
+    test('hides Imunify360 infrastructure details from customers', () {
+      final result = ApiResponse.fromResponse(
+        response(403, {
+          'message':
+              'Access denied by Imunify360 bot-protection. IPs used for automation should be whitelisted',
+        }),
+      );
+
+      expect(result.allGood, isFalse);
+      expect(result.message, ApiResponse.unavailableMessage);
+      expect(result.message, isNot(contains('Imunify360')));
+      expect(result.message, isNot(contains('whitelisted')));
+    });
   });
 }

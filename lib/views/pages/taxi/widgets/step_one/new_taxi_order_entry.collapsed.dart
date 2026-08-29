@@ -1,4 +1,5 @@
 import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/constants/app_images.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/view_models/taxi.vm.dart';
 import 'package:chaskiy/view_models/taxi_new_order_location_entry.vm.dart';
@@ -6,6 +7,7 @@ import 'package:chaskiy/widgets/busy_indicator.dart';
 import 'package:chaskiy/widgets/custom_list_view.dart';
 import 'package:chaskiy/widgets/list_items/taxi_order_location_history.list_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:measure_size/measure_size.dart';
 
 class NewTaxiOrderEntryCollapsed extends StatelessWidget {
@@ -54,52 +56,79 @@ class NewTaxiOrderEntryCollapsed extends StatelessWidget {
                             borderRadius: BorderRadius.circular(99),
                           ),
                         ),
+                        SizedBox(
+                          height: 72,
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            children: [
+                              _VehiclePreference(
+                                label: 'Auto',
+                                asset: AppImages.mapVehicleCar,
+                                selected: vm.preferredVehicleKind == 'car',
+                                onTap:
+                                    () => vm.selectPreferredVehicleKind('car'),
+                              ),
+                              const SizedBox(width: 10),
+                              _VehiclePreference(
+                                label: 'Taxi',
+                                asset: AppImages.mapVehicleTaxi,
+                                selected: vm.preferredVehicleKind == 'taxi',
+                                onTap:
+                                    () => vm.selectPreferredVehicleKind('taxi'),
+                              ),
+                              const SizedBox(width: 10),
+                              _VehiclePreference(
+                                label: 'Moto',
+                                asset: AppImages.mapVehicleMotorcycle,
+                                selected:
+                                    vm.preferredVehicleKind == 'motorcycle',
+                                onTap:
+                                    () => vm.selectPreferredVehicleKind(
+                                      'motorcycle',
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
                         Material(
                           color: colors.surfaceContainerHighest.withOpacity(
-                            .65,
+                            .72,
                           ),
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius: BorderRadius.circular(20),
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(20),
                             onTap: taxiNewOrderViewModel.onDestinationPressed,
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
-                                vertical: 15,
+                                vertical: 14,
                               ),
                               child: Row(
                                 children: [
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: AppColor.primaryColor.withOpacity(
-                                        .12,
-                                      ),
-                                      borderRadius: BorderRadius.circular(13),
-                                    ),
-                                    child: Icon(
-                                      Icons.search_rounded,
-                                      color: AppColor.primaryColor,
-                                    ),
+                                  Icon(
+                                    Icons.search_rounded,
+                                    size: 30,
+                                    color: colors.onSurface,
                                   ),
-                                  const SizedBox(width: 13),
+                                  const SizedBox(width: 14),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '¿A dónde vas?',
+                                          '¿A dónde quieres ir?',
                                           style: Theme.of(
                                             context,
                                           ).textTheme.titleMedium?.copyWith(
-                                            fontWeight: FontWeight.w700,
+                                            fontWeight: FontWeight.w800,
                                           ),
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
-                                          'Busca una dirección o elige en el mapa',
+                                          'Busca tu destino o elige en el mapa',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: Theme.of(
@@ -154,6 +183,64 @@ class NewTaxiOrderEntryCollapsed extends StatelessWidget {
                         ],
                       ],
                     ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _VehiclePreference extends StatelessWidget {
+  const _VehiclePreference({
+    required this.label,
+    required this.asset,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final String asset;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Material(
+      color:
+          selected
+              ? AppColor.primaryColor.withOpacity(.13)
+              : colors.surfaceContainerHighest.withOpacity(.42),
+      borderRadius: BorderRadius.circular(17),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(17),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          width: 94,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(17),
+            border: Border.all(
+              color: selected ? AppColor.primaryColor : colors.outlineVariant,
+              width: selected ? 1.5 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              SvgPicture.asset(asset, width: 39, height: 32),
+              const SizedBox(width: 7),
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: selected ? AppColor.primaryColor : colors.onSurface,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

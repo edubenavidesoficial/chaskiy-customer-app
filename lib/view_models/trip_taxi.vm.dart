@@ -534,12 +534,17 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
       }
     }
     _routeProgressIndex = nearestIndex;
+    final routePoint = polylineCoordinates[nearestIndex];
+    // Dentro de unos metros, el GPS se considera sobre la vía. Si la
+    // precisión lo coloca fuera, no dibujamos una falsa calle sólida:
+    // mostramos solamente un enlace entrecortado hasta la ruta calculada.
+    final isOffRoute = nearestDistance > 18;
     final completed = <LatLng>[
       ...polylineCoordinates.take(nearestIndex + 1),
-      position,
+      if (!isOffRoute) position,
     ];
     final remaining = <LatLng>[
-      position,
+      if (!isOffRoute) position else routePoint,
       ...polylineCoordinates.skip(nearestIndex + 1),
     ];
     gMapPolylines = {
@@ -556,6 +561,15 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
           points: remaining,
           width: 5,
           color: const Color(0xFF1769AA),
+        ),
+      if (isOffRoute)
+        Polyline(
+          polylineId: const PolylineId('driverToRoute'),
+          points: [position, routePoint],
+          width: 4,
+          color: const Color(0xFF1769AA).withValues(alpha: .72),
+          patterns: [PatternItem.dash(18), PatternItem.gap(10)],
+          zIndex: 2,
         ),
     };
   }
@@ -721,6 +735,21 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
       );
       gMapMarkers.removeWhere((e) => e.markerId.value == "driverMarker");
       gMapMarkers.add(driverMarker);
+    }
+
+    if (driverCalloutIcon != null) {
+      gMapMarkers.removeWhere(
+        (marker) => marker.markerId.value == 'driverCallout',
+      );
+      gMapMarkers.add(
+        Marker(
+          markerId: const MarkerId('driverCallout'),
+          position: driverPosition!,
+          icon: driverCalloutIcon!,
+          anchor: const Offset(0.5, 1),
+          zIndexInt: 21,
+        ),
+      );
     }
 
     notifyListeners();

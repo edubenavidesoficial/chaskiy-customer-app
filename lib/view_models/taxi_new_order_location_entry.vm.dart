@@ -77,14 +77,14 @@ class NewTaxiOrderLocationEntryViewModel extends MyBaseViewModel {
     setBusyForObject(previousAddresses, true);
     try {
       previousAddresses = await taxiRequest.locationHistory();
-      if (previousAddresses.length > 2) {
-        shortPreviousAddressesList = previousAddresses.sublist(0, 2);
+      if (previousAddresses.length > 3) {
+        shortPreviousAddressesList = previousAddresses.sublist(0, 3);
       } else {
         shortPreviousAddressesList = previousAddresses;
       }
       notifyListeners();
       //update the height
-      double extraHeight = (shortPreviousAddressesList.length * 55.00);
+      double extraHeight = (shortPreviousAddressesList.length * 54.00);
       resetStateViewheight(extraHeight);
     } catch (error) {
       print("Error getting previous location ==> $error");

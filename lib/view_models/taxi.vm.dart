@@ -40,6 +40,7 @@ class TaxiViewModel extends TripTaxiViewModel {
   Coupon? coupon;
   TextEditingController couponTEC = TextEditingController();
   bool vehicleTypesLoadFailed = false;
+  String preferredVehicleKind = 'car';
 
   //
   CheckOut? checkout = CheckOut();
@@ -114,8 +115,12 @@ class TaxiViewModel extends TripTaxiViewModel {
   //after locations has been selected
   proceedToStep2() async {
     //validate user has selected both pickup and drop off location
-    if (dropoffLocation == null) {
-      toastError("Please select pickup and drop-off location".tr());
+    final validPickup =
+        pickupLocation?.latitude != null && pickupLocation?.longitude != null;
+    final validDropoff =
+        dropoffLocation?.latitude != null && dropoffLocation?.longitude != null;
+    if (!validPickup || !validDropoff) {
+      toastError('Selecciona un punto de partida y un destino válidos'.tr());
     } else if (canScheduleTaxiOrder &&
         (checkout!.pickupDate == null || checkout!.pickupTime == null)) {
       toastError("Please select pickup date and pickup time".tr());
@@ -159,12 +164,44 @@ class TaxiViewModel extends TripTaxiViewModel {
         countryCode: LocationService.currenctAddress?.countryCode,
       );
       vehicleTypesLoadFailed = vehicleTypes.isEmpty;
+      final preferredVehicle = _preferredVehicleFrom(vehicleTypes);
+      if (preferredVehicle != null) {
+        changeSelectedVehicleType(preferredVehicle);
+      }
     } catch (error) {
       print("Error getting vehicleTypes ==> $error");
       vehicleTypesLoadFailed = true;
     }
     setBusyForObject(vehicleTypes, false);
     notifyListeners();
+  }
+
+  void selectPreferredVehicleKind(String kind) {
+    preferredVehicleKind = kind;
+    notifyListeners();
+  }
+
+  VehicleType? _preferredVehicleFrom(List<VehicleType> availableTypes) {
+    if (availableTypes.isEmpty) return null;
+
+    for (final vehicleType in availableTypes) {
+      final identity = '${vehicleType.slug} ${vehicleType.name}'.toLowerCase();
+      final matches = switch (preferredVehicleKind) {
+        'motorcycle' =>
+          identity.contains('moto') ||
+              identity.contains('motor') ||
+              identity.contains('bike'),
+        'taxi' => identity.contains('taxi'),
+        _ =>
+          !identity.contains('moto') &&
+              !identity.contains('motor') &&
+              !identity.contains('bike') &&
+              !identity.contains('taxi'),
+      };
+      if (matches) return vehicleType;
+    }
+
+    return availableTypes.first;
   }
 
   resortVehicleTypes() {
