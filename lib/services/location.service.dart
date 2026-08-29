@@ -9,7 +9,7 @@ import 'package:chaskiy/services/app.service.dart';
 import 'package:chaskiy/services/local_storage.service.dart';
 import 'package:chaskiy/widgets/bottomsheets/location_permission.bottomsheet.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:location/location.dart';
+import 'package:location/location.dart' hide LocationAccuracy;
 // import 'package:geocoder/geocoder.dart';
 import 'package:rxdart/rxdart.dart';
 import 'geocoder.service.dart';
@@ -24,6 +24,7 @@ class LocationService {
   static Address? currenctAddress;
   static DeliveryAddress? deliveryaddress;
   static StreamSubscription? currentLocationListener;
+  static Future<bool>? _automaticRefreshRequest;
 
   //
   static PublishSubject<Address> currenctAddressSubject =
@@ -59,6 +60,91 @@ class LocationService {
     }
 
     _startLocationListner(oneTime);
+  }
+
+  /// Actualiza la ubicación al entrar a la aplicación sin bloquear Inicio.
+  /// Si el GPS o los permisos no están disponibles, conserva la última
+  /// dirección válida para que el usuario pueda seguir usando la app.
+  static Future<bool> refreshCurrentLocationSilently() {
+    final activeRequest = _automaticRefreshRequest;
+    if (activeRequest != null) return activeRequest;
+
+    final request = _performAutomaticRefresh();
+    _automaticRefreshRequest = request;
+    request.whenComplete(() {
+      if (identical(_automaticRefreshRequest, request)) {
+        _automaticRefreshRequest = null;
+      }
+    });
+    return request;
+  }
+
+  static Future<bool> _performAutomaticRefresh() async {
+    try {
+      if (!await Geolocator.isLocationServiceEnabled()) return false;
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        return false;
+      }
+
+      Position? position;
+      try {
+        position = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.high,
+            timeLimit: Duration(seconds: 8),
+          ),
+        );
+      } on TimeoutException {
+        position = await Geolocator.getLastKnownPosition();
+      } catch (_) {
+        position = await Geolocator.getLastKnownPosition();
+      }
+      if (position == null ||
+          (position.latitude == 0 && position.longitude == 0)) {
+        return false;
+      }
+
+      final coordinates = Coordinates(position.latitude, position.longitude);
+      final address = await addressFromCoordinates(
+        lat: position.latitude,
+        lng: position.longitude,
+      ).timeout(
+        const Duration(seconds: 8),
+        onTimeout: () => _coordinateFallback(coordinates),
+      );
+      final resolvedAddress = address ?? _coordinateFallback(coordinates);
+      final automaticAddress = DeliveryAddress(
+        name:
+            resolvedAddress.featureName?.trim().isNotEmpty == true
+                ? resolvedAddress.featureName
+                : 'Ubicación actual',
+        address:
+            resolvedAddress.addressLine?.trim().isNotEmpty == true
+                ? resolvedAddress.addressLine
+                : 'Ubicación actual',
+        latitude: position.latitude,
+        longitude: position.longitude,
+        city: resolvedAddress.locality,
+        state: resolvedAddress.adminArea,
+        country: resolvedAddress.countryName,
+      );
+
+      await saveSelectedAddressLocally(automaticAddress);
+      // Conservamos todos los metadatos del geocodificador, incluido el país,
+      // después de persistir la versión utilizada para entregas.
+      currenctAddress = resolvedAddress;
+      currenctAddressSubject.add(resolvedAddress);
+      return true;
+    } catch (error) {
+      debugPrint('Actualización automática de ubicación omitida: $error');
+      return false;
+    }
   }
 
   static Future<bool> showRequestDialog() async {

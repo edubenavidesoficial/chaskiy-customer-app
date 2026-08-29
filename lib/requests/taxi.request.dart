@@ -33,7 +33,7 @@ class TaxiRequest extends HttpService {
 
   //
   Future<List<VehicleType>> getVehicleTypes() async {
-    final apiResult = await get("${Api.vehicleTypes}");
+    final apiResult = await get("${Api.vehicleTypes}", forceRefresh: true);
     final apiResponse = ApiResponse.fromResponse(apiResult);
     if (apiResponse.allGood) {
       return (apiResponse.body as List)

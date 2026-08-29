@@ -41,6 +41,10 @@ class TaxiViewModel extends TripTaxiViewModel {
   TextEditingController couponTEC = TextEditingController();
   bool vehicleTypesLoadFailed = false;
   String preferredVehicleKind = 'car';
+  int? preferredVehicleTypeId;
+  List<VehicleType> configuredVehicleTypes = [];
+  bool configuredVehicleTypesLoadFailed = false;
+  Future<void>? _configuredVehicleTypesRequest;
 
   //
   CheckOut? checkout = CheckOut();
@@ -50,6 +54,7 @@ class TaxiViewModel extends TripTaxiViewModel {
 
   //functions
   void initialise() async {
+    unawaited(fetchConfiguredVehicleTypes());
     await fetchTaxiPaymentOptions();
     await getOnGoingTrip();
     if (!onTrip) {
@@ -176,29 +181,68 @@ class TaxiViewModel extends TripTaxiViewModel {
     notifyListeners();
   }
 
-  void selectPreferredVehicleKind(String kind) {
+  Future<void> selectPreferredVehicleKind(String kind) async {
     preferredVehicleKind = kind;
+    preferredVehicleTypeId = null;
+    notifyListeners();
+    await fetchConfiguredVehicleTypes();
+  }
+
+  Future<void> fetchConfiguredVehicleTypes({bool force = false}) async {
+    if (configuredVehicleTypes.isNotEmpty && !force) return;
+    if (_configuredVehicleTypesRequest != null && !force) {
+      return _configuredVehicleTypesRequest;
+    }
+    final request = _loadConfiguredVehicleTypes();
+    _configuredVehicleTypesRequest = request;
+    try {
+      await request;
+    } finally {
+      if (identical(_configuredVehicleTypesRequest, request)) {
+        _configuredVehicleTypesRequest = null;
+      }
+    }
+  }
+
+  Future<void> _loadConfiguredVehicleTypes() async {
+    setBusyForObject('configuredVehicleTypes', true);
+    configuredVehicleTypesLoadFailed = false;
+    try {
+      configuredVehicleTypes = await taxiRequest.getVehicleTypes();
+      configuredVehicleTypesLoadFailed = configuredVehicleTypes.isEmpty;
+    } catch (_) {
+      configuredVehicleTypesLoadFailed = true;
+    }
+    setBusyForObject('configuredVehicleTypes', false);
+    notifyListeners();
+  }
+
+  List<VehicleType> configuredTypesFor(String kind) {
+    return configuredVehicleTypes
+        .where((vehicleType) => vehicleType.vehicleKind == kind)
+        .toList();
+  }
+
+  void selectPreferredVehicleType(VehicleType vehicleType) {
+    preferredVehicleKind = vehicleType.vehicleKind;
+    preferredVehicleTypeId = vehicleType.id;
+    nearbyVehicleTypeId = vehicleType.id;
+    unawaited(updateNearbyDriverIconDynamically(vehicleType));
+    loadNearbyDrivers();
     notifyListeners();
   }
 
   VehicleType? _preferredVehicleFrom(List<VehicleType> availableTypes) {
     if (availableTypes.isEmpty) return null;
 
+    if (preferredVehicleTypeId != null) {
+      for (final vehicleType in availableTypes) {
+        if (vehicleType.id == preferredVehicleTypeId) return vehicleType;
+      }
+    }
+
     for (final vehicleType in availableTypes) {
-      final identity = '${vehicleType.slug} ${vehicleType.name}'.toLowerCase();
-      final matches = switch (preferredVehicleKind) {
-        'motorcycle' =>
-          identity.contains('moto') ||
-              identity.contains('motor') ||
-              identity.contains('bike'),
-        'taxi' => identity.contains('taxi'),
-        _ =>
-          !identity.contains('moto') &&
-              !identity.contains('motor') &&
-              !identity.contains('bike') &&
-              !identity.contains('taxi'),
-      };
-      if (matches) return vehicleType;
+      if (vehicleType.vehicleKind == preferredVehicleKind) return vehicleType;
     }
 
     return availableTypes.first;

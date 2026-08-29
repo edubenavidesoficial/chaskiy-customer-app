@@ -33,6 +33,7 @@ class VehicleType {
     this.surgeRate,
     this.icon,
     this.iconBase64,
+    this.vehicleKind = 'car',
   });
 
   int id;
@@ -55,6 +56,7 @@ class VehicleType {
   double? surgeRate;
   String? icon;
   String? iconBase64;
+  String vehicleKind;
 
   factory VehicleType.fromJson(Map<String, dynamic> json) {
     return VehicleType(
@@ -76,39 +78,60 @@ class VehicleType {
       currency:
           json["currency"] != null ? Currency.fromJSON(json["currency"]) : null,
       //new fields
-      surgeRate: json["surge_rate"] != null
-          ? (json["surge_rate"].toString().toDouble())
-          : null,
+      surgeRate:
+          json["surge_rate"] != null
+              ? (json["surge_rate"].toString().toDouble())
+              : null,
       icon: json["icon"],
       iconBase64: json["icon_base64"],
+      vehicleKind: _vehicleKindFromJson(json),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "slug": slug,
-        "base_fare": baseFare,
-        "distance_fare": distanceFare,
-        "time_fare": timeFare,
-        "min_fare": minFare,
-        "total": total,
-        "tax": tax,
-        "is_active": isActive,
-        "created_at": createdAt.toIso8601String(),
-        "updated_at": updatedAt.toIso8601String(),
-        "formatted_date": formattedDate,
-        "photo": photo,
-        "encrypted": encrypted,
-        "currency": currency != null ? currency?.toJson() : null,
-        //new fields
-        "surge_rate": surgeRate,
-        "icon": icon,
-        "icon_base64": iconBase64,
-      };
+    "id": id,
+    "name": name,
+    "slug": slug,
+    "base_fare": baseFare,
+    "distance_fare": distanceFare,
+    "time_fare": timeFare,
+    "min_fare": minFare,
+    "total": total,
+    "tax": tax,
+    "is_active": isActive,
+    "created_at": createdAt.toIso8601String(),
+    "updated_at": updatedAt.toIso8601String(),
+    "formatted_date": formattedDate,
+    "photo": photo,
+    "encrypted": encrypted,
+    "currency": currency != null ? currency?.toJson() : null,
+    //new fields
+    "surge_rate": surgeRate,
+    "icon": icon,
+    "icon_base64": iconBase64,
+    "vehicle_kind": vehicleKind,
+  };
 
   //
   bool get hasSurge {
     return surgeRate != null && surgeRate! > 0;
   }
+}
+
+String _vehicleKindFromJson(Map<String, dynamic> json) {
+  final configured = '${json["vehicle_kind"] ?? ''}'.trim().toLowerCase();
+  if (configured == 'car' ||
+      configured == 'taxi' ||
+      configured == 'motorcycle') {
+    return configured;
+  }
+
+  final identity = '${json["slug"] ?? ''} ${json["name"] ?? ''}'.toLowerCase();
+  if (identity.contains('moto') || identity.contains('motorcycle')) {
+    return 'motorcycle';
+  }
+  if (identity.contains('taxi') || identity.contains('canario')) {
+    return 'taxi';
+  }
+  return 'car';
 }

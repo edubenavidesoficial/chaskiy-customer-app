@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:double_back_to_close/double_back_to_close.dart';
 import 'package:flutter/material.dart';
@@ -35,14 +36,19 @@ class _HomePageState extends State<HomePage>
     //
     vm = HomeViewModel(context);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (LocationService.currenctAddress == null) {
-        LocationService.prepareLocationListener(true);
-      }
+      // Muestra inmediatamente la dirección guardada y la sustituye en
+      // segundo plano por el GPS actual. No recarga la pantalla completa.
+      unawaited(_refreshInitialLocation());
       vm.initialise();
 
       // Handle any pending deep links after home page is loaded
       AppService().handlePendingDeepLink();
     });
+  }
+
+  Future<void> _refreshInitialLocation() async {
+    await LocationService.restoreSelectedAddress();
+    await LocationService.refreshCurrentLocationSilently();
   }
 
   @override

@@ -198,8 +198,8 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     nearbyDriverIcon = await BitmapDescriptor.asset(
       const ImageConfiguration(),
       AppImages.driverCar,
-      width: 38,
-      height: 38,
+      width: 28,
+      height: 28,
     );
   }
 
@@ -273,19 +273,35 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
       (logicalHeight * scale).round(),
     );
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    return BitmapDescriptor.bytes(byteData!.buffer.asUint8List());
+    image.dispose();
+    return BitmapDescriptor.bytes(
+      byteData!.buffer.asUint8List(),
+      // El PNG se genera a 2.5x para conservar nitidez. Declarar el tamaño
+      // lógico evita que iOS lo muestre a resolución física y cubra el mapa.
+      width: 150,
+      height: 80,
+    );
   }
 
   //
   updateDriverIconDynamically(VehicleType vehicleType) async {
     final asset = _mapVehicleAsset(vehicleType);
+    final isMotorcycle = asset == AppImages.mapVehicleMotorcycle;
+    final logicalWidth = isMotorcycle ? 26.0 : 28.0;
+    final logicalHeight = isMotorcycle ? 39.0 : 42.0;
     Uint8List? iconByteData = await MapUtils.svgAssetToPng(
       asset,
-      width: asset == AppImages.mapVehicleMotorcycle ? 52 : 58,
-      height: 86,
+      // Rasterizamos a 3x y declaramos debajo el tamaño lógico. Así el icono
+      // queda nítido en Retina/Android sin ocupar varias cuadras del mapa.
+      width: (logicalWidth * 3).round(),
+      height: (logicalHeight * 3).round(),
     );
     if (iconByteData != null) {
-      driverIcon = await BitmapDescriptor.fromBytes(iconByteData);
+      driverIcon = BitmapDescriptor.bytes(
+        iconByteData,
+        width: logicalWidth,
+        height: logicalHeight,
+      );
     }
   }
 
@@ -293,13 +309,20 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     VehicleType vehicleType,
   ) async {
     final asset = _mapVehicleAsset(vehicleType);
+    final isMotorcycle = asset == AppImages.mapVehicleMotorcycle;
+    final logicalWidth = isMotorcycle ? 23.0 : 25.0;
+    final logicalHeight = isMotorcycle ? 35.0 : 38.0;
     final bytes = await MapUtils.svgAssetToPng(
       asset,
-      width: asset == AppImages.mapVehicleMotorcycle ? 42 : 46,
-      height: 68,
+      width: (logicalWidth * 3).round(),
+      height: (logicalHeight * 3).round(),
     );
     if (bytes != null) {
-      nearbyDriverIcon = BitmapDescriptor.bytes(bytes);
+      nearbyDriverIcon = BitmapDescriptor.bytes(
+        bytes,
+        width: logicalWidth,
+        height: logicalHeight,
+      );
       notifyListeners();
     }
   }
