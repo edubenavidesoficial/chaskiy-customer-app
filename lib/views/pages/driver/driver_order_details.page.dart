@@ -2,16 +2,21 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:chaskiy/constants/app_strings.dart';
+import 'package:chaskiy/constants/app_ui_settings.dart';
 import 'package:chaskiy/constants/app_taxi_settings.dart';
 import 'package:chaskiy/extensions/string.dart';
 import 'package:chaskiy/models/order.dart';
 import 'package:chaskiy/requests/order.request.dart';
+import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/services/chat.service.dart';
 import 'package:chaskiy/traits/qrcode_scanner.trait.dart';
 import 'package:chaskiy/utils/utils.dart';
 import 'package:chaskiy/widgets/order_status_chip.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:chaskiy/views/pages/driver/driver_signature.page.dart';
+import 'package:chaskiy/views/pages/chat/order_chat.page.dart';
+import 'package:firestore_chat/firestore_chat.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class DriverOrderDetailsPage extends StatefulWidget {
@@ -196,6 +201,37 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
     }
   }
 
+  Future<void> _openCustomerChat() async {
+    if (!_isTaxi || _order.driverId == null) return;
+    final currentUser = await AuthServices.getCurrentUser();
+    if (!mounted) return;
+
+    final peers = <String, PeerUser>{
+      '${currentUser.id}': PeerUser(
+        id: '${currentUser.id}',
+        name: currentUser.name,
+        image: currentUser.photo,
+      ),
+      '${_order.userId}': PeerUser(
+        id: '${_order.userId}',
+        name: _order.user.name,
+        image: _order.user.photo,
+      ),
+    };
+    final chat = ChatEntity(
+      onMessageSent: ChatService.sendChatMessage,
+      mainUser: peers['${currentUser.id}']!,
+      peers: peers,
+      path: 'orders/${_order.code}/customerDriver/chats',
+      title: 'Chat con cliente',
+      supportMedia: AppUISettings.canCustomerChatSupportMedia,
+    );
+
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => OrderChatPage(chatEntity: chat)));
+  }
+
   Future<bool?> _verificationDialog({
     String title = 'Verificar entrega',
   }) async {
@@ -297,6 +333,14 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
             fontWeight: FontWeight.w700,
           ),
         ),
+        actions: [
+          if (_isTaxi && !_isFinished && AppUISettings.canDriverChat)
+            IconButton(
+              tooltip: 'Chat con cliente',
+              onPressed: _openCustomerChat,
+              icon: const Icon(Icons.chat_bubble_outline_rounded),
+            ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: _refresh,

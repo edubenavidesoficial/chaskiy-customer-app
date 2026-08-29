@@ -223,8 +223,11 @@ class FirebaseService {
           return;
         } else if (isChat) {
           //
-          dynamic user = jsonDecode(notificationPayloadData!['user']);
-          dynamic peer = jsonDecode(notificationPayloadData!['peer']);
+          final userPayload = notificationPayloadData!['user'];
+          final peerPayload = notificationPayloadData!['peer'];
+          if (userPayload == null || peerPayload == null) return;
+          dynamic user = jsonDecode('$userPayload');
+          dynamic peer = jsonDecode('$peerPayload');
           String chatPath = notificationPayloadData!['path'];
           //
           Map<String, PeerUser> peers = {
@@ -249,10 +252,12 @@ class FirebaseService {
             //don't translate this
             path: chatPath,
             title:
-                peer["role"] == null
-                    ? "Chat with".tr() + " ${peer['name']}"
+                notificationPayloadData!['title']?.toString().isNotEmpty == true
+                    ? notificationPayloadData!['title'].toString()
                     : peerRole == 'vendor'
                     ? "Chat with vendor".tr()
+                    : peerRole == 'customer'
+                    ? 'Chat con cliente'
                     : "Chat with driver".tr(),
             supportMedia: AppUISettings.canCustomerChatSupportMedia,
           );
