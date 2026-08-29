@@ -65,6 +65,7 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
   TextEditingController pickupLocationTEC = TextEditingController();
   FocusNode pickupLocationFocusNode = FocusNode();
   DeliveryAddress? pickupLocation;
+  bool _manualPickupNoticeShown = false;
   TextEditingController dropoffLocationTEC = TextEditingController();
   FocusNode dropoffLocationFocusNode = FocusNode();
   DeliveryAddress? dropoffLocation;
@@ -205,11 +206,11 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
 
   Future<void> _ensureCalloutIcons() async {
     pickupCalloutIcon ??= await _buildMapCallout(
-      'Punto de recogida',
+      'Recogida',
       AppColor.primaryColor,
     );
     driverCalloutIcon ??= await _buildMapCallout(
-      'Tu conductor',
+      'Conductor',
       const Color(0xFF10233F),
     );
     notifyListeners();
@@ -217,13 +218,13 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
 
   Future<BitmapDescriptor> _buildMapCallout(String label, Color accent) async {
     const scale = 2.5;
-    const logicalWidth = 164.0;
-    const bubbleHeight = 48.0;
-    const logicalHeight = 88.0;
+    final logicalWidth = label.length <= 10 ? 118.0 : 142.0;
+    const bubbleHeight = 44.0;
+    const logicalHeight = 68.0;
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder)..scale(scale);
     final bubble = RRect.fromRectAndRadius(
-      const Rect.fromLTWH(2, 2, logicalWidth - 4, bubbleHeight),
+      Rect.fromLTWH(2, 2, logicalWidth - 4, bubbleHeight),
       const Radius.circular(14),
     );
     canvas.drawShadow(
@@ -278,8 +279,8 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
       byteData!.buffer.asUint8List(),
       // El PNG se genera a 2.5x para conservar nitidez. Declarar el tamaño
       // lógico evita que iOS lo muestre a resolución física y cubra el mapa.
-      width: 150,
-      height: 80,
+      width: logicalWidth,
+      height: logicalHeight,
     );
   }
 
@@ -483,6 +484,7 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
   Future<void> setupCurrentLocationAsPickuplocation() async {
     try {
       if (!await Geolocator.isLocationServiceEnabled()) {
+        if (await _useBestKnownPickupLocation()) return;
         _requireManualPickup(
           'Activa la ubicación o selecciona manualmente el punto de partida.',
         );
@@ -495,16 +497,17 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
       }
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
+        if (await _useBestKnownPickupLocation()) return;
         _requireManualPickup(
           'Permite el acceso a tu ubicación o selecciona manualmente el punto de partida.',
         );
         return;
       }
 
-      Position currentLocation = await Geolocator.getCurrentPosition(
+      final currentLocation = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 12),
+          timeLimit: Duration(seconds: 8),
         ),
       );
 
@@ -531,17 +534,79 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
         // The coordinates already provide a valid pickup point.
       }
     } catch (_) {
+      if (await _useBestKnownPickupLocation()) return;
       _requireManualPickup(
         'No pudimos confirmar tu ubicación actual. Selecciona el punto de partida en el mapa.',
       );
     }
   }
 
+  /// Recuperación progresiva para que un timeout breve del GPS no deje al
+  /// usuario sin origen ni muestre un error invasivo.
+  Future<bool> _useBestKnownPickupLocation() async {
+    try {
+      final lastPosition = await Geolocator.getLastKnownPosition();
+      if (_validCoordinates(lastPosition?.latitude, lastPosition?.longitude)) {
+        _setPickupLocation(
+          latitude: lastPosition!.latitude,
+          longitude: lastPosition.longitude,
+        );
+        return true;
+      }
+    } catch (_) {
+      // Continúa con la dirección persistida por Inicio.
+    }
+
+    final savedAddress = await LocationService.restoreSelectedAddress();
+    if (_validCoordinates(savedAddress?.latitude, savedAddress?.longitude)) {
+      _setPickupLocation(
+        latitude: savedAddress!.latitude!,
+        longitude: savedAddress.longitude!,
+        address: savedAddress.address,
+        name: savedAddress.name,
+      );
+      return true;
+    }
+
+    final currentAddress = LocationService.currenctAddress;
+    final latitude = currentAddress?.coordinates?.latitude;
+    final longitude = currentAddress?.coordinates?.longitude;
+    if (_validCoordinates(latitude, longitude)) {
+      _setPickupLocation(
+        latitude: latitude!,
+        longitude: longitude!,
+        address: currentAddress?.addressLine,
+        name: currentAddress?.featureName,
+      );
+      return true;
+    }
+
+    return false;
+  }
+
+  bool _validCoordinates(double? latitude, double? longitude) =>
+      latitude != null &&
+      longitude != null &&
+      latitude >= -90 &&
+      latitude <= 90 &&
+      longitude >= -180 &&
+      longitude <= 180 &&
+      !(latitude == 0 && longitude == 0);
+
   void _requireManualPickup(String message) {
+    if (_validCoordinates(
+      pickupLocation?.latitude,
+      pickupLocation?.longitude,
+    )) {
+      return;
+    }
     pickupLocation = null;
     pickupLocationTEC.clear();
     notifyListeners();
-    toastError(message);
+    if (!_manualPickupNoticeShown) {
+      _manualPickupNoticeShown = true;
+      toastError(message);
+    }
   }
 
   void _setPickupLocation({
@@ -558,6 +623,7 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
       longitude: longitude,
     );
     pickupLocationTEC.text = pickupLocation!.address!;
+    _manualPickupNoticeShown = false;
     notifyListeners();
   }
 

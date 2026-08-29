@@ -42,6 +42,7 @@ class TaxiViewModel extends TripTaxiViewModel {
   bool vehicleTypesLoadFailed = false;
   String preferredVehicleKind = 'car';
   int? preferredVehicleTypeId;
+  bool showAllVehicleOptions = false;
   List<VehicleType> configuredVehicleTypes = [];
   bool configuredVehicleTypesLoadFailed = false;
   Future<void>? _configuredVehicleTypesRequest;
@@ -171,7 +172,12 @@ class TaxiViewModel extends TripTaxiViewModel {
       vehicleTypesLoadFailed = vehicleTypes.isEmpty;
       final preferredVehicle = _preferredVehicleFrom(vehicleTypes);
       if (preferredVehicle != null) {
-        changeSelectedVehicleType(preferredVehicle);
+        final exactPreferenceAvailable =
+            preferredVehicleTypeId != null &&
+            vehicleTypes.any((item) => item.id == preferredVehicleTypeId);
+        showAllVehicleOptions =
+            preferredVehicleTypeId != null && !exactPreferenceAvailable;
+        changeSelectedVehicleType(preferredVehicle, rememberSelection: false);
       }
     } catch (error) {
       print("Error getting vehicleTypes ==> $error");
@@ -226,6 +232,7 @@ class TaxiViewModel extends TripTaxiViewModel {
   void selectPreferredVehicleType(VehicleType vehicleType) {
     preferredVehicleKind = vehicleType.vehicleKind;
     preferredVehicleTypeId = vehicleType.id;
+    showAllVehicleOptions = false;
     nearbyVehicleTypeId = vehicleType.id;
     unawaited(updateNearbyDriverIconDynamically(vehicleType));
     loadNearbyDrivers();
@@ -254,8 +261,26 @@ class TaxiViewModel extends TripTaxiViewModel {
   }
 
   //
-  changeSelectedVehicleType(VehicleType vehicleType) {
+  bool get hasConfirmedVehicleChoice =>
+      !showAllVehicleOptions &&
+      preferredVehicleTypeId != null &&
+      selectedVehicleType?.id == preferredVehicleTypeId;
+
+  void revealVehicleOptions() {
+    showAllVehicleOptions = true;
+    notifyListeners();
+  }
+
+  changeSelectedVehicleType(
+    VehicleType vehicleType, {
+    bool rememberSelection = true,
+  }) {
     selectedVehicleType = vehicleType;
+    if (rememberSelection) {
+      preferredVehicleKind = vehicleType.vehicleKind;
+      preferredVehicleTypeId = vehicleType.id;
+      showAllVehicleOptions = false;
+    }
     nearbyVehicleTypeId = vehicleType.id;
     unawaited(updateNearbyDriverIconDynamically(vehicleType));
     loadNearbyDrivers();

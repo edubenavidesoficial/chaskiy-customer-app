@@ -1,8 +1,10 @@
 import 'package:chaskiy/constants/app_colors.dart';
+import 'package:chaskiy/view_models/taxi.vm.dart';
 import 'package:chaskiy/view_models/taxi_new_order_summary.vm.dart';
 import 'package:chaskiy/views/pages/taxi/widgets/order_taxi.button.dart';
 import 'package:chaskiy/views/pages/taxi/widgets/step_two/new_style_taxi_order_vehicle_type.list_view.dart';
 import 'package:chaskiy/views/pages/taxi/widgets/step_two/new_taxi_order_payment_method.selection_view.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:flutter/material.dart';
 import 'package:measure_size/measure_size.dart';
 
@@ -53,12 +55,16 @@ class NewTaxiOrderSummaryCollapsed extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Elige tu viaje',
+                            vm.hasConfirmedVehicleChoice
+                                ? 'Confirma tu viaje'
+                                : 'Elige tu viaje',
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(fontWeight: FontWeight.w800),
                           ),
                           Text(
-                            'Compara opciones y precios',
+                            vm.hasConfirmedVehicleChoice
+                                ? 'Revisa el pago y solicita tu vehículo'
+                                : 'Compara opciones y precios',
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(color: colors.onSurfaceVariant),
                           ),
@@ -72,7 +78,10 @@ class NewTaxiOrderSummaryCollapsed extends StatelessWidget {
                   ],
                 ),
               ),
-              NewTaxiVehicleTypeListView(vm: vm),
+              if (vm.hasConfirmedVehicleChoice)
+                _ConfirmedVehicleCard(vm: vm)
+              else
+                NewTaxiVehicleTypeListView(vm: vm),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
                 child: Row(
@@ -99,6 +108,70 @@ class NewTaxiOrderSummaryCollapsed extends StatelessWidget {
               OrderTaxiButton(vm),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ConfirmedVehicleCard extends StatelessWidget {
+  const _ConfirmedVehicleCard({required this.vm});
+
+  final TaxiViewModel vm;
+
+  @override
+  Widget build(BuildContext context) {
+    final vehicle = vm.selectedVehicleType!;
+    final colors = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+      child: Container(
+        height: 74,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: BoxDecoration(
+          color: colors.primaryContainer.withValues(alpha: .42),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: colors.primary.withValues(alpha: .35)),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 54,
+              height: 48,
+              child: CustomImage(
+                imageUrl: vehicle.photo,
+                boxFit: BoxFit.contain,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    vehicle.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Text(
+                    'Vehículo seleccionado',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            TextButton(
+              onPressed: vm.revealVehicleOptions,
+              child: const Text('Cambiar'),
+            ),
+          ],
         ),
       ),
     );
