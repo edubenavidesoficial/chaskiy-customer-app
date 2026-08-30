@@ -14,6 +14,7 @@ import 'package:chaskiy/requests/cart.request.dart';
 import 'package:chaskiy/requests/payment_method.request.dart';
 import 'package:chaskiy/requests/taxi.request.dart';
 import 'package:chaskiy/services/alert.service.dart';
+import 'package:chaskiy/services/active_taxi_trip.service.dart';
 import 'package:chaskiy/services/chat.service.dart';
 import 'package:chaskiy/services/location.service.dart';
 import 'package:chaskiy/services/trip.service.dart';
@@ -57,6 +58,7 @@ class TaxiViewModel extends TripTaxiViewModel {
   void initialise() async {
     unawaited(fetchConfiguredVehicleTypes());
     await fetchTaxiPaymentOptions();
+    await restoreCachedOnGoingTrip();
     await getOnGoingTrip();
     if (!onTrip) {
       await setupCurrentLocationAsPickuplocation();
@@ -361,10 +363,44 @@ class TaxiViewModel extends TripTaxiViewModel {
 
     //if there was an issue placing the order
     if (!apiResponse.allGood) {
-      AlertService.error(title: "Order failed".tr(), text: apiResponse.message);
+      final existing =
+          apiResponse.body is Map ? apiResponse.body['order'] : null;
+      if (existing is Map) {
+        onGoingOrderTrip = Order.fromJson(Map<String, dynamic>.from(existing));
+        await ActiveTaxiTripService.save(onGoingOrderTrip);
+        startHandlingOnGoingTrip();
+        toastSuccessful(
+          apiResponse.message ?? 'Retomamos tu viaje activo'.tr(),
+        );
+      } else if (apiResponse.code == 409) {
+        await Future.delayed(const Duration(seconds: 2));
+        Order? confirmedTrip;
+        try {
+          confirmedTrip = await taxiRequest.getOnGoingTrip();
+        } catch (_) {
+          confirmedTrip = await ActiveTaxiTripService.restore();
+        }
+        if (confirmedTrip != null) {
+          onGoingOrderTrip = confirmedTrip;
+          await ActiveTaxiTripService.save(confirmedTrip);
+          startHandlingOnGoingTrip();
+          toastSuccessful('Retomamos tu viaje activo'.tr());
+        } else {
+          AlertService.error(
+            title: 'Estamos confirmando tu viaje'.tr(),
+            text: apiResponse.message,
+          );
+        }
+      } else {
+        AlertService.error(
+          title: "Order failed".tr(),
+          text: apiResponse.message,
+        );
+      }
     } else {
       //
       onGoingOrderTrip = Order.fromJson(apiResponse.body["order"]);
+      await ActiveTaxiTripService.save(onGoingOrderTrip);
       //payment
       String paymentLink = apiResponse.body["link"];
       if (paymentLink.isNotBlank) {

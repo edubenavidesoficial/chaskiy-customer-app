@@ -10,6 +10,7 @@ import 'package:chaskiy/models/vehicle_type.dart';
 import 'package:chaskiy/requests/order.request.dart';
 import 'package:chaskiy/requests/payment_method.request.dart';
 import 'package:chaskiy/requests/taxi.request.dart';
+import 'package:chaskiy/services/active_taxi_trip.service.dart';
 import 'package:chaskiy/view_models/taxi_google_map.vm.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -66,11 +67,25 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   }
 
   //get current on going trip
+  Future<void> restoreCachedOnGoingTrip() async {
+    final cachedTrip = await ActiveTaxiTripService.restore();
+    if (cachedTrip == null) return;
+    onGoingOrderTrip = cachedTrip;
+    loadTripUIByOrderStatus(initial: true);
+  }
+
   getOnGoingTrip() async {
     //
     setBusyForObject(onGoingOrderTrip, true);
     try {
-      onGoingOrderTrip = await taxiRequest.getOnGoingTrip();
+      final serverTrip = await taxiRequest.getOnGoingTrip();
+      if (serverTrip == null) {
+        onGoingOrderTrip = null;
+        await ActiveTaxiTripService.clear();
+      } else {
+        onGoingOrderTrip = serverTrip;
+        await ActiveTaxiTripService.save(serverTrip);
+      }
       loadTripUIByOrderStatus(initial: true);
     } catch (error) {
       print("trip ongoing error ==> $error");
@@ -126,6 +141,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
       }
 
       onGoingOrderTrip = serverTrip;
+      await ActiveTaxiTripService.save(serverTrip);
       loadTripUIByOrderStatus();
       notifyListeners();
       return true;
@@ -137,6 +153,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   }
 
   void _clearFinishedTrip() {
+    unawaited(ActiveTaxiTripService.clear());
     onGoingOrderTrip = null;
     setCurrentStep(1);
     clearMapData();
@@ -200,6 +217,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
         throw 'El servidor no devolvió el viaje actualizado'.tr();
       }
       onGoingOrderTrip = Order.fromJson(Map<String, dynamic>.from(source));
+      await ActiveTaxiTripService.save(onGoingOrderTrip);
       dropoffLocation = DeliveryAddress(
         address: onGoingOrderTrip?.taxiOrder?.dropoffAddress,
         latitude: onGoingOrderTrip?.taxiOrder?.dropoffLatitude.toDoubleOrNull(),
@@ -338,6 +356,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     }
 
     //
+    await tripUpdateStream?.cancel();
     tripUpdateStream = firebaseFirestore
         .collection("orders")
         .doc("${onGoingOrderTrip?.code}")
@@ -361,6 +380,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
           //update the rest onGoingTrip details
           if (event.exists) {
             onGoingOrderTrip?.status = event.data()?["status"] ?? "failed";
+            unawaited(ActiveTaxiTripService.save(onGoingOrderTrip));
           }
           //
           notifyListeners();
@@ -390,6 +410,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
         // conductor la completa. Esa respuesta es una transición real, no un
         // error: debe abrir la calificación en lugar de dejar la vista vieja.
         onGoingOrderTrip = null;
+        await ActiveTaxiTripService.clear();
         loadTripUIByOrderStatus();
         return;
       }
@@ -397,6 +418,9 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
       final driverAssigned =
           previousDriverId == null && refreshedTrip.driverId != null;
       final statusChanged = previousStatus != refreshedTrip.status;
+      if (driverAssigned || statusChanged) {
+        await ActiveTaxiTripService.save(refreshedTrip);
+      }
       if (driverAssigned) startDriverDetailsListener();
       if (driverAssigned || statusChanged) {
         loadTripUIByOrderStatus();
@@ -422,6 +446,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
       //teníamos; dejarlo en null cerraba la búsqueda de conductor sin avisar
       if (refreshedTrip != null) {
         onGoingOrderTrip = refreshedTrip;
+        await ActiveTaxiTripService.save(refreshedTrip);
       }
       //loop until driver data is gotten
       if (onGoingOrderTrip?.driver == null) {
