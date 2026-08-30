@@ -16,7 +16,18 @@ import 'package:chaskiy/views/pages/driver/driver_order_details.page.dart';
 import 'package:flutter/material.dart';
 
 class DriverAssignedOrdersPage extends StatefulWidget {
-  const DriverAssignedOrdersPage({super.key});
+  const DriverAssignedOrdersPage({
+    super.key,
+    required this.availabilityUser,
+    required this.changingAvailability,
+    required this.onAvailabilityChanged,
+    required this.onAvailabilitySynced,
+  });
+
+  final User? availabilityUser;
+  final bool changingAvailability;
+  final ValueChanged<bool> onAvailabilityChanged;
+  final ValueChanged<bool> onAvailabilitySynced;
 
   @override
   State<DriverAssignedOrdersPage> createState() =>
@@ -30,7 +41,6 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
   List<Order> _orders = const [];
   User? _user;
   bool _loading = true;
-  bool _changingAvailability = false;
   Object? _error;
   StreamSubscription<DriverAssignment>? _assignmentSubscription;
   StreamSubscription<bool>? _refreshSubscription;
@@ -100,6 +110,7 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
         _user = user;
         _orders = orders;
       });
+      widget.onAvailabilitySynced(user.isOnline);
       if (user.isOnline) {
         try {
           await _ensureReadyToReceive();
@@ -115,38 +126,6 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
       if (mounted && !silent) setState(() => _error = error);
     } finally {
       if (mounted && !silent) setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _toggleAvailability(bool value) async {
-    if (_changingAvailability || _user == null) return;
-    setState(() => _changingAvailability = true);
-    try {
-      final response = await _authRequest.updateOnlineStatus(isOnline: value);
-      if (!response.allGood) throw response.message ?? 'No se pudo actualizar';
-      _user!.isOnline = value;
-      await AuthServices.saveUser(_user!.toJson(), reload: false);
-      if (value) {
-        try {
-          await _ensureReadyToReceive();
-          await DriverLocationService.instance.start();
-          await DriverAssignmentService.instance.start();
-        } catch (error) {
-          await _forceOffline(error);
-          rethrow;
-        }
-      } else {
-        await DriverAssignmentService.instance.stop();
-        await DriverLocationService.instance.stop();
-      }
-      if (mounted) setState(() {});
-    } catch (error) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$error'), backgroundColor: Colors.red),
-      );
-    } finally {
-      if (mounted) setState(() => _changingAvailability = false);
     }
   }
 
@@ -169,6 +148,7 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
       _user!.isOnline = false;
       await AuthServices.saveUser(_user!.toJson(), reload: false);
     }
+    widget.onAvailabilitySynced(false);
     try {
       await _authRequest.updateOnlineStatus(isOnline: false);
     } catch (_) {
@@ -232,9 +212,12 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
               sliver: SliverToBoxAdapter(
                 child: _AvailabilityCard(
-                  isOnline: _user?.isOnline ?? false,
-                  busy: _changingAvailability,
-                  onChanged: _toggleAvailability,
+                  isOnline:
+                      widget.availabilityUser?.isOnline ??
+                      _user?.isOnline ??
+                      false,
+                  busy: widget.changingAvailability,
+                  onChanged: widget.onAvailabilityChanged,
                 ),
               ),
             ),

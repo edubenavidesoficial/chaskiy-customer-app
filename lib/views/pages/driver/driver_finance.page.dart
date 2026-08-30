@@ -292,11 +292,85 @@ class _ReportList extends StatelessWidget {
           title: Text('${item['date'] ?? item['formatted_date'] ?? ''}'),
           subtitle: status == null ? null : Text('$status'),
           trailing: Text(
-            '${amount ?? '0.00'}',
+            '\$${amount ?? '0.00'}',
             style: const TextStyle(fontWeight: FontWeight.w800),
           ),
+          onTap: () => _showDetails(context, item),
         );
       },
     );
+  }
+
+  void _showDetails(BuildContext context, Map<String, dynamic> item) {
+    final rows =
+        type == _ReportType.earning
+            ? <(String, dynamic)>[
+              ('Fecha', item['date'] ?? item['formatted_date']),
+              ('Ganancia bruta', item['total_earning'] ?? item['amount']),
+              ('Comisión', item['total_commission']),
+              ('Ganancia neta', item['total_balance']),
+            ]
+            : <(String, dynamic)>[
+              ('Fecha', item['date'] ?? item['formatted_date']),
+              ('Monto', item['amount']),
+              ('Estado', item['status']),
+              ('Cuenta', _paymentAccount(item['payment_account'])),
+            ];
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder:
+          (context) => SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 6, 24, 28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    type == _ReportType.earning
+                        ? 'Detalle de ganancia'
+                        : 'Detalle de pago',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  for (final row in rows.where((row) => row.$2 != null))
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: Text(row.$1)),
+                          const SizedBox(width: 16),
+                          Flexible(
+                            child: Text(
+                              '${row.$2}',
+                              textAlign: TextAlign.end,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+    );
+  }
+
+  String? _paymentAccount(dynamic value) {
+    if (value is! Map) return value?.toString();
+    final account = Map<String, dynamic>.from(value);
+    final name = account['name'] ?? account['bank_name'];
+    final number = account['number'] ?? account['account_number'];
+    return [
+      name,
+      number,
+    ].where((part) => part != null && '$part'.trim().isNotEmpty).join(' · ');
   }
 }
