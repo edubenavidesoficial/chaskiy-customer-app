@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_strings.dart';
@@ -9,6 +11,7 @@ import 'package:chaskiy/requests/product.request.dart';
 import 'package:chaskiy/services/auth.service.dart';
 import 'package:chaskiy/services/location.service.dart';
 import 'package:chaskiy/view_models/base.view_model.dart';
+import 'package:chaskiy/services/app.service.dart';
 
 class ProductsViewModel extends MyBaseViewModel {
   //
@@ -35,6 +38,7 @@ class ProductsViewModel extends MyBaseViewModel {
   ProductRequest productRequest = ProductRequest();
   List<Product> products = [];
   late bool? byLocation;
+  StreamSubscription<bool>? _refreshSubscription;
 
   bool get anyProductWithOptions {
     try {
@@ -64,12 +68,15 @@ class ProductsViewModel extends MyBaseViewModel {
 
     //get today picks
     fetchProducts();
+    _refreshSubscription ??= AppService().refreshHomeContent.listen(
+      (_) => fetchProducts(silent: true),
+    );
   }
 
   //
-  fetchProducts() async {
+  fetchProducts({bool silent = false}) async {
     //
-    setBusy(true);
+    if (!silent && products.isEmpty) setBusy(true);
     try {
       Map<String, dynamic> queryParams = {
         "category_id": categoryId,
@@ -85,12 +92,17 @@ class ProductsViewModel extends MyBaseViewModel {
         });
       }
 
-      products = await productRequest.getProdcuts(
-        queryParams: queryParams,
-      );
+      products = await productRequest.getProdcuts(queryParams: queryParams);
     } catch (error) {
       print("fetchProducts Error ==> $error");
     }
-    setBusy(false);
+    if (!silent && isBusy) setBusy(false);
+    if (silent) notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _refreshSubscription?.cancel();
+    super.dispose();
   }
 }

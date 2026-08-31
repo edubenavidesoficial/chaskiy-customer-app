@@ -28,14 +28,13 @@ class WalletViewModel extends PaymentViewModel {
   StreamSubscription<bool>? refreshWalletBalanceSub;
 
   //
-  initialise() async {
-    await loadWalletData();
+  initialise({bool silent = false}) async {
+    await loadWalletData(silent: silent || wallet != null);
 
-    refreshWalletBalanceSub = AppService().refreshWalletBalance.listen(
-      (value) {
-        loadWalletData();
-      },
-    );
+    await refreshWalletBalanceSub?.cancel();
+    refreshWalletBalanceSub = AppService().refreshWalletBalance.listen((value) {
+      loadWalletData(silent: true);
+    });
   }
 
   dispose() {
@@ -44,31 +43,34 @@ class WalletViewModel extends PaymentViewModel {
   }
 
   //
-  loadWalletData() async {
+  loadWalletData({bool silent = false}) async {
     if (refreshController.isRefresh) {
       refreshController.refreshCompleted();
     }
 
-    getWalletBalance();
-    getWalletTransactions();
+    getWalletBalance(showLoading: !silent && wallet == null);
+    getWalletTransactions(showLoading: !silent && walletTransactions.isEmpty);
   }
 
   //
-  getWalletBalance() async {
-    setBusy(true);
+  getWalletBalance({bool showLoading = true}) async {
+    if (showLoading) setBusy(true);
     try {
       wallet = await walletRequest.walletBalance();
       clearErrors();
     } catch (error) {
       setError(error);
     }
-    setBusy(false);
+    if (showLoading) setBusy(false);
   }
 
-  getWalletTransactions({bool initialLoading = true}) async {
+  getWalletTransactions({
+    bool initialLoading = true,
+    bool showLoading = true,
+  }) async {
     //
     if (initialLoading) {
-      setBusyForObject(walletTransactions, true);
+      if (showLoading) setBusyForObject(walletTransactions, true);
       refreshController.refreshCompleted();
       queryPage = 1;
     } else {
@@ -92,7 +94,8 @@ class WalletViewModel extends PaymentViewModel {
       print("Wallet transactions error ==> $error");
       setErrorForObject(walletTransactions, error);
     }
-    setBusyForObject(walletTransactions, false);
+    if (showLoading) setBusyForObject(walletTransactions, false);
+    if (!showLoading) notifyListeners();
   }
 
   //

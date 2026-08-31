@@ -8,9 +8,7 @@ class AppImages {
   static const otpImage = "assets/images/otp.png";
 
   //
-  static const onboarding1 = "assets/images/1.png";
-  static const onboarding2 = "assets/images/2.png";
-  static const onboarding3 = "assets/images/3.png";
+  static const registerIllustration = "assets/images/2.png";
 
   //
   static const error = "assets/images/error.png";

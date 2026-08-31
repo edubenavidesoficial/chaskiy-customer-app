@@ -28,7 +28,6 @@ import 'package:chaskiy/views/pages/service/service_details.page.dart';
 import 'package:chaskiy/views/pages/vendor_details/vendor_details.page.dart';
 import 'package:chaskiy/views/pages/notification/notification_details.page.dart';
 import 'package:chaskiy/views/pages/notification/notifications.page.dart';
-import 'package:chaskiy/views/pages/onboarding.page.dart';
 import 'package:chaskiy/views/pages/order/orders_details.page.dart';
 import 'package:chaskiy/views/pages/product/product_details.page.dart';
 import 'package:chaskiy/views/pages/profile/edit_profile.page.dart';
@@ -44,9 +43,6 @@ import 'package:chaskiy/models/vendor_type.dart';
 Route<dynamic>? generateRoute(RouteSettings settings) {
   log("route settings ==> ${settings.name} :: ${settings.arguments}");
   switch (settings.name) {
-    case AppRoutes.welcomeRoute:
-      return MaterialPageRoute(builder: (context) => OnboardingPage());
-
     case AppRoutes.loginRoute:
       return MaterialPageRoute(builder: (context) => LoginPage());
     case AppRoutes.registerRoute:
@@ -225,6 +221,5 @@ Route<dynamic>? generateRoute(RouteSettings settings) {
 
     default:
       return null;
-    // return MaterialPageRoute(builder: (context) => OnboardingPage());
   }
 }

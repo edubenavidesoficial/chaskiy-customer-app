@@ -39,7 +39,7 @@ class _GojekWalletCardState extends State<GojekWalletCard>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) model.initialise();
+    if (state == AppLifecycleState.resumed) model.initialise(silent: true);
   }
 
   @override

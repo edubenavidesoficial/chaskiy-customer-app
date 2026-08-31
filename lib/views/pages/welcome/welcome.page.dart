@@ -54,7 +54,29 @@ class _WelcomePageState extends State<WelcomePage>
           return CustomEasyRefreshView(
             headerView: MaterialHeader(),
             onRefresh: () => vm.initialise(initial: false),
-            child: HomeScreenConfig.homeScreen(vm, vm.pageKey),
+            child: Stack(
+              children: [
+                HomeScreenConfig.homeScreen(vm, vm.pageKey),
+                if (vm.showSilentLoader)
+                  Positioned(
+                    top: MediaQuery.paddingOf(context).top + 8,
+                    right: 16,
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      padding: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        shape: BoxShape.circle,
+                        boxShadow: const [
+                          BoxShadow(color: Color(0x22000000), blurRadius: 8),
+                        ],
+                      ),
+                      child: const CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+              ],
+            ),
           );
         },
       ),

@@ -19,6 +19,7 @@ class AppService {
   BehaviorSubject<int> homePageIndex = BehaviorSubject<int>();
   BehaviorSubject<bool> refreshAssignedOrders = BehaviorSubject<bool>();
   BehaviorSubject<bool> refreshWalletBalance = BehaviorSubject<bool>();
+  PublishSubject<bool> refreshHomeContent = PublishSubject<bool>();
   int? vendorId;
   Lock lock = new Lock();
   String? _pendingDeepLink;
@@ -61,10 +62,7 @@ class AppService {
         Future.delayed(Duration(milliseconds: 500), () {
           navigatorKey.currentState?.push(
             MaterialPageRoute(
-              builder: (context) => DeepLinkLoadingPage(
-                type: type,
-                id: id,
-              ),
+              builder: (context) => DeepLinkLoadingPage(type: type, id: id),
             ),
           );
         });

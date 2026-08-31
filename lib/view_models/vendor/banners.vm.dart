@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart' hide Banner;
 import 'package:chaskiy/models/banner.dart';
 import 'package:chaskiy/models/vendor_type.dart';
@@ -6,6 +8,7 @@ import 'package:chaskiy/view_models/base.view_model.dart';
 import 'package:chaskiy/constants/app_routes.dart';
 import 'package:chaskiy/models/search.dart';
 import 'package:velocity_x/velocity_x.dart';
+import 'package:chaskiy/services/app.service.dart';
 
 class BannersViewModel extends MyBaseViewModel {
   BannersViewModel(
@@ -24,10 +27,18 @@ class BannersViewModel extends MyBaseViewModel {
   //
   List<Banner> banners = [];
   int currentIndex = 0;
+  StreamSubscription<bool>? _refreshSubscription;
 
   //
   initialise() async {
-    setBusy(true);
+    await _load();
+    _refreshSubscription ??= AppService().refreshHomeContent.listen(
+      (_) => _load(silent: true),
+    );
+  }
+
+  Future<void> _load({bool silent = false}) async {
+    if (!silent && banners.isEmpty) setBusy(true);
     try {
       banners = await _bannerRequest.banners(
         vendorTypeId: vendorType?.id,
@@ -37,11 +48,18 @@ class BannersViewModel extends MyBaseViewModel {
     } catch (error) {
       setError(error);
     }
-    setBusy(false);
+    if (!silent && isBusy) setBusy(false);
+    if (silent) notifyListeners();
 
     if (banners.isEmpty) {
       onEmpty?.call();
     }
+  }
+
+  @override
+  void dispose() {
+    _refreshSubscription?.cancel();
+    super.dispose();
   }
 
   //

@@ -16,7 +16,6 @@ import 'package:chaskiy/services/session.service.dart';
 import 'package:chaskiy/services/local_storage.service.dart';
 import 'package:chaskiy/utils/utils.dart';
 //import 'package:chaskiy/widgets/cards/language_selector.view.dart';
-import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'base.view_model.dart';
 
@@ -167,23 +166,10 @@ class SplashViewModel extends MyBaseViewModel {
     final isDriverSession =
         AuthServices.authenticated() && SessionService.isDriver;
 
-    if (!isDriverSession && AuthServices.firstTimeOnApp()) {
-      await AuthServices.setLocale("es");
-      await translator.setNewLanguage(
-        viewContext,
-        newLanguage: "es",
-        remember: true,
-      );
-      await Utils.setJiffyLocale();
-    }
     //una sola navegación: antes se empujaba la pantalla del conductor y
     //enseguida la del cliente encima, así que el modo conductor nunca se veía
     final nextRoute =
-        isDriverSession
-            ? AppRoutes.driverHomeRoute
-            : AuthServices.firstTimeOnApp()
-            ? AppRoutes.welcomeRoute
-            : AppRoutes.homeRoute;
+        isDriverSession ? AppRoutes.driverHomeRoute : AppRoutes.homeRoute;
 
     Navigator.of(
       viewContext,

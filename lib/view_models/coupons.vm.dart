@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:chaskiy/models/coupon.dart';
 import 'package:chaskiy/models/vendor_type.dart';
@@ -5,6 +7,7 @@ import 'package:chaskiy/requests/coupon.request.dart';
 import 'package:chaskiy/view_models/base.view_model.dart';
 import 'package:chaskiy/views/pages/coupon/coupon_details.page.dart';
 import 'package:velocity_x/velocity_x.dart';
+import 'package:chaskiy/services/app.service.dart';
 
 class CouponsViewModel extends MyBaseViewModel {
   CouponsViewModel(
@@ -22,21 +25,23 @@ class CouponsViewModel extends MyBaseViewModel {
   VendorType? vendorType;
   bool byLocation;
   CouponRequest couponRequest = CouponRequest();
+  StreamSubscription<bool>? _refreshSubscription;
 
   //
   initialise() {
     fetchCoupons();
+    _refreshSubscription ??= AppService().refreshHomeContent.listen(
+      (_) => fetchCoupons(silent: true),
+    );
   }
 
   //
-  fetchCoupons() async {
-    setBusy(true);
+  fetchCoupons({bool silent = false}) async {
+    if (!silent && coupons.isEmpty) setBusy(true);
     try {
       //filter by location if user selects delivery address
       coupons = await couponRequest.fetchCoupons(
-        params: {
-          "vendor_type_id": vendorType?.id,
-        },
+        params: {"vendor_type_id": vendorType?.id},
       );
 
       clearErrors();
@@ -44,7 +49,14 @@ class CouponsViewModel extends MyBaseViewModel {
       print("error loading coupons ==> $error");
       setError(error);
     }
-    setBusy(false);
+    if (!silent && isBusy) setBusy(false);
+    if (silent) notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _refreshSubscription?.cancel();
+    super.dispose();
   }
 
   couponSelected(Coupon coupon) async {

@@ -7,7 +7,6 @@ class Api {
   }
 
   static const appSettings = "/app/settings";
-  static const appOnboardings = "/app/onboarding?type=customer";
   static const faqs = "/app/faqs?type=customer";
 
   static const accountDelete = "/account/delete";

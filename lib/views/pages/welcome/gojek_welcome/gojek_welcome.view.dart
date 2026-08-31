@@ -51,7 +51,7 @@ class _GojekWelcomeViewState extends State<GojekWelcomeView> {
                 const GojekWalletCard(),
 
                 // STEP 5: The custom Services Grid
-                if (widget.vm.isBusy)
+                if (widget.vm.isBusy && widget.vm.vendorTypes.isEmpty)
                   const LoadingShimmer().px(20).centered()
                 else
                   GojekServicesGrid(vm: widget.vm),

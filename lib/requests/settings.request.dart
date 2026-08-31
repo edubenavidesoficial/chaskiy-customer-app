@@ -22,21 +22,4 @@ class SettingsRequest extends HttpService {
       throw error;
     }
   }
-
-  Future<ApiResponse> appOnboardings() async {
-    try {
-      final apiResult = await get(Api.appOnboardings);
-      return ApiResponse.fromResponse(apiResult);
-    } on DioError catch (error) {
-      if (error.type == DioErrorType.unknown) {
-        throw "Falló la conexión. Verifica que tengas internet en este dispositivo."
-                .tr() +
-            "\n" +
-            "Inténtalo nuevamente más tarde".tr();
-      }
-      throw error;
-    } catch (error) {
-      throw error;
-    }
-  }
 }

@@ -15,15 +15,6 @@ import 'local_storage.service.dart';
 
 class AuthServices {
   //
-  static bool firstTimeOnApp() {
-    return LocalStorageService.prefs?.getBool(AppStrings.firstTimeOnApp) ??
-        true;
-  }
-
-  static firstTimeCompleted() async {
-    await LocalStorageService.prefs?.setBool(AppStrings.firstTimeOnApp, false);
-  }
-
   //
   static bool authenticated() {
     return LocalStorageService.prefs?.getBool(AppStrings.authenticated) ??
@@ -161,7 +152,6 @@ class AuthServices {
     await HttpService().getCacheManager().clearAll();
     await LocalStorageService.prefs?.clear();
     await LocalStorageService.rxPrefs?.clear();
-    await LocalStorageService.prefs?.setBool(AppStrings.firstTimeOnApp, false);
 
     //
     final roles = <String>{

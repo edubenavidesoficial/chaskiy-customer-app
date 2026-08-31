@@ -61,7 +61,7 @@ class _RegisterPageState extends State<RegisterPage> {
               child:
                   VStack([
                     Image.asset(
-                      AppImages.onboarding2,
+                      AppImages.registerIllustration,
                     ).hOneForth(context).centered(),
                     //
                     VStack([
