@@ -34,7 +34,8 @@ class DriverHomePage extends StatefulWidget {
   State<DriverHomePage> createState() => _DriverHomePageState();
 }
 
-class _DriverHomePageState extends State<DriverHomePage> {
+class _DriverHomePageState extends State<DriverHomePage>
+    with WidgetsBindingObserver {
   int _currentIndex = 0;
   User? _user;
   bool _changingAvailability = false;
@@ -44,7 +45,22 @@ class _DriverHomePageState extends State<DriverHomePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     unawaited(_initializeDriverRuntime());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _user?.isOnline == true) {
+      unawaited(DriverLocationService.instance.recover());
+      unawaited(DriverAssignmentService.instance.start());
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   Future<void> _initializeDriverRuntime() async {

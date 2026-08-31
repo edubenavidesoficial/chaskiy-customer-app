@@ -694,7 +694,10 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     //get the points from the result
     List<PointLatLng> result = polylineResult?.points ?? const [];
     if (result.isEmpty) {
-      result = await _getRoutePointsFromRoutesApi();
+      result = await getDrivingRoutePoints(
+        LatLng(pickupLocation!.latitude!, pickupLocation!.longitude!),
+        LatLng(dropoffLocation!.latitude!, dropoffLocation!.longitude!),
+      );
     }
     //
     if (result.isNotEmpty) {
@@ -743,7 +746,10 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     notifyListeners();
   }
 
-  Future<List<PointLatLng>> _getRoutePointsFromRoutesApi() async {
+  Future<List<PointLatLng>> getDrivingRoutePoints(
+    LatLng origin,
+    LatLng destination,
+  ) async {
     try {
       final response = await http
           .post(
@@ -759,16 +765,16 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
               'origin': {
                 'location': {
                   'latLng': {
-                    'latitude': pickupLocation!.latitude,
-                    'longitude': pickupLocation!.longitude,
+                    'latitude': origin.latitude,
+                    'longitude': origin.longitude,
                   },
                 },
               },
               'destination': {
                 'location': {
                   'latLng': {
-                    'latitude': dropoffLocation!.latitude,
-                    'longitude': dropoffLocation!.longitude,
+                    'latitude': destination.latitude,
+                    'longitude': destination.longitude,
                   },
                 },
               },

@@ -18,6 +18,7 @@ import 'package:chaskiy/services/active_taxi_trip.service.dart';
 import 'package:chaskiy/services/chat.service.dart';
 import 'package:chaskiy/services/location.service.dart';
 import 'package:chaskiy/services/trip.service.dart';
+import 'package:chaskiy/services/taxi_trip_share.service.dart';
 import 'package:chaskiy/view_models/trip_taxi.vm.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -450,6 +451,12 @@ class TaxiViewModel extends TripTaxiViewModel {
     Navigator.of(
       viewContext,
     ).pushNamed(AppRoutes.chatRoute, arguments: chatEntity);
+  }
+
+  Future<void> shareTrip() async {
+    final trip = onGoingOrderTrip;
+    if (trip == null) return;
+    await TaxiTripShareService.share(trip);
   }
 
   Future<Order?> getLastTripForRating() async {

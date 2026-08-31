@@ -59,6 +59,9 @@ class _TaxiOrderDetailPageState extends State<TaxiOrderDetailPage> {
                 TaxiTripMapPreview(vm.order),
 
                 VStack([
+                  if (vm.order.isOngoing && !vm.order.isScheduled)
+                    _ActiveTaxiActions(vm: vm),
+
                   //basic info
                   OrderDetailsCard(child: BasicTaxiTripInfoView(vm.order)),
 
@@ -154,5 +157,69 @@ class _TaxiOrderDetailPageState extends State<TaxiOrderDetailPage> {
     return (vm.order.isPaymentPending && vm.order.isOngoing) ||
         (vm.order.paymentStatus == "request" &&
             ["pending"].contains(vm.order.status));
+  }
+}
+
+class _ActiveTaxiActions extends StatelessWidget {
+  const _ActiveTaxiActions({required this.vm});
+
+  final OrderDetailsViewModel vm;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: scheme.primaryContainer,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.sensors_rounded, color: scheme.onPrimaryContainer),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Tienes un viaje activo'.tr(),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: scheme.onPrimaryContainer,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Vuelve al seguimiento para ver al conductor y el avance del viaje.'
+                .tr(),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: scheme.onPrimaryContainer),
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: vm.resumeTaxiTrip,
+              icon: const Icon(Icons.route_rounded),
+              label: Text('Volver al seguimiento'.tr()),
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: vm.shareTaxiTrip,
+              icon: const Icon(Icons.ios_share_rounded),
+              label: Text('Compartir viaje'.tr()),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -11,6 +11,8 @@ import 'package:chaskiy/models/payment_method.dart';
 import 'package:chaskiy/requests/order.request.dart';
 import 'package:chaskiy/services/app.service.dart';
 import 'package:chaskiy/services/chat.service.dart';
+import 'package:chaskiy/services/active_taxi_trip.service.dart';
+import 'package:chaskiy/services/taxi_trip_share.service.dart';
 import 'package:chaskiy/view_models/checkout_base.vm.dart';
 import 'package:chaskiy/views/pages/checkout/widgets/payment_methods.view.dart';
 import 'package:chaskiy/widgets/bottomsheets/driver_rating.bottomsheet.dart';
@@ -22,6 +24,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:chaskiy/extensions/context.dart';
+import 'package:chaskiy/views/pages/taxi/taxi.page.dart';
 
 class OrderDetailsViewModel extends CheckoutBaseViewModel {
   //
@@ -268,6 +271,15 @@ class OrderDetailsViewModel extends CheckoutBaseViewModel {
           .fill([order.user.name, order.code]),
     );
   }
+
+  Future<void> resumeTaxiTrip() async {
+    if (!order.isTaxi || !order.isOngoing || order.isScheduled) return;
+    await ActiveTaxiTripService.save(order);
+    await viewContext.push((context) => const TaxiPage(null));
+    await fetchOrderDetails(silent: true);
+  }
+
+  Future<void> shareTaxiTrip() => TaxiTripShareService.share(order);
 
   openPaymentMethodSelection() async {
     //

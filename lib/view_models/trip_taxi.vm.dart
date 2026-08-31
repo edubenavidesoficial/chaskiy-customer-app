@@ -532,8 +532,11 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   }
 
   void _updateRouteProgress(LatLng position) {
-    if (onGoingOrderTrip?.status != 'enroute' ||
-        polylineCoordinates.length < 2) {
+    final trip = onGoingOrderTrip;
+    if (trip == null || polylineCoordinates.length < 2) return;
+    final phase = trip.canZoomOnPickupLocation ? 'pickup' : 'dropoff';
+    if (_liveRoutePhase != phase) {
+      unawaited(_refreshLiveRoute(position));
       return;
     }
     var nearestIndex = _routeProgressIndex.clamp(
@@ -560,10 +563,11 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     }
     _routeProgressIndex = nearestIndex;
     final routePoint = polylineCoordinates[nearestIndex];
-    // Dentro de unos metros, el GPS se considera sobre la vía. Si la
-    // precisión lo coloca fuera, no dibujamos una falsa calle sólida:
-    // mostramos solamente un enlace entrecortado hasta la ruta calculada.
+    // Dentro de unos metros, el GPS se considera sobre la vía. Si está fuera,
+    // se solicita una ruta vial nueva; nunca se dibuja una línea atravesando
+    // casas para unir artificialmente el GPS con la ruta anterior.
     final isOffRoute = nearestDistance > 18;
+    if (isOffRoute) unawaited(_refreshLiveRoute(position));
     final completed = <LatLng>[
       ...polylineCoordinates.take(nearestIndex + 1),
       if (!isOffRoute) position,
@@ -587,16 +591,47 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
           width: 5,
           color: const Color(0xFF1769AA),
         ),
-      if (isOffRoute)
-        Polyline(
-          polylineId: const PolylineId('driverToRoute'),
-          points: [position, routePoint],
-          width: 4,
-          color: const Color(0xFF1769AA).withValues(alpha: .72),
-          patterns: [PatternItem.dash(18), PatternItem.gap(10)],
-          zIndex: 2,
-        ),
     };
+  }
+
+  bool _refreshingLiveRoute = false;
+  DateTime? _lastLiveRouteRefresh;
+  String? _liveRoutePhase;
+  String? _lastLiveRouteRequestPhase;
+
+  Future<void> _refreshLiveRoute(LatLng driver) async {
+    final trip = onGoingOrderTrip;
+    if (trip == null || _refreshingLiveRoute) return;
+    final target =
+        trip.canZoomOnPickupLocation ? pickupLocation : dropoffLocation;
+    if (target?.latitude == null || target?.longitude == null) return;
+    final phase = trip.canZoomOnPickupLocation ? 'pickup' : 'dropoff';
+    final now = DateTime.now();
+    if (_lastLiveRouteRequestPhase == phase &&
+        _lastLiveRouteRefresh != null &&
+        now.difference(_lastLiveRouteRefresh!) < const Duration(seconds: 20)) {
+      return;
+    }
+    _lastLiveRouteRequestPhase = phase;
+    _lastLiveRouteRefresh = now;
+    _refreshingLiveRoute = true;
+    try {
+      final route = await getDrivingRoutePoints(
+        driver,
+        LatLng(target!.latitude!, target.longitude!),
+      );
+      if (route.length < 2) return;
+      polylineCoordinates =
+          route
+              .map((point) => LatLng(point.latitude, point.longitude))
+              .toList();
+      _routeProgressIndex = 0;
+      _liveRoutePhase = phase;
+      _updateRouteProgress(driver);
+      notifyListeners();
+    } finally {
+      _refreshingLiveRoute = false;
+    }
   }
 
   void _updateDriverProgress(LatLng position) {

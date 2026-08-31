@@ -17,6 +17,7 @@ class DriverLocationService {
   Timer? _restartTimer;
   bool _starting = false;
   bool _syncing = false;
+  bool _checkingPosition = false;
   bool _shouldRun = false;
   DateTime? _lastSync;
   Position? _lastPosition;
@@ -54,10 +55,10 @@ class DriverLocationService {
         onError: (_) => _restartAfterSensorError(),
         cancelOnError: false,
       );
-      _heartbeatTimer = Timer.periodic(const Duration(seconds: 15), (_) {
-        final position = _lastPosition;
-        if (position != null) _onPosition(position);
-      });
+      _heartbeatTimer = Timer.periodic(
+        const Duration(seconds: 15),
+        (_) => _requestFreshPosition(settings),
+      );
 
       try {
         await _onPosition(
@@ -69,6 +70,36 @@ class DriverLocationService {
     } finally {
       _starting = false;
     }
+  }
+
+  /// Obtiene una lectura nueva en vez de reenviar indefinidamente la última.
+  /// Así el pasajero nunca verá "En vivo" sobre un GPS que quedó congelado.
+  Future<void> _requestFreshPosition(LocationSettings settings) async {
+    if (_checkingPosition || !_shouldRun || !SessionService.isDriver) return;
+    _checkingPosition = true;
+    try {
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: settings,
+        timeLimit: const Duration(seconds: 10),
+      );
+      await _onPosition(position);
+    } catch (_) {
+      // Al no reenviar una coordenada vieja, el servidor la marcará como
+      // desactualizada y la interfaz informará el problema con honestidad.
+    } finally {
+      _checkingPosition = false;
+    }
+  }
+
+  /// Revalida el flujo cuando Android/iOS devuelve la app al primer plano.
+  Future<void> recover() async {
+    if (!SessionService.isDriver) return;
+    _shouldRun = true;
+    if (!isRunning) {
+      await start();
+      return;
+    }
+    await _requestFreshPosition(_settings());
   }
 
   LocationSettings _settings() {
@@ -142,6 +173,7 @@ class DriverLocationService {
     _subscription = null;
     await subscription?.cancel();
     _syncing = false;
+    _checkingPosition = false;
     _starting = false;
     _lastSync = null;
   }

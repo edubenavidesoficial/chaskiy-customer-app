@@ -16,7 +16,7 @@ import 'package:stacked/stacked.dart';
 class TaxiPage extends StatefulWidget {
   const TaxiPage(this.vendorType, {Key? key}) : super(key: key);
 
-  final VendorType vendorType;
+  final VendorType? vendorType;
 
   @override
   _TaxiPageState createState() => _TaxiPageState();
@@ -50,7 +50,7 @@ class _TaxiPageState extends State<TaxiPage> with WidgetsBindingObserver {
           showAppBar: false,
           showLeadingAction: !AppStrings.isSingleVendorMode,
           elevation: 0,
-          title: "${widget.vendorType.name}",
+          title: widget.vendorType?.name ?? 'Taxi Seguro',
           appBarColor: Theme.of(context).colorScheme.surface,
           appBarItemColor: AppColor.primaryColor,
           body: Stack(
