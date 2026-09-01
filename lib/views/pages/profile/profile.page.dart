@@ -170,7 +170,9 @@ class _DriverModeSection extends StatelessWidget {
           //en revisión también se usa `switchToDriver`: vuelve a preguntarle
           //al servidor y entra al modo conductor si ya quedó aprobado
           onTap:
-              approved || pending
+              model.switchingRole
+                  ? () {}
+                  : approved || pending
                   ? model.switchToDriver
                   : model.openDriverOnboarding,
         ),

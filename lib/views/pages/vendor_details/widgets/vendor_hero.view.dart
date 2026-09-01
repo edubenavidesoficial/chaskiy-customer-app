@@ -13,10 +13,16 @@ import 'package:velocity_x/velocity_x.dart';
 /// Reemplaza a la tarjeta blanca que flotaba debajo de la foto y repetía el
 /// logo que ya se ve en la portada.
 class VendorHeroView extends StatelessWidget {
-  const VendorHeroView(this.model, {required this.height, super.key});
+  const VendorHeroView(
+    this.model, {
+    required this.height,
+    this.showDetails = true,
+    super.key,
+  });
 
   final VendorDetailsViewModel model;
   final double height;
+  final bool showDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -48,41 +54,42 @@ class VendorHeroView extends StatelessWidget {
             ),
           ),
 
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: 16,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _StatusPill(
-                  isOpen: vendor.isOpen,
-                  detail: _deliveryLabel(vendor),
-                  semantics: semantics,
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  vendor.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -.6,
-                    height: 1.1,
+          if (showDetails)
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _StatusPill(
+                    isOpen: vendor.isOpen,
+                    detail: _deliveryLabel(vendor),
+                    semantics: semantics,
                   ),
-                ),
-                const SizedBox(height: 6),
-                _MetaLine(
-                  vendor: vendor,
-                  star: semantics.star,
-                  onRatingTap:
-                      () => context.nextPage(VendorReviewsPage(vendor)),
-                ),
-              ],
+                  const SizedBox(height: 10),
+                  Text(
+                    vendor.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -.6,
+                      height: 1.1,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  _MetaLine(
+                    vendor: vendor,
+                    star: semantics.star,
+                    onRatingTap:
+                        () => context.nextPage(VendorReviewsPage(vendor)),
+                  ),
+                ],
+              ),
             ),
-          ),
         ],
       ),
     );

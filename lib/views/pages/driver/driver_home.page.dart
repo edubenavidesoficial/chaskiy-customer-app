@@ -39,6 +39,7 @@ class _DriverHomePageState extends State<DriverHomePage>
   int _currentIndex = 0;
   User? _user;
   bool _changingAvailability = false;
+  bool _switchingRole = false;
   final AuthRequest _authRequest = AuthRequest();
   final DriverVehicleRequest _vehicleRequest = DriverVehicleRequest();
 
@@ -74,6 +75,7 @@ class _DriverHomePageState extends State<DriverHomePage>
       return;
     }
     setState(() => _user = user);
+    unawaited(_refreshDriverProfile());
 
     // El modo conductor no pasa por HomeViewModel. Inicializa aquí FCM y el
     // sondeo para recibir asignaciones desde cualquier pestaña del módulo.
@@ -84,6 +86,21 @@ class _DriverHomePageState extends State<DriverHomePage>
       await DriverLocationService.instance.start();
     } catch (_) {
       // La pantalla de pedidos muestra el motivo y permite corregir permisos.
+    }
+  }
+
+  Future<void> _refreshDriverProfile() async {
+    try {
+      final user = await _authRequest.getMyDetails();
+      await AuthServices.saveUser(user.toJson(), reload: false);
+      if (!mounted || !SessionService.isDriver) return;
+      if (!user.driverAccessApproved) {
+        await _switchToCustomer();
+        return;
+      }
+      setState(() => _user = user);
+    } catch (_) {
+      // Se conserva la copia local mientras la red vuelve a estar disponible.
     }
   }
 
@@ -105,12 +122,15 @@ class _DriverHomePageState extends State<DriverHomePage>
 
   Future<void> _switchToCustomer() async {
     final user = _user;
-    if (user == null || !user.hasCustomerRole) return;
-    await DriverAssignmentService.instance.stop();
-    await DriverLocationService.instance.stop();
+    if (_switchingRole || user == null || !user.hasCustomerRole) return;
+    setState(() => _switchingRole = true);
     await SessionService.setActiveRole(AppRole.customer, user: user);
+    // El nuevo rol bloquea inmediatamente nuevas lecturas y asignaciones. La
+    // cancelación física de los streams finaliza sin detener la navegación.
+    unawaited(DriverAssignmentService.instance.stop());
+    unawaited(DriverLocationService.instance.stop());
     if (mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
+      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => HomePage()),
         (_) => false,
       );
@@ -187,7 +207,7 @@ class _DriverHomePageState extends State<DriverHomePage>
       _DriverAccount(
         user: _user,
         onLogout: _logout,
-        onSwitchToCustomer: _switchToCustomer,
+        onSwitchToCustomer: _switchingRole ? null : _switchToCustomer,
       ),
     ];
 
@@ -516,7 +536,7 @@ class _DriverAccount extends StatelessWidget {
 
   final User? user;
   final Future<void> Function() onLogout;
-  final Future<void> Function() onSwitchToCustomer;
+  final Future<void> Function()? onSwitchToCustomer;
 
   @override
   Widget build(BuildContext context) {

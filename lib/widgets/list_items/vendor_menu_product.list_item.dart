@@ -27,8 +27,6 @@ class VendorMenuProductListItem extends StatelessWidget {
   final double? height;
   final double? padding;
 
-  bool get _isFeatured => product.featured == 1;
-
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -58,53 +56,10 @@ class VendorMenuProductListItem extends StatelessWidget {
                 color: colors.outlineVariant.withValues(alpha: .55),
               ),
             ),
-            child:
-                _isFeatured
-                    ? _FeaturedLayout(product: product)
-                    : _CompactLayout(product: product, height: height),
+            child: _CompactLayout(product: product, height: height),
           ),
         ),
       ),
-    );
-  }
-}
-
-/// Producto destacado: foto ancha arriba, datos abajo.
-class _FeaturedLayout extends StatelessWidget {
-  const _FeaturedLayout({required this.product});
-
-  final Product product;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Stack(
-          children: [
-            Hero(
-              tag: product.heroTag ?? product.id,
-              child: CustomImage(
-                imageUrl: product.photo,
-                height: 150,
-                boxFit: BoxFit.cover,
-              ),
-            ),
-            const Positioned(top: 12, left: 12, child: _FeaturedBadge()),
-          ],
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(child: _ProductInfo(product: product, maxLines: 2)),
-              const SizedBox(width: 12),
-              _PriceAndAction(product: product),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
@@ -119,7 +74,7 @@ class _CompactLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height ?? 104,
+      constraints: BoxConstraints(minHeight: height ?? 112),
       padding: const EdgeInsets.all(11),
       child: Row(
         children: [
@@ -136,7 +91,14 @@ class _CompactLayout extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 13),
-          Expanded(child: _ProductInfo(product: product, maxLines: 2)),
+          Expanded(
+            child: _ProductInfo(
+              product: product,
+              maxLines: 2,
+              showDescription: true,
+              showAvailability: true,
+            ),
+          ),
           const SizedBox(width: 10),
           _PriceAndAction(product: product),
         ],
@@ -147,10 +109,17 @@ class _CompactLayout extends StatelessWidget {
 
 /// Nombre, calificación y unidad.
 class _ProductInfo extends StatelessWidget {
-  const _ProductInfo({required this.product, required this.maxLines});
+  const _ProductInfo({
+    required this.product,
+    required this.maxLines,
+    this.showDescription = false,
+    this.showAvailability = false,
+  });
 
   final Product product;
   final int maxLines;
+  final bool showDescription;
+  final bool showAvailability;
 
   @override
   Widget build(BuildContext context) {
@@ -177,6 +146,27 @@ class _ProductInfo extends StatelessWidget {
             height: 1.2,
           ),
         ),
+        if (showDescription && product.description.trim().isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            product.description.trim(),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: detailStyle,
+          ),
+        ],
+        if (showAvailability && product.availableQty != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            product.hasStock
+                ? '${product.availableQty} disponibles'
+                : 'Agotado',
+            maxLines: 1,
+            style: detailStyle?.copyWith(
+              color: product.hasStock ? colors.onSurfaceVariant : colors.error,
+            ),
+          ),
+        ],
         if (hasReviews || unit.isNotEmpty) ...[
           const SizedBox(height: 5),
           Row(
@@ -207,6 +197,141 @@ class _ProductInfo extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+/// La misma acción y los mismos datos del producto, presentados en dos
+/// columnas. El modo de visualización nunca altera el carrito ni la consulta.
+class VendorMenuProductGridItem extends StatelessWidget {
+  const VendorMenuProductGridItem(
+    this.product, {
+    this.onPressed,
+    required this.qtyUpdated,
+    super.key,
+  });
+
+  final Product product;
+  final Function(Product)? onPressed;
+  final Function(Product, int)? qtyUpdated;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Material(
+      color: colors.surfaceContainerLow,
+      borderRadius: BorderRadius.circular(18),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onPressed == null ? null : () => onPressed!(product),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: colors.outlineVariant.withValues(alpha: .55),
+            ),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Hero(
+                  tag: product.heroTag ?? product.id,
+                  child: CustomImage(
+                    imageUrl: product.photo,
+                    width: double.infinity,
+                    boxFit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 10, 10, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _ProductInfo(
+                      product: product,
+                      maxLines: 2,
+                      showAvailability: true,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(child: _CompactPrice(product: product)),
+                        const SizedBox(width: 6),
+                        _AddButton(product: product),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CompactPrice extends StatelessWidget {
+  const _CompactPrice({required this.product});
+
+  final Product product;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final price = product.showDiscount ? product.discountPrice : product.price;
+    final symbol = AppStrings.currentCurrencySymbol;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '$symbol${price.convertCurrency.currencyValueFormat()}',
+          maxLines: 1,
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: colors.primary,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        if (product.showDiscount)
+          Text(
+            '$symbol${product.price.convertCurrency.currencyValueFormat()}',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colors.onSurfaceVariant,
+              decoration: TextDecoration.lineThrough,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _AddButton extends StatelessWidget {
+  const _AddButton({required this.product});
+
+  final Product product;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        color: product.hasStock ? colors.primary : colors.surfaceContainerHigh,
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        HugeIcons.strokeRoundedPlusSign,
+        color: product.hasStock ? colors.onPrimary : colors.onSurfaceVariant,
+        size: 19,
+      ),
     );
   }
 }
@@ -263,33 +388,6 @@ class _PriceAndAction extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// Etiqueta de destacado, según el campo `featured` que marca el panel.
-class _FeaturedBadge extends StatelessWidget {
-  const _FeaturedBadge();
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: colors.primary,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        'DESTACADO',
-        style: TextStyle(
-          color: colors.onPrimary,
-          fontSize: 10,
-          fontWeight: FontWeight.w900,
-          letterSpacing: .6,
-        ),
-      ),
     );
   }
 }

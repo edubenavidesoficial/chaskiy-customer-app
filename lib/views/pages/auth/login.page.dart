@@ -155,20 +155,38 @@ class _RegistrationOptions extends StatelessWidget {
       children: [
         const Text('¿Eres nuevo?'),
         const SizedBox(height: 8),
-        Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 8,
-          runSpacing: 8,
+        Row(
           children: [
-            OutlinedButton.icon(
-              onPressed: onCustomer,
-              icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
-              label: const Text('Crear cuenta cliente'),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: onCustomer,
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(44),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                ),
+                icon: const Icon(Icons.person_add_alt_1_rounded, size: 17),
+                label: const Text(
+                  'Crear cliente',
+                  maxLines: 1,
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                ),
+              ),
             ),
-            OutlinedButton.icon(
-              onPressed: onDriver,
-              icon: const Icon(Icons.delivery_dining_rounded, size: 18),
-              label: const Text('Crear cuenta conductor'),
+            const SizedBox(width: 8),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: onDriver,
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(44),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                ),
+                icon: const Icon(Icons.delivery_dining_rounded, size: 17),
+                label: const Text(
+                  'Crear conductor',
+                  maxLines: 1,
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                ),
+              ),
             ),
           ],
         ),

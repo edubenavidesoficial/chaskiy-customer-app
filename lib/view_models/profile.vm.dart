@@ -37,6 +37,7 @@ class ProfileViewModel extends PaymentViewModel {
   String appVersionInfo = "";
   bool authenticated = false;
   User? currentUser;
+  bool switchingRole = false;
 
   //
   AuthRequest _authRequest = AuthRequest();
@@ -118,15 +119,23 @@ class ProfileViewModel extends PaymentViewModel {
   }
 
   Future<void> switchToDriver() async {
+    if (switchingRole) return;
+    switchingRole = true;
+    notifyListeners();
+    var navigated = false;
     try {
-      final user = await _authRequest.getMyDetails();
-      //`reload: false` a propósito: recargar la configuración desde aquí
-      //reinicia la navegación y deja al usuario otra vez en la app de cliente
-      await AuthServices.saveUser(user.toJson(), reload: false);
-      //el permiso se decide con lo que responde el servidor, así que la
-      //tarjeta del perfil tiene que quedar mostrando lo mismo
-      currentUser = user;
-      notifyListeners();
+      var user =
+          currentUser ??
+          AuthServices.currentUser ??
+          await _authRequest.getMyDetails();
+      // Un perfil local ya aprobado permite cambiar inmediatamente. Solo las
+      // solicitudes pendientes necesitan consultar nuevamente al servidor.
+      if (!user.driverAccessApproved) {
+        user = await _authRequest.getMyDetails();
+        await AuthServices.saveUser(user.toJson(), reload: false);
+        currentUser = user;
+        notifyListeners();
+      }
       if (!user.driverAccessApproved) {
         await AlertService.error(
           title: 'Acceso pendiente',
@@ -135,22 +144,32 @@ class ProfileViewModel extends PaymentViewModel {
         return;
       }
       await SessionService.setActiveRole(AppRole.driver, user: user);
-      try {
-        await FirebaseMessaging.instance.subscribeToTopic('d_${user.id}');
-      } catch (_) {
-        // El sondeo API garantiza las asignaciones aunque FCM falle.
-      }
+      unawaited(_prepareDriverNotifications(user.id));
       if (viewContext.mounted) {
         Navigator.of(viewContext, rootNavigator: true).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const DriverHomePage()),
           (_) => false,
         );
+        navigated = true;
       }
     } catch (error) {
       await AlertService.error(
         title: 'No se pudo cambiar de modo',
         text: '$error',
       );
+    } finally {
+      if (!navigated) {
+        switchingRole = false;
+        notifyListeners();
+      }
+    }
+  }
+
+  Future<void> _prepareDriverNotifications(int userId) async {
+    try {
+      await FirebaseMessaging.instance.subscribeToTopic('d_$userId');
+    } catch (_) {
+      // El sondeo API garantiza las asignaciones aunque FCM falle.
     }
   }
 

@@ -13,6 +13,7 @@ import 'package:chaskiy/widgets/busy_indicator.dart';
 import 'package:chaskiy/widgets/buttons/circle_action_button.dart';
 import 'package:chaskiy/widgets/buttons/share.btn.dart';
 import 'package:chaskiy/widgets/custom_easy_refresh_view.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:chaskiy/widgets/inputs/search_bar.input.dart';
 import 'package:chaskiy/widgets/list_items/vendor_menu_product.list_item.dart';
 import 'package:chaskiy/widgets/tags/fav_vendor.tag.dart';
@@ -31,6 +32,8 @@ class VendorDetailsWithMenuPage extends StatefulWidget {
 
 class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
     with TickerProviderStateMixin {
+  bool _showGrid = false;
+
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<VendorDetailsWithMenuViewModel>.reactive(
@@ -43,7 +46,7 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
       onViewModelReady: (model) => model.getVendorDetails(),
       builder: (context, model, child) {
         final colors = Theme.of(context).colorScheme;
-        final heroHeight = (context.percentHeight * 30).clamp(240.0, 320.0);
+        final heroHeight = (context.percentHeight * 22).clamp(170.0, 210.0);
         final menus = model.vendor?.menus ?? [];
         final tabsReady =
             model.tabBarController != null &&
@@ -97,7 +100,21 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
                   ),
                   flexibleSpace: FlexibleSpaceBar(
                     collapseMode: CollapseMode.parallax,
-                    background: VendorHeroView(model, height: heroHeight),
+                    background: VendorHeroView(
+                      model,
+                      height: heroHeight,
+                      showDetails: false,
+                    ),
+                  ),
+                ),
+
+                SliverToBoxAdapter(
+                  child: Transform.translate(
+                    offset: const Offset(0, -24),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: _VendorSummaryCard(vendor: model.vendor!),
+                    ),
                   ),
                 ),
 
@@ -116,7 +133,7 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
                       child: Row(
                         children: [
                           Expanded(
@@ -149,6 +166,14 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
                       menus: model.vendor!.menus,
                     ),
                   ),
+
+                if (tabsReady)
+                  SliverToBoxAdapter(
+                    child: _LayoutSelector(
+                      showGrid: _showGrid,
+                      onChanged: (value) => setState(() => _showGrid = value),
+                    ),
+                  ),
               ];
             },
             body: ColoredBox(
@@ -177,6 +202,18 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
                               final mProducts =
                                   model.menuProducts[menu.id] ?? [];
                               //
+                              if (mProducts.isEmpty && !model.busy(menu.id)) {
+                                return _VendorLoadState(
+                                  icon: Icons.inventory_2_outlined,
+                                  title: 'No hay productos disponibles',
+                                  message:
+                                      'Desliza hacia abajo para actualizar.',
+                                  actionLabel: 'Actualizar',
+                                  onAction:
+                                      () => model.loadMoreProducts(menu.id),
+                                );
+                              }
+
                               return CustomEasyRefreshView(
                                 padding: const EdgeInsets.only(
                                   top: 6,
@@ -191,23 +228,55 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
                                     ),
                                 loading: model.busy(menu.id),
                                 dataset: mProducts,
-                                emptyView: _VendorLoadState(
-                                  icon: Icons.inventory_2_outlined,
-                                  title: 'No hay productos disponibles',
-                                  message:
-                                      'Desliza hacia abajo para actualizar.',
-                                  actionLabel: 'Actualizar',
-                                  onAction:
-                                      () => model.loadMoreProducts(menu.id),
-                                ),
-                                listView:
-                                    mProducts.map((product) {
-                                      return VendorMenuProductListItem(
-                                        product,
-                                        onPressed: model.productSelected,
-                                        qtyUpdated: model.addToCartDirectly,
-                                      );
-                                    }).toList(),
+                                child:
+                                    _showGrid
+                                        ? GridView.builder(
+                                          key: const PageStorageKey(
+                                            'vendor-products-grid',
+                                          ),
+                                          padding: const EdgeInsets.fromLTRB(
+                                            16,
+                                            6,
+                                            16,
+                                            110,
+                                          ),
+                                          gridDelegate:
+                                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                                crossAxisCount: 2,
+                                                crossAxisSpacing: 10,
+                                                mainAxisSpacing: 10,
+                                                mainAxisExtent: 266,
+                                              ),
+                                          itemCount: mProducts.length,
+                                          itemBuilder: (context, index) {
+                                            final product = mProducts[index];
+                                            return VendorMenuProductGridItem(
+                                              product,
+                                              onPressed: model.productSelected,
+                                              qtyUpdated:
+                                                  model.addToCartDirectly,
+                                            );
+                                          },
+                                        )
+                                        : ListView.builder(
+                                          key: const PageStorageKey(
+                                            'vendor-products-list',
+                                          ),
+                                          padding: const EdgeInsets.only(
+                                            top: 6,
+                                            bottom: 110,
+                                          ),
+                                          itemCount: mProducts.length,
+                                          itemBuilder: (context, index) {
+                                            final product = mProducts[index];
+                                            return VendorMenuProductListItem(
+                                              product,
+                                              onPressed: model.productSelected,
+                                              qtyUpdated:
+                                                  model.addToCartDirectly,
+                                            );
+                                          },
+                                        ),
                               );
                             }).toList(),
                       ),
@@ -216,6 +285,230 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
           bottomSheet: CartViewBottomSheet(),
         );
       },
+    );
+  }
+}
+
+class _VendorSummaryCard extends StatelessWidget {
+  const _VendorSummaryCard({required this.vendor});
+
+  final Vendor vendor;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final deliveryTime = vendor.deliveryTime?.trim() ?? '';
+    final deliveryUnit = vendor.deliveryTimeUnit?.trim() ?? '';
+    final delivery = [
+      deliveryTime,
+      deliveryUnit,
+    ].where((value) => value.isNotEmpty).join(' ');
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: .45)),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: .08),
+            blurRadius: 22,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  vendor.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -.35,
+                  ),
+                ),
+                if (AppUISettings.showVendorAddress &&
+                    vendor.address.trim().isNotEmpty) ...[
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 16,
+                        color: colors.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          vendor.address,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 7),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.star_rounded,
+                      size: 19,
+                      color: Color(0xFFFFB000),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      vendor.rating.toStringAsFixed(1),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '(${vendor.reviews_count} reseñas)',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 11,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: (vendor.isOpen ? Colors.green : colors.error)
+                        .withValues(alpha: .09),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                      color: (vendor.isOpen ? Colors.green : colors.error)
+                          .withValues(alpha: .22),
+                    ),
+                  ),
+                  child: Text(
+                    '${vendor.isOpen ? '●  Abierto' : '●  Cerrado'}${delivery.isEmpty ? '' : ' · Entrega $delivery'}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color:
+                          vendor.isOpen ? Colors.green.shade700 : colors.error,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: CustomImage(
+              imageUrl: vendor.logo,
+              width: 82,
+              height: 82,
+              boxFit: BoxFit.cover,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LayoutSelector extends StatelessWidget {
+  const _LayoutSelector({required this.showGrid, required this.onChanged});
+
+  final bool showGrid;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+      child: Row(
+        children: [
+          _LayoutOption(
+            icon: Icons.format_list_bulleted_rounded,
+            label: 'Lista',
+            selected: !showGrid,
+            onTap: () => onChanged(false),
+          ),
+          const SizedBox(width: 8),
+          _LayoutOption(
+            icon: Icons.grid_view_rounded,
+            label: 'Cuadrícula',
+            selected: showGrid,
+            onTap: () => onChanged(true),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LayoutOption extends StatelessWidget {
+  const _LayoutOption({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Material(
+      color: selected ? colors.primaryContainer : colors.surfaceContainerLow,
+      borderRadius: BorderRadius.circular(999),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 9),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color:
+                  selected
+                      ? colors.primary
+                      : colors.outlineVariant.withValues(alpha: .65),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 18, color: selected ? colors.primary : null),
+              const SizedBox(width: 7),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: selected ? colors.primary : colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
