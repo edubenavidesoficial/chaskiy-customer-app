@@ -7,7 +7,6 @@ import 'package:chaskiy/services/auth.service.dart';
 import 'package:chaskiy/services/location.service.dart';
 import 'package:chaskiy/services/app.service.dart';
 import 'package:chaskiy/view_models/base.view_model.dart';
-import 'package:chaskiy/views/pages/vendor/featured_vendors.page.dart';
 
 class WelcomeViewModel extends MyBaseViewModel {
   //
@@ -102,9 +101,10 @@ class WelcomeViewModel extends MyBaseViewModel {
     if (showLoading && isBusy) setBusy(false);
   }
 
-  openFeaturedVendors() async {
-    Navigator.of(
-      viewContext,
-    ).push(MaterialPageRoute(builder: (context) => FeaturedVendorsPage()));
+  openFeaturedVendors() {
+    // La búsqueda ya incluye vendedores cercanos, filtros, productos y
+    // servicios. Reutilizamos esa experiencia en lugar de mantener una
+    // segunda pantalla con el mismo contenido.
+    AppService().changeHomePageIndex(index: 2);
   }
 }

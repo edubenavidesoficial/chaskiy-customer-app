@@ -25,8 +25,14 @@ import 'package:velocity_x/velocity_x.dart';
 
 class TaxiViewModel extends TripTaxiViewModel {
   //
-  TaxiViewModel(BuildContext context, this.vendorType) {
+  TaxiViewModel(BuildContext context, this.vendorType, {Order? initialOrder}) {
     this.viewContext = context;
+    if (initialOrder != null &&
+        initialOrder.isTaxi &&
+        initialOrder.isOngoing &&
+        !initialOrder.isScheduled) {
+      onGoingOrderTrip = initialOrder;
+    }
   }
 
   //requests
@@ -59,7 +65,12 @@ class TaxiViewModel extends TripTaxiViewModel {
   void initialise() async {
     unawaited(fetchConfiguredVehicleTypes());
     await fetchTaxiPaymentOptions();
-    await restoreCachedOnGoingTrip();
+    if (onGoingOrderTrip != null) {
+      await ActiveTaxiTripService.save(onGoingOrderTrip);
+      loadTripUIByOrderStatus(initial: true);
+    } else {
+      await restoreCachedOnGoingTrip();
+    }
     await getOnGoingTrip();
     if (!onTrip) {
       await setupCurrentLocationAsPickuplocation();

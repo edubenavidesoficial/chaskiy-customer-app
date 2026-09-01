@@ -18,12 +18,68 @@ class OrdersViewModel extends PaymentViewModel {
   //
   OrderRequest orderRequest = OrderRequest();
   List<Order> orders = [];
+  bool showDelivered = false;
+  bool showCancelled = false;
+  DateTimeRange? orderDateRange;
   //
   int queryPage = 1;
   StreamSubscription? homePageChangeStream;
   StreamSubscription? refreshOrderStream;
   Timer? _autoRefreshTimer;
   bool _isFetching = false;
+
+  bool get hasActiveFilters =>
+      showDelivered || showCancelled || orderDateRange != null;
+
+  List<Order> get filteredOrders {
+    return orders.where((order) {
+      final status = order.status.trim().toLowerCase();
+      final matchesSelectedStatus =
+          (!showDelivered && !showCancelled) ||
+          (showDelivered &&
+              ['delivered', 'completed', 'successful'].contains(status)) ||
+          (showCancelled &&
+              ['failed', 'fail', 'cancelled', 'cancel'].contains(status));
+      if (!matchesSelectedStatus) return false;
+
+      final range = orderDateRange;
+      if (range == null) return true;
+      final start = DateTime(
+        range.start.year,
+        range.start.month,
+        range.start.day,
+      );
+      final endExclusive = DateTime(
+        range.end.year,
+        range.end.month,
+        range.end.day,
+      ).add(const Duration(days: 1));
+      return !order.createdAt.isBefore(start) &&
+          order.createdAt.isBefore(endExclusive);
+    }).toList();
+  }
+
+  void toggleDeliveredFilter() {
+    showDelivered = !showDelivered;
+    notifyListeners();
+  }
+
+  void toggleCancelledFilter() {
+    showCancelled = !showCancelled;
+    notifyListeners();
+  }
+
+  void setOrderDateRange(DateTimeRange? range) {
+    orderDateRange = range;
+    notifyListeners();
+  }
+
+  void clearOrderFilters() {
+    showDelivered = false;
+    showCancelled = false;
+    orderDateRange = null;
+    notifyListeners();
+  }
 
   void initialise() async {
     final cachedOrders = await orderRequest.getCachedOrders();

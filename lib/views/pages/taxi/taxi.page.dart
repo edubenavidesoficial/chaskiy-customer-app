@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/models/vendor_type.dart';
+import 'package:chaskiy/models/order.dart';
 import 'package:chaskiy/view_models/taxi.vm.dart';
 import 'package:chaskiy/views/pages/taxi/widgets/new_order_step_1.dart';
 import 'package:chaskiy/views/pages/taxi/widgets/new_order_step_2.dart';
@@ -14,9 +15,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stacked/stacked.dart';
 
 class TaxiPage extends StatefulWidget {
-  const TaxiPage(this.vendorType, {Key? key}) : super(key: key);
+  const TaxiPage(this.vendorType, {this.initialOrder, Key? key})
+    : super(key: key);
 
   final VendorType? vendorType;
+  final Order? initialOrder;
 
   @override
   _TaxiPageState createState() => _TaxiPageState();
@@ -29,7 +32,11 @@ class _TaxiPageState extends State<TaxiPage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    taxiViewModel = TaxiViewModel(context, widget.vendorType);
+    taxiViewModel = TaxiViewModel(
+      context,
+      widget.vendorType,
+      initialOrder: widget.initialOrder,
+    );
   }
 
   //

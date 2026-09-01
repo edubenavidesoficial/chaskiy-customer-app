@@ -25,7 +25,7 @@ class VendorMetaChip extends StatelessWidget {
     final effectiveForeground = foreground ?? colors.onSurfaceVariant;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
         color: background ?? colors.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(12),
@@ -33,11 +33,11 @@ class VendorMetaChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: effectiveForeground),
-          const SizedBox(width: 5),
+          Icon(icon, size: 15, color: effectiveForeground),
+          const SizedBox(width: 4),
           Text(
             label,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
               color: effectiveForeground,
               fontWeight: FontWeight.w700,
             ),

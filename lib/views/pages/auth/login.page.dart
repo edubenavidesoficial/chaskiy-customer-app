@@ -22,14 +22,9 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'login/scan_login.view.dart';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({
-    this.required = false,
-    this.expectedRole = AppRole.customer,
-    Key? key,
-  }) : super(key: key);
+  LoginPage({this.required = false, Key? key}) : super(key: key);
 
   final bool required;
-  final AppRole expectedRole;
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -40,8 +35,7 @@ class _LoginPageState extends State<LoginPage> {
     return DynamicStatusBar(
       baseColor: context.backgroundColor,
       child: ViewModelBuilder<LoginViewModel>.reactive(
-        viewModelBuilder:
-            () => LoginViewModel(context, expectedRole: widget.expectedRole),
+        viewModelBuilder: () => LoginViewModel(context),
         onViewModelReady: (model) => model.initialise(),
         builder: (context, model, child) {
           return PopScope(
@@ -78,18 +72,8 @@ class _LoginPageState extends State<LoginPage> {
                         //
                         HStack([
                           VStack([
-                            (widget.expectedRole == AppRole.driver
-                                    ? "Acceso para conductores"
-                                    : "Welcome Back".tr())
-                                .text
-                                .xl2
-                                .semiBold
-                                .make(),
-                            (widget.expectedRole == AppRole.driver
-                                    ? "Conductor o motorizado"
-                                    : "Login to continue".tr())
-                                .text
-                                .light
+                            "Bienvenido a Chaskiy".text.xl2.semiBold.make(),
+                            "Ingresa como cliente o conductor".text.light
                                 .make(),
                           ]).expand(),
                           Image.asset(AppImages.appLogo)
@@ -125,44 +109,15 @@ class _LoginPageState extends State<LoginPage> {
                         "OR".tr().text.light.make().px8(),
                         UiSpacer.divider().expand(),
                       ]).py8().px20(),
-                      (widget.expectedRole == AppRole.driver
-                              ? '¿Nuevo conductor?'
-                              : "New user?".tr())
-                          .richText
-                          .withTextSpanChildren([
-                            " ".textSpan.make(),
-                            (widget.expectedRole == AppRole.driver
-                                    ? 'Crear cuenta de conductor'
-                                    : "Create An Account".tr())
-                                .textSpan
-                                .semiBold
-                                .color(AppColor.primaryColor)
-                                .make(),
-                          ])
-                          .makeCentered()
-                          .py12()
-                          .onInkTap(model.openRegister),
-                      if (widget.expectedRole == AppRole.customer)
-                        SocialMediaView(model, bottomPadding: 10),
+                      _RegistrationOptions(
+                        onCustomer: () => model.openRegister(AppRole.customer),
+                        onDriver: () => model.openRegister(AppRole.driver),
+                      ).px20().py8(),
+                      SocialMediaView(model, bottomPadding: 10),
                       ScanLoginView(model),
-                      if (widget.expectedRole == AppRole.customer)
-                        VStack([
-                          _DriverAccessCard(
-                            onTap:
-                                () => Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder:
-                                        (_) => LoginPage(
-                                          expectedRole: AppRole.driver,
-                                        ),
-                                  ),
-                                ),
-                          ),
-                          const SizedBox(height: 10),
-                          _VendorAccessCard(
-                            onTap: () => _openVendorLogin(context),
-                          ),
-                        ]).px20().py16(),
+                      _VendorAccessCard(
+                        onTap: () => _openVendorLogin(context),
+                      ).px20().py16(),
                     ]).scrollVertical(),
               ),
             ),
@@ -185,34 +140,39 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-class _DriverAccessCard extends StatelessWidget {
-  const _DriverAccessCard({required this.onTap});
+class _RegistrationOptions extends StatelessWidget {
+  const _RegistrationOptions({
+    required this.onCustomer,
+    required this.onDriver,
+  });
 
-  final VoidCallback onTap;
+  final VoidCallback onCustomer;
+  final VoidCallback onDriver;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      color: AppColor.primaryColor.withValues(alpha: .08),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(Sizes.radiusLarge),
-        side: BorderSide(color: AppColor.primaryColor.withValues(alpha: .18)),
-      ),
-      child: ListTile(
-        onTap: onTap,
-        leading: CircleAvatar(
-          backgroundColor: AppColor.primaryColor,
-          foregroundColor: Colors.white,
-          child: const Icon(Icons.delivery_dining),
+    return Column(
+      children: [
+        const Text('¿Eres nuevo?'),
+        const SizedBox(height: 8),
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            OutlinedButton.icon(
+              onPressed: onCustomer,
+              icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
+              label: const Text('Crear cuenta cliente'),
+            ),
+            OutlinedButton.icon(
+              onPressed: onDriver,
+              icon: const Icon(Icons.delivery_dining_rounded, size: 18),
+              label: const Text('Crear cuenta conductor'),
+            ),
+          ],
         ),
-        title: const Text(
-          "¿Trabajas con Chaskiy?",
-          style: TextStyle(fontWeight: FontWeight.w700),
-        ),
-        subtitle: const Text("Inicia sesión como conductor o motorizado"),
-        trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
-      ),
+      ],
     );
   }
 }

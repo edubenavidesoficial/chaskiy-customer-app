@@ -42,7 +42,7 @@ class TaxiOrderListItem extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
               decoration: BoxDecoration(
                 color: theme.colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
                 children: [
@@ -64,18 +64,67 @@ class TaxiOrderListItem extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
           ],
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Text(
-                  Utils.orderDate(order.createdAt),
-                  style: mutedStyle,
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Icon(
+                  Icons.local_taxi_outlined,
+                  color: theme.colorScheme.onPrimaryContainer,
+                  size: 26,
                 ),
               ),
-              const SizedBox(width: 8),
-              OrderStatusChip(order.Taxistatus),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        OrderStatusChip(order.Taxistatus),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            Utils.orderDate(order.createdAt),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: mutedStyle,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Taxi Seguro',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          "$currencySymbol ${order.total}".currencyFormat(
+                            currencySymbol,
+                          ),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 10),
@@ -95,19 +144,10 @@ class TaxiOrderListItem extends StatelessWidget {
             AppImages.dropoffLocation,
             "${order.taxiOrder?.dropoffAddress}",
           ),
-          const SizedBox(height: 12),
-          Divider(height: 1, color: theme.colorScheme.outlineVariant),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(child: Text("#${order.code}", style: mutedStyle)),
-              Text(
-                "$currencySymbol ${order.total}".currencyFormat(currencySymbol),
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
+          const SizedBox(height: 8),
+          Text(
+            'Viaje #${order.code}',
+            style: mutedStyle?.copyWith(fontWeight: FontWeight.w600),
           ),
         ],
       ),

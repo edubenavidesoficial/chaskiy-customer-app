@@ -25,7 +25,6 @@ import 'package:velocity_x/velocity_x.dart';
 import 'package:chaskiy/extensions/context.dart';
 
 class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
-  final AppRole expectedRole;
   //the textediting controllers
   TextEditingController phoneTEC = new TextEditingController();
   TextEditingController emailTEC = new TextEditingController();
@@ -38,7 +37,7 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
   Country? selectedCountry;
   String? accountPhoneNumber;
 
-  LoginViewModel(BuildContext context, {this.expectedRole = AppRole.customer}) {
+  LoginViewModel(BuildContext context) {
     this.viewContext = context;
   }
 
@@ -261,7 +260,6 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
       final apiResponse = await authRequest.loginRequest(
         email: emailTEC.text,
         password: passwordTEC.text,
-        role: expectedRole == AppRole.driver ? 'driver' : 'client',
       );
       setBusy(false);
 
@@ -280,10 +278,7 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
       setBusy(true);
 
       try {
-        final apiResponse = await authRequest.qrLoginRequest(
-          code: loginCode,
-          role: expectedRole == AppRole.driver ? 'driver' : 'client',
-        );
+        final apiResponse = await authRequest.qrLoginRequest(code: loginCode);
         //
         setBusy(false);
         await handleDeviceLogin(apiResponse);
@@ -308,12 +303,11 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
       } else {
         final user = User.fromJson(apiResponse.body["user"]);
         final authenticatedRole = AppRole.fromBackendRole(user.role);
-        if (authenticatedRole != expectedRole) {
-          final message =
-              expectedRole == AppRole.driver
-                  ? "Esta cuenta no pertenece a un conductor o motorizado."
-                  : "Esta cuenta pertenece a un conductor. Usa el acceso para conductores y motorizados.";
-          AlertService.error(title: "Acceso incorrecto", text: message);
+        if (authenticatedRole == AppRole.guest) {
+          AlertService.error(
+            title: "Acceso no disponible",
+            text: "Esta cuenta no tiene un rol habilitado para la aplicación.",
+          );
           return;
         }
         //everything works well
@@ -322,7 +316,7 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
         final fbToken = apiResponse.body["fb_token"];
         await FirebaseAuth.instance.signInWithCustomToken(fbToken);
         await AuthServices.saveUser(apiResponse.body["user"], reload: false);
-        if (expectedRole == AppRole.driver &&
+        if (authenticatedRole == AppRole.driver &&
             apiResponse.body["vehicle"] is Map) {
           await AuthServices.saveDriverVehicle(apiResponse.body["vehicle"]);
         }
@@ -334,7 +328,7 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
         //   AppRoutes.homeRoute,
         //   (_) => false,
         // );
-        if (expectedRole == AppRole.driver) {
+        if (authenticatedRole == AppRole.driver) {
           viewContext.nextAndRemoveUntilPage(const DriverHomePage());
         } else {
           //Google y Apple no entregan teléfono, así que la cuenta recién
@@ -370,7 +364,12 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
 
   ///
 
-  void openRegister({String? email, String? name, String? phone}) async {
+  void openRegister(
+    AppRole role, {
+    String? email,
+    String? name,
+    String? phone,
+  }) async {
     Navigator.of(viewContext).push(
       MaterialPageRoute(
         builder:
@@ -378,7 +377,7 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
               email: email,
               name: name,
               phone: phone,
-              expectedRole: expectedRole,
+              expectedRole: role,
             ),
       ),
     );

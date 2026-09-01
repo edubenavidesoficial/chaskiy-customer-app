@@ -51,8 +51,9 @@ class SearchBarInput extends StatelessWidget {
             onChanged: onChanged,
             decoration: InputDecoration(
               hintText: hintText ?? "Search".tr(),
+              isDense: true,
               hintStyle: context.textTheme.bodyMedium!.copyWith(
-                fontSize: 15,
+                fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: colors.onSurfaceVariant,
               ),
@@ -61,10 +62,18 @@ class SearchBarInput extends StatelessWidget {
               focusedBorder: InputBorder.none,
               prefixIcon: Icon(
                 FlutterIcons.search_fea,
-                size: 21,
+                size: 20,
                 color: colors.primary,
               ),
-              contentPadding: const EdgeInsets.symmetric(vertical: 16),
+              prefixIconConstraints: const BoxConstraints(
+                minWidth: 44,
+                minHeight: 44,
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 2,
+                vertical: 11,
+              ),
+              constraints: const BoxConstraints(minHeight: 44, maxHeight: 46),
               filled: true,
               fillColor: colors.surfaceContainerLow,
             ),
@@ -82,6 +91,11 @@ class SearchBarInput extends StatelessWidget {
           IconButton(
                 onPressed: null,
                 color: context.theme.colorScheme.surface,
+                constraints: const BoxConstraints.tightFor(
+                  width: 44,
+                  height: 44,
+                ),
+                padding: EdgeInsets.zero,
                 icon: Icon(
                   FlutterIcons.sliders_faw,
                   color: context.primaryColor,

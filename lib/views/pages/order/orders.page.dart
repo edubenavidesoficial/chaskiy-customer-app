@@ -51,7 +51,7 @@ class _OrdersPageState extends State<OrdersPage>
 
     return BasePage(
       allowTopSafeArea: true,
-      backgroundColor: theme.colorScheme.surfaceContainerLow,
+      backgroundColor: theme.colorScheme.surface,
       body: ViewModelBuilder<OrdersViewModel>.reactive(
         viewModelBuilder: () => vm,
         onViewModelReady: (vm) => vm.initialise(),
@@ -59,44 +59,51 @@ class _OrdersPageState extends State<OrdersPage>
           return VStack([
             //
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 18, 12, 4),
-              child: Row(
+              padding: const EdgeInsets.fromLTRB(20, 22, 20, 10),
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "My Orders".tr(),
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
+                  Column(
+                    children: [
+                      Text(
+                        "My Orders".tr(),
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.25,
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          vm.orders.isEmpty
-                              ? 'Compras y viajes en un solo lugar'.tr()
-                              : '${vm.orders.length} ${vm.orders.length == 1 ? 'pedido' : 'pedidos'}',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        vm.orders.isEmpty
+                            ? 'Compras y viajes en un solo lugar'.tr()
+                            : vm.hasActiveFilters
+                            ? '${vm.filteredOrders.length} de ${vm.orders.length} pedidos'
+                            : '${vm.orders.length} ${vm.orders.length == 1 ? 'pedido' : 'pedidos'}',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    tooltip: 'Actualizar'.tr(),
-                    onPressed: vm.isBusy ? null : vm.fetchMyOrders,
-                    icon: const Icon(Icons.refresh_rounded),
-                    style: IconButton.styleFrom(
-                      backgroundColor: theme.colorScheme.surface,
-                      foregroundColor: theme.colorScheme.primary,
-                      side: BorderSide(color: theme.colorScheme.outlineVariant),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      tooltip: 'Actualizar'.tr(),
+                      onPressed: vm.isBusy ? null : vm.fetchMyOrders,
+                      icon: const Icon(Icons.refresh_rounded),
+                      style: IconButton.styleFrom(
+                        backgroundColor:
+                            theme.colorScheme.surfaceContainerHighest,
+                        foregroundColor: theme.colorScheme.onSurface,
+                        minimumSize: const Size(46, 46),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
+            if (vm.isAuthenticated()) _OrderFilters(vm: vm),
             //
             if (vm.isAuthenticated())
               CustomListView(
@@ -105,8 +112,8 @@ class _OrdersPageState extends State<OrdersPage>
                 refreshController: vm.refreshController,
                 onRefresh: () => vm.fetchMyOrders(),
                 onLoading: () => vm.fetchMyOrders(initialLoading: false),
-                dataSet: vm.orders,
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                dataSet: vm.filteredOrders,
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
                 emptyWidget: EmptyOrder(),
                 //si la consulta falla se veía "Sin pedidos", igual que si de
                 //verdad no hubiera ninguno
@@ -115,10 +122,10 @@ class _OrdersPageState extends State<OrdersPage>
                   onrefresh: vm.fetchMyOrders,
                   description: "${vm.modelError ?? ''}",
                 ),
-                separatorBuilder: (_, index) => 12.heightBox,
+                separatorBuilder: (_, index) => 18.heightBox,
                 isLoading: vm.isBusy,
                 itemBuilder: (context, index) {
-                  final order = vm.orders[index];
+                  final order = vm.filteredOrders[index];
                   //for taxi tye of order
                   if (order.taxiOrder != null) {
                     return TaxiOrderListItem(
@@ -156,4 +163,127 @@ class _OrdersPageState extends State<OrdersPage>
 
   @override
   bool get wantKeepAlive => true;
+}
+
+class _OrderFilters extends StatelessWidget {
+  const _OrderFilters({required this.vm});
+
+  final OrdersViewModel vm;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 52,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+        children: [
+          _OrderFilterChip(
+            label: 'Filtros',
+            icon:
+                vm.hasActiveFilters ? Icons.close_rounded : Icons.tune_rounded,
+            selected: vm.hasActiveFilters,
+            onTap: vm.hasActiveFilters ? vm.clearOrderFilters : () {},
+          ),
+          const SizedBox(width: 8),
+          _OrderFilterChip(
+            label: 'Entregados',
+            selected: vm.showDelivered,
+            onTap: vm.toggleDeliveredFilter,
+          ),
+          const SizedBox(width: 8),
+          _OrderFilterChip(
+            label: 'Cancelados',
+            selected: vm.showCancelled,
+            onTap: vm.toggleCancelledFilter,
+          ),
+          const SizedBox(width: 8),
+          _OrderFilterChip(
+            label: vm.orderDateRange == null ? 'Período' : 'Período activo',
+            icon: Icons.keyboard_arrow_down_rounded,
+            trailingIcon: true,
+            selected: vm.orderDateRange != null,
+            onTap: () => _selectPeriod(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _selectPeriod(BuildContext context) async {
+    final now = DateTime.now();
+    final range = await showDateRangePicker(
+      context: context,
+      initialDateRange: vm.orderDateRange,
+      firstDate: DateTime(now.year - 5),
+      lastDate: now,
+      helpText: 'Filtrar pedidos por período',
+      cancelText: 'Cancelar',
+      confirmText: 'Aplicar',
+      saveText: 'Aplicar',
+    );
+    if (range != null) vm.setOrderDateRange(range);
+  }
+}
+
+class _OrderFilterChip extends StatelessWidget {
+  const _OrderFilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.icon,
+    this.trailingIcon = false,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  final IconData? icon;
+  final bool trailingIcon;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final iconWidget =
+        icon == null
+            ? null
+            : Icon(
+              icon,
+              size: 19,
+              color: selected ? scheme.onPrimaryContainer : scheme.onSurface,
+            );
+    return Material(
+      color:
+          selected ? scheme.primaryContainer : scheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(22),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(22),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 9),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (iconWidget != null && !trailingIcon) ...[
+                iconWidget,
+                const SizedBox(width: 7),
+              ],
+              Text(
+                label,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color:
+                      selected ? scheme.onPrimaryContainer : scheme.onSurface,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              if (iconWidget != null && trailingIcon) ...[
+                const SizedBox(width: 5),
+                iconWidget,
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

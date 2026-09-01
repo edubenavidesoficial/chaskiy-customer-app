@@ -29,26 +29,81 @@ class OrderCard extends StatelessWidget {
     return Material(
       color: scheme.surface,
       clipBehavior: Clip.antiAlias,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(20),
+      elevation: 0,
       child: InkWell(
         onTap: () => onPressed(),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: scheme.outlineVariant),
+            borderRadius: BorderRadius.circular(20),
+            color: scheme.surface,
+            border: Border.all(
+              color: scheme.outlineVariant.withValues(alpha: 0.65),
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Padding(padding: const EdgeInsets.all(14), child: child),
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  12,
+                  0,
+                  12,
+                  onPayPressed == null ? 12 : 7,
+                ),
+                child: Material(
+                  color: scheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(15),
+                  child: InkWell(
+                    onTap: () => onPressed(),
+                    borderRadius: BorderRadius.circular(15),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 9,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.receipt_long_outlined,
+                            size: 18,
+                            color: scheme.onSurface,
+                          ),
+                          const SizedBox(width: 7),
+                          Text(
+                            'Ver detalle'.tr(),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.labelLarge?.copyWith(
+                              color: scheme.onSurface,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.chevron_right_rounded,
+                            size: 18,
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               if (onPayPressed != null)
-                CustomButton(
-                  title: "PAY FOR ORDER".tr(),
-                  icon: FlutterIcons.credit_card_fea,
-                  iconSize: 18,
-                  height: 46,
-                  shapeRadius: 0,
-                  onPressed: onPayPressed,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                  child: CustomButton(
+                    title: "PAY FOR ORDER".tr(),
+                    icon: FlutterIcons.credit_card_fea,
+                    iconSize: 18,
+                    height: 44,
+                    shapeRadius: 15,
+                    onPressed: onPayPressed,
+                  ),
                 ),
             ],
           ),

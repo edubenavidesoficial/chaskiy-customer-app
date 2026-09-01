@@ -11,6 +11,7 @@ import 'package:chaskiy/requests/order.request.dart';
 import 'package:chaskiy/requests/payment_method.request.dart';
 import 'package:chaskiy/requests/taxi.request.dart';
 import 'package:chaskiy/services/active_taxi_trip.service.dart';
+import 'package:chaskiy/services/active_taxi_trip_coordinator.dart';
 import 'package:chaskiy/view_models/taxi_google_map.vm.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -19,7 +20,16 @@ import 'package:localize_and_translate/localize_and_translate.dart';
 class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   //requests
   TaxiRequest taxiRequest = TaxiRequest();
+  OrderRequest orderRequest = OrderRequest();
   PaymentMethodRequest paymentOptionRequest = PaymentMethodRequest();
+  late final ActiveTaxiTripCoordinator activeTripCoordinator =
+      ActiveTaxiTripCoordinator(
+        fetchCurrent: taxiRequest.getOnGoingTrip,
+        fetchById: (id) => orderRequest.getOrderDetails(id: id),
+        restoreTrip: ActiveTaxiTripService.restore,
+        saveTrip: ActiveTaxiTripService.save,
+        clearTrip: ActiveTaxiTripService.clear,
+      );
   //
   Order? onGoingOrderTrip;
   //código del último viaje del que ya se avisó que terminó, para no repetir
@@ -68,7 +78,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
 
   //get current on going trip
   Future<void> restoreCachedOnGoingTrip() async {
-    final cachedTrip = await ActiveTaxiTripService.restore();
+    final cachedTrip = await activeTripCoordinator.restore();
     if (cachedTrip == null) return;
     onGoingOrderTrip = cachedTrip;
     loadTripUIByOrderStatus(initial: true);
@@ -78,14 +88,9 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     //
     setBusyForObject(onGoingOrderTrip, true);
     try {
-      final serverTrip = await taxiRequest.getOnGoingTrip();
-      if (serverTrip == null) {
-        onGoingOrderTrip = null;
-        await ActiveTaxiTripService.clear();
-      } else {
-        onGoingOrderTrip = serverTrip;
-        await ActiveTaxiTripService.save(serverTrip);
-      }
+      onGoingOrderTrip = await activeTripCoordinator.synchronize(
+        onGoingOrderTrip,
+      );
       loadTripUIByOrderStatus(initial: true);
     } catch (error) {
       print("trip ongoing error ==> $error");
@@ -402,18 +407,11 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
     if (_refreshingTrip || onGoingOrderTrip == null) return;
     _refreshingTrip = true;
     try {
-      final previousDriverId = onGoingOrderTrip?.driverId;
-      final previousStatus = onGoingOrderTrip?.status;
-      final refreshedTrip = await taxiRequest.getOnGoingTrip();
-      if (refreshedTrip == null) {
-        // El endpoint de viaje activo deja de devolver la orden apenas el
-        // conductor la completa. Esa respuesta es una transición real, no un
-        // error: debe abrir la calificación en lugar de dejar la vista vieja.
-        onGoingOrderTrip = null;
-        await ActiveTaxiTripService.clear();
-        loadTripUIByOrderStatus();
-        return;
-      }
+      final knownTrip = onGoingOrderTrip!;
+      final previousDriverId = knownTrip.driverId;
+      final previousStatus = knownTrip.status;
+      final refreshedTrip = await activeTripCoordinator.synchronize(knownTrip);
+      if (refreshedTrip == null) return;
       onGoingOrderTrip = refreshedTrip;
       final driverAssigned =
           previousDriverId == null && refreshedTrip.driverId != null;

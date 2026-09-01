@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:chaskiy/enums/app_role.dart';
 import 'package:chaskiy/services/alert.service.dart';
 import 'package:chaskiy/view_models/login.view_model.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -19,9 +20,7 @@ class SocialMediaLoginService {
     model.setBusy(true);
     try {
       //
-      GoogleSignIn googleSignIn = GoogleSignIn(
-        scopes: ['email', 'profile'],
-      );
+      GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
       try {
         // Trigger the authentication flow
         if (await googleSignIn.isSignedIn()) {
@@ -60,6 +59,7 @@ class SocialMediaLoginService {
             await model.handleDeviceLogin(apiResponse);
           } else {
             model.openRegister(
+              AppRole.customer,
               email: googleUser.email,
               name: googleUser.displayName,
             );
@@ -69,9 +69,7 @@ class SocialMediaLoginService {
         }
         //
       } on FirebaseAuthException catch (error) {
-        model.toastError(
-          "${error.message}",
-        );
+        model.toastError("${error.message}");
       } catch (error) {
         model.toastError("$error");
       }
@@ -99,15 +97,11 @@ class SocialMediaLoginService {
         try {
           // Create a credential from the access token
           final OAuthCredential facebookAuthCredential =
-              FacebookAuthProvider.credential(
-            accessToken.tokenString,
-          );
+              FacebookAuthProvider.credential(accessToken.tokenString);
 
           // Once signed in, return the UserCredential
-          UserCredential userAccount =
-              await FirebaseAuth.instance.signInWithCredential(
-            facebookAuthCredential,
-          );
+          UserCredential userAccount = await FirebaseAuth.instance
+              .signInWithCredential(facebookAuthCredential);
 
           //
           final apiResponse = await model.authRequest.socialLogin(
@@ -121,15 +115,14 @@ class SocialMediaLoginService {
           } else {
             AlertService.stopLoading();
             model.openRegister(
+              AppRole.customer,
               email: userAccount.user!.email!,
               name: userAccount.user!.displayName ?? "",
             );
           }
         } on FirebaseAuthException catch (error) {
           AlertService.stopLoading();
-          model.toastError(
-            "${error.message}",
-          );
+          model.toastError("${error.message}");
         } catch (error) {
           AlertService.stopLoading();
           model.toastError("$error");
@@ -172,10 +165,8 @@ class SocialMediaLoginService {
       );
 
       //
-      UserCredential userAccount =
-          await FirebaseAuth.instance.signInWithCredential(
-        oauthCredential,
-      );
+      UserCredential userAccount = await FirebaseAuth.instance
+          .signInWithCredential(oauthCredential);
 
       // Sign the user in (or link) with the credential
       try {
@@ -193,6 +184,7 @@ class SocialMediaLoginService {
         } else {
           AlertService.stopLoading();
           model.openRegister(
+            AppRole.customer,
             email: userAccount.user!.email,
             name: userAccount.user!.displayName,
           );
@@ -205,9 +197,7 @@ class SocialMediaLoginService {
     } on FirebaseAuthException catch (error) {
       print("Apple login: $error");
       AlertService.stopLoading();
-      model.toastError(
-        "${error.message}",
-      );
+      model.toastError("${error.message}");
     } catch (error) {
       AlertService.stopLoading();
       model.toastError("$error");
@@ -218,8 +208,10 @@ class SocialMediaLoginService {
     final charset =
         '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
     final random = Random.secure();
-    return List.generate(length, (_) => charset[random.nextInt(charset.length)])
-        .join();
+    return List.generate(
+      length,
+      (_) => charset[random.nextInt(charset.length)],
+    ).join();
   }
 
   /// Returns the sha256 hash of [input] in hex notation.

@@ -275,7 +275,7 @@ class OrderDetailsViewModel extends CheckoutBaseViewModel {
   Future<void> resumeTaxiTrip() async {
     if (!order.isTaxi || !order.isOngoing || order.isScheduled) return;
     await ActiveTaxiTripService.save(order);
-    await viewContext.push((context) => const TaxiPage(null));
+    await viewContext.push((context) => TaxiPage(null, initialOrder: order));
     await fetchOrderDetails(silent: true);
   }
 

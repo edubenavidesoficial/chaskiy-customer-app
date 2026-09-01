@@ -1,11 +1,9 @@
-import 'package:chaskiy/constants/app_strings.dart';
-import 'package:chaskiy/constants/app_ui_sizes.dart';
+import 'package:chaskiy/models/category.dart';
 import 'package:chaskiy/view_models/vendor_details.vm.dart';
 import 'package:chaskiy/views/pages/vendor_details/vendor_category_products.page.dart';
 import 'package:chaskiy/views/pages/vendor_details/widgets/vendor_details_header.view.dart';
 import 'package:chaskiy/widgets/busy_indicator.dart';
-import 'package:chaskiy/widgets/custom_grid_view.dart';
-import 'package:chaskiy/widgets/list_items/category.list_item.dart';
+import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:flutter/material.dart';
 
 class VendorDetailsWithSubcategoryPage extends StatelessWidget {
@@ -47,47 +45,103 @@ class VendorDetailsWithSubcategoryPage extends StatelessWidget {
               )
             else ...[
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
                 child: Text(
                   'Explora el menú',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
-              CustomGridView(
-                noScrollPhysics: true,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: AppUISizes.getAspectRatio(
-                  context,
-                  AppStrings.categoryPerRow,
-                  AppStrings.categoryImageHeight + 42,
-                ),
-                crossAxisCount: AppStrings.categoryPerRow,
-                dataSet: vendor.categories,
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
-                itemBuilder: (context, index) {
-                  final category = vendor.categories[index];
-                  return CategoryListItem(
-                    h: AppStrings.categoryImageHeight + 20,
-                    inverted: true,
-                    category: category,
-                    onPressed:
-                        (category) => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder:
-                                (_) => VendorCategoryProductsPage(
-                                  category: category,
-                                  vendor: vendor,
-                                ),
-                          ),
-                        ),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final columns = constraints.maxWidth >= 600 ? 3 : 2;
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: columns,
+                      mainAxisExtent: 76,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
+                    itemCount: vendor.categories.length,
+                    itemBuilder: (context, index) {
+                      final category = vendor.categories[index];
+                      return _CompactCategoryTile(
+                        category: category,
+                        onTap:
+                            () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => VendorCategoryProductsPage(
+                                      category: category,
+                                      vendor: vendor,
+                                    ),
+                              ),
+                            ),
+                      );
+                    },
                   );
                 },
               ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CompactCategoryTile extends StatelessWidget {
+  const _CompactCategoryTile({required this.category, required this.onTap});
+
+  final Category category;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Material(
+      color: colors.surfaceContainerLow,
+      borderRadius: BorderRadius.circular(18),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(9),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(13),
+                child: CustomImage(
+                  imageUrl: category.imageUrl,
+                  width: 52,
+                  height: 52,
+                  boxFit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  category.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    height: 1.15,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 18,
+                color: colors.onSurfaceVariant,
+              ),
+            ],
+          ),
         ),
       ),
     );

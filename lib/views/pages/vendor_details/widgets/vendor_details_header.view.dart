@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_semantic_colors.dart';
-import 'package:chaskiy/constants/app_ui_settings.dart';
 import 'package:chaskiy/models/vendor.dart';
 import 'package:chaskiy/view_models/vendor_details.vm.dart';
-import 'package:chaskiy/views/pages/vendor/vendor_reviews.page.dart';
+import 'package:chaskiy/views/pages/vendor_details/widgets/vendor_hero.view.dart';
 import 'package:chaskiy/views/pages/vendor_details/widgets/vendor_meta_chip.dart';
 import 'package:chaskiy/views/pages/vendor_details/widgets/bottomsheets/vendor_full_profie.bottomsheet.dart';
 import 'package:chaskiy/views/pages/vendor_details/widgets/upload_prescription.btn.dart';
-import 'package:chaskiy/widgets/custom_image.view.dart';
 import 'package:chaskiy/widgets/inputs/search_bar.input.dart';
 import 'package:chaskiy/widgets/tags/fav_vendor.tag.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 class VendorDetailsHeader extends StatelessWidget {
   const VendorDetailsHeader(
     this.model, {
     this.showFeatureImage = true,
-    this.featureImageHeight = 220,
+    this.featureImageHeight = 210,
     this.showPrescription = false,
     this.showSearch = true,
     super.key,
@@ -40,134 +37,30 @@ class VendorDetailsHeader extends StatelessWidget {
       child: Column(
         children: [
           if (showFeatureImage)
-            CustomImage(
-              imageUrl: vendor.featureImage,
-              height: featureImageHeight,
-              canZoom: true,
-            ).wFull(context),
+            VendorHeroView(model, height: featureImageHeight),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: colors.surface,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(
-                      alpha: theme.brightness == Brightness.dark ? .16 : .045,
-                    ),
-                    blurRadius: 18,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 58,
-                    height: 58,
-                    decoration: BoxDecoration(
-                      color: colors.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: CustomImage(
-                      imageUrl: vendor.logo,
-                      boxFit: BoxFit.cover,
-                      canZoom: true,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Row(
+              children: [
+                if (showSearch)
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          vendor.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -.2,
-                          ),
-                        ),
-                        if (vendor.address.isNotEmptyAndNotNull &&
-                            AppUISettings.showVendorAddress) ...[
-                          const SizedBox(height: 3),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.location_on_outlined,
-                                size: 16,
-                                color: colors.onSurfaceVariant,
-                              ),
-                              const SizedBox(width: 3),
-                              Expanded(
-                                child: Text(
-                                  vendor.address,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: colors.onSurfaceVariant,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                        const SizedBox(height: 6),
-                        InkWell(
-                          onTap:
-                              () => context.nextPage(VendorReviewsPage(vendor)),
-                          borderRadius: BorderRadius.circular(12),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.star_rounded,
-                                color: semantics.star,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 3),
-                              Text(
-                                vendor.rating.toStringAsFixed(1),
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                '(${vendor.reviews_count} reseñas)',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: colors.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                    child: SearchBarInput(
+                      hintText: 'Buscar en ${vendor.name}',
+                      onTap: model.openVendorSearch,
+                      showFilter: false,
                     ),
-                  ),
-                  const SizedBox(width: 6),
-                  Column(
-                    children: [
-                      FavVendorTag(vendor),
-                      IconButton(
-                        tooltip: 'Información',
-                        visualDensity: VisualDensity.compact,
-                        onPressed:
-                            () => openVendorDetailsBottomSheet(context, vendor),
-                        icon: Icon(
-                          Icons.info_outline_rounded,
-                          color: colors.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                  )
+                else
+                  const Spacer(),
+                const SizedBox(width: 8),
+                _HeaderAction(tooltip: 'Favorito', child: FavVendorTag(vendor)),
+                const SizedBox(width: 8),
+                _HeaderAction(
+                  tooltip: 'Información',
+                  icon: Icons.info_outline_rounded,
+                  onTap: () => openVendorDetailsBottomSheet(context, vendor),
+                ),
+              ],
             ),
           ),
           Padding(
@@ -229,22 +122,11 @@ class VendorDetailsHeader extends StatelessWidget {
               ),
             ),
           ),
-          if (showSearch) ...[
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SearchBarInput(
-                hintText: 'Buscar en ${vendor.name}',
-                onTap: model.openVendorSearch,
-                showFilter: false,
-              ),
-            ),
-          ],
           if (showPrescription) ...[
-            const SizedBox(height: 14),
+            const SizedBox(height: 10),
             UploadPrescriptionFab(model),
           ],
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
         ],
       ),
     );
@@ -264,6 +146,41 @@ class VendorDetailsHeader extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       builder: (_) => VendorFullProfileBottomSheet(vendor),
+    );
+  }
+}
+
+class _HeaderAction extends StatelessWidget {
+  const _HeaderAction({
+    required this.tooltip,
+    this.icon,
+    this.child,
+    this.onTap,
+  });
+
+  final String tooltip;
+  final IconData? icon;
+  final Widget? child;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(15),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: SizedBox(
+            width: 46,
+            height: 46,
+            child: child ?? Icon(icon, size: 21, color: colors.primary),
+          ),
+        ),
+      ),
     );
   }
 }

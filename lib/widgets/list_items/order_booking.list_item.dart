@@ -41,37 +41,57 @@ class OrderBookingListItem extends StatelessWidget {
             children: [
               CustomImage(
                 imageUrl: property?.mainPhoto,
-                width: 52,
-                height: 52,
-              ).cornerRadius(14),
+                width: 56,
+                height: 56,
+              ).cornerRadius(16),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        OrderStatusChip(order.status),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            booking == null
+                                ? ''
+                                : "${Jiffy.parse(booking.checkInDate.toString()).format(pattern: 'd MMM')} - ${Jiffy.parse(booking.checkOutDate.toString()).format(pattern: 'd MMM y')}",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: mutedStyle,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                           child: Text(
                             property?.name ?? "",
-                            maxLines: 1,
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w800,
+                              height: 1.15,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        OrderStatusChip(order.status),
+                        const SizedBox(width: 10),
+                        Text(
+                          "${AppStrings.currencySymbol} ${order.total}"
+                              .currencyFormat(),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 4),
-                    if (booking != null)
-                      Text(
-                        "${Jiffy.parse(booking.checkInDate.toString()).format(pattern: 'd MMM')} - ${Jiffy.parse(booking.checkOutDate.toString()).format(pattern: 'd MMM y')}",
-                        style: mutedStyle,
-                      ),
                     if (order.paymentMethod != null)
                       Text("${order.paymentMethod?.name}", style: mutedStyle),
                   ],
@@ -79,19 +99,10 @@ class OrderBookingListItem extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Divider(height: 1, color: theme.colorScheme.outlineVariant),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(child: Text("#${order.code}", style: mutedStyle)),
-              Text(
-                "${AppStrings.currencySymbol} ${order.total}".currencyFormat(),
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
+          const SizedBox(height: 8),
+          Text(
+            'Reserva #${order.code}',
+            style: mutedStyle?.copyWith(fontWeight: FontWeight.w600),
           ),
         ],
       ),
