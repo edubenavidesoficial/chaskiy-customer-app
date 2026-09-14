@@ -4,6 +4,7 @@ import 'package:chaskiy/models/vendor.dart';
 import 'package:chaskiy/view_models/vendor_details.vm.dart';
 import 'package:chaskiy/views/pages/vendor_details/widgets/vendor_hero.view.dart';
 import 'package:chaskiy/views/pages/vendor_details/widgets/vendor_meta_chip.dart';
+import 'package:chaskiy/views/pages/vendor_details/widgets/vendor_summary_card.view.dart';
 import 'package:chaskiy/views/pages/vendor_details/widgets/bottomsheets/vendor_full_profie.bottomsheet.dart';
 import 'package:chaskiy/views/pages/vendor_details/widgets/upload_prescription.btn.dart';
 import 'package:chaskiy/widgets/inputs/search_bar.input.dart';
@@ -37,9 +38,18 @@ class VendorDetailsHeader extends StatelessWidget {
       child: Column(
         children: [
           if (showFeatureImage)
-            VendorHeroView(model, height: featureImageHeight),
+            VendorHeroView(
+              model,
+              height: featureImageHeight,
+              showDetails: false,
+            ),
+          if (showFeatureImage)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              child: VendorSummaryCard(vendor: vendor),
+            ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
             child: Row(
               children: [
                 if (showSearch)

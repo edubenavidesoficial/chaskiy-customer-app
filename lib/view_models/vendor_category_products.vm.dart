@@ -27,7 +27,7 @@ class VendorCategoryProductsViewModel extends MyBaseViewModel {
   //
   Category category;
   Vendor? vendor;
-  Map<int, List> categoriesProducts = {};
+  Map<int, List<Product>> categoriesProducts = {};
   Map<int, int> categoriesProductsQueryPages = {};
   final currencySymbol = AppStrings.currencySymbol;
 

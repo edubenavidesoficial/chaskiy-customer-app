@@ -4,8 +4,6 @@ import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/models/driver_assignment.dart';
 import 'package:chaskiy/models/order.dart';
 import 'package:chaskiy/models/user.dart';
-import 'package:chaskiy/requests/auth.request.dart';
-import 'package:chaskiy/requests/driver_vehicle.request.dart';
 import 'package:chaskiy/requests/order.request.dart';
 import 'package:chaskiy/services/app.service.dart';
 import 'package:chaskiy/services/auth.service.dart';
@@ -36,8 +34,6 @@ class DriverAssignedOrdersPage extends StatefulWidget {
 
 class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
   final OrderRequest _orderRequest = OrderRequest();
-  final AuthRequest _authRequest = AuthRequest();
-  final DriverVehicleRequest _vehicleRequest = DriverVehicleRequest();
   List<Order> _orders = const [];
   User? _user;
   bool _loading = true;
@@ -112,13 +108,9 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
       });
       widget.onAvailabilitySynced(user.isOnline);
       if (user.isOnline) {
-        try {
-          await _ensureReadyToReceive();
-          await DriverLocationService.instance.start();
-          await DriverAssignmentService.instance.start();
-        } catch (error) {
-          await _forceOffline(error);
-        }
+        // Esta recarga solo recupera servicios. Nunca interpreta una falla
+        // transitoria de red/GPS como una orden del conductor de desconectarse.
+        unawaited(_recoverDriverRuntime());
       }
     } catch (error) {
       //un fallo de red en una recarga de fondo no debe borrar la lista que el
@@ -129,32 +121,16 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
     }
   }
 
-  Future<void> _ensureReadyToReceive() async {
-    final vehicles = await _vehicleRequest.vehicles();
-    final ready = vehicles.any(
-      (vehicle) => vehicle.isActive && vehicle.isVerified,
-    );
-    if (!ready) {
-      throw const DriverLocationException(
-        'Necesitas un vehículo activo y verificado para recibir solicitudes.',
-      );
-    }
-  }
-
-  Future<void> _forceOffline(Object reason) async {
-    await DriverAssignmentService.instance.stop();
-    await DriverLocationService.instance.stop();
-    if (_user != null) {
-      _user!.isOnline = false;
-      await AuthServices.saveUser(_user!.toJson(), reload: false);
-    }
-    widget.onAvailabilitySynced(false);
+  Future<void> _recoverDriverRuntime() async {
     try {
-      await _authRequest.updateOnlineStatus(isOnline: false);
+      await Future.wait([
+        DriverLocationService.instance.recover(),
+        DriverAssignmentService.instance.start(),
+      ]);
     } catch (_) {
-      // Preserve the local safe state even if the compensating request fails.
+      // La próxima lectura GPS, reanudación o recarga vuelve a intentarlo sin
+      // cambiar la preferencia de disponibilidad elegida por el conductor.
     }
-    if (mounted) setState(() {});
   }
 
   Future<void> _showAssignment(DriverAssignment assignment) async {

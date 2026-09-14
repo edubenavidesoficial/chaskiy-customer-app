@@ -53,8 +53,7 @@ class _DriverHomePageState extends State<DriverHomePage>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && _user?.isOnline == true) {
-      unawaited(DriverLocationService.instance.recover());
-      unawaited(DriverAssignmentService.instance.start());
+      unawaited(_recoverDriverRuntime());
     }
   }
 
@@ -81,11 +80,25 @@ class _DriverHomePageState extends State<DriverHomePage>
     // sondeo para recibir asignaciones desde cualquier pestaña del módulo.
     await SetupService.init();
     if (!user.isOnline || !mounted) return;
-    await DriverAssignmentService.instance.start();
+    unawaited(_recoverDriverRuntime());
+  }
+
+  Future<void> _recoverDriverRuntime({bool notifyFailure = false}) async {
+    // Los dos servicios se recuperan de forma independiente. Una demora del
+    // GPS nunca debe retrasar la disponibilidad ni bloquear las asignaciones.
     try {
-      await DriverLocationService.instance.start();
-    } catch (_) {
-      // La pantalla de pedidos muestra el motivo y permite corregir permisos.
+      await Future.wait([
+        DriverAssignmentService.instance.start(),
+        DriverLocationService.instance.recover(),
+      ]);
+    } catch (error) {
+      if (!notifyFailure || !mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$error'),
+          backgroundColor: Colors.orange.shade800,
+        ),
+      );
     }
   }
 
@@ -157,22 +170,18 @@ class _DriverHomePageState extends State<DriverHomePage>
       if (!response.allGood) throw response.message ?? 'No se pudo actualizar';
       user.isOnline = value;
       await AuthServices.saveUser(user.toJson(), reload: false);
+      if (mounted) setState(() {});
       if (value) {
-        await DriverAssignmentService.instance.start();
-        await DriverLocationService.instance.start();
+        // La preferencia ya fue confirmada por el servidor. GPS, FCM y sondeo
+        // arrancan en segundo plano y se reintentan sin apagar al conductor.
+        unawaited(_recoverDriverRuntime(notifyFailure: true));
       } else {
         await DriverAssignmentService.instance.stop();
         await DriverLocationService.instance.stop();
       }
-      if (mounted) setState(() {});
     } catch (error) {
-      user.isOnline = false;
-      await AuthServices.saveUser(user.toJson(), reload: false);
-      try {
-        await _authRequest.updateOnlineStatus(isOnline: false);
-      } catch (_) {}
-      await DriverAssignmentService.instance.stop();
-      await DriverLocationService.instance.stop();
+      // Un error de red, GPS o permisos no equivale a que el conductor haya
+      // elegido desconectarse. Conservamos el último estado confirmado.
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('$error'), backgroundColor: Colors.red),

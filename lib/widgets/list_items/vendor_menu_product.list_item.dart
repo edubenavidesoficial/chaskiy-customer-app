@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:chaskiy/constants/app_semantic_colors.dart';
 import 'package:chaskiy/constants/app_strings.dart';
 import 'package:chaskiy/extensions/string.dart';
 import 'package:chaskiy/models/product.dart';
@@ -96,7 +95,6 @@ class _CompactLayout extends StatelessWidget {
               product: product,
               maxLines: 2,
               showDescription: true,
-              showAvailability: true,
             ),
           ),
           const SizedBox(width: 10),
@@ -113,21 +111,16 @@ class _ProductInfo extends StatelessWidget {
     required this.product,
     required this.maxLines,
     this.showDescription = false,
-    this.showAvailability = false,
   });
 
   final Product product;
   final int maxLines;
   final bool showDescription;
-  final bool showAvailability;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    //sin reseñas la fila solo mostraría "0.0 (0)", que no le dice nada a nadie
-    final hasReviews = product.reviewsCount > 0;
-    final unit = product.unit?.trim() ?? '';
     final detailStyle = theme.textTheme.bodySmall?.copyWith(
       color: colors.onSurfaceVariant,
     );
@@ -153,47 +146,6 @@ class _ProductInfo extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: detailStyle,
-          ),
-        ],
-        if (showAvailability && product.availableQty != null) ...[
-          const SizedBox(height: 4),
-          Text(
-            product.hasStock
-                ? '${product.availableQty} disponibles'
-                : 'Agotado',
-            maxLines: 1,
-            style: detailStyle?.copyWith(
-              color: product.hasStock ? colors.onSurfaceVariant : colors.error,
-            ),
-          ),
-        ],
-        if (hasReviews || unit.isNotEmpty) ...[
-          const SizedBox(height: 5),
-          Row(
-            children: [
-              if (hasReviews) ...[
-                Icon(Icons.star_rounded, size: 17, color: theme.semantics.star),
-                const SizedBox(width: 3),
-                Text(
-                  (product.rating ?? 0).toStringAsFixed(1),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                Text(' (${product.reviewsCount})', style: detailStyle),
-              ],
-              if (hasReviews && unit.isNotEmpty)
-                Text(' · ', style: detailStyle),
-              if (unit.isNotEmpty)
-                Flexible(
-                  child: Text(
-                    unit,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: detailStyle,
-                  ),
-                ),
-            ],
           ),
         ],
       ],
@@ -250,11 +202,7 @@ class VendorMenuProductGridItem extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _ProductInfo(
-                      product: product,
-                      maxLines: 2,
-                      showAvailability: true,
-                    ),
+                    _ProductInfo(product: product, maxLines: 2),
                     const SizedBox(height: 8),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,

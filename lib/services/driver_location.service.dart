@@ -60,13 +60,10 @@ class DriverLocationService {
         (_) => _requestFreshPosition(settings),
       );
 
-      try {
-        await _onPosition(
-          await Geolocator.getCurrentPosition(locationSettings: settings),
-        );
-      } catch (_) {
-        // The continuous stream remains responsible for the first valid fix.
-      }
+      // Obtener el primer fix puede tardar varios minutos dentro de edificios o
+      // tras volver del segundo plano. No bloqueamos la activación del modo
+      // conductor: el stream y el heartbeat enviarán la primera lectura válida.
+      unawaited(_requestFreshPosition(settings));
     } finally {
       _starting = false;
     }

@@ -109,12 +109,9 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
                 ),
 
                 SliverToBoxAdapter(
-                  child: Transform.translate(
-                    offset: const Offset(0, -24),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: _VendorSummaryCard(vendor: model.vendor!),
-                    ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                    child: _VendorSummaryCard(vendor: model.vendor!),
                   ),
                 ),
 
@@ -133,7 +130,7 @@ class _VendorDetailsWithMenuPageState extends State<VendorDetailsWithMenuPage>
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
                       child: Row(
                         children: [
                           Expanded(
@@ -386,7 +383,7 @@ class _VendorSummaryCard extends StatelessWidget {
                 const SizedBox(height: 10),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 11,
+                    horizontal: 8,
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
@@ -406,6 +403,7 @@ class _VendorSummaryCard extends StatelessWidget {
                       color:
                           vendor.isOpen ? Colors.green.shade700 : colors.error,
                       fontWeight: FontWeight.w800,
+                      fontSize: 11,
                     ),
                   ),
                 ),
