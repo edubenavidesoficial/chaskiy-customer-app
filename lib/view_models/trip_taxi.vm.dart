@@ -139,7 +139,9 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
 
   Future<bool> _synchronizeTripAfterCancellation() async {
     try {
-      final serverTrip = await taxiRequest.getOnGoingTrip();
+      final serverTrip = await activeTripCoordinator.synchronize(
+        onGoingOrderTrip,
+      );
       if (serverTrip == null || !serverTrip.isOngoing) {
         _clearFinishedTrip();
         return false;
@@ -265,6 +267,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
             onGoingOrderTrip?.taxiOrder?.dropoffLongitude.toDoubleOrNull(),
         address: onGoingOrderTrip?.taxiOrder?.dropoffAddress,
       );
+      _restoreTaxiStops();
       //set the pickup and drop off locations
       drawTripPolyLines();
       startHandlingOnGoingTrip();
@@ -366,31 +369,18 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
         .collection("orders")
         .doc("${onGoingOrderTrip?.code}")
         .snapshots()
-        .listen((event) async {
-          //once driver is assigned
-
-          final driverId =
-              event.data() != null ? event.data()!["driver_id"] ?? null : null;
-          if (driverId != null && onGoingOrderTrip?.driverId == null) {
-            onGoingOrderTrip?.driverId = event.data()!["driver_id"];
-            onGoingOrderTrip?.driver = event.data()!["driver"] ?? null;
-          }
-
-          //
-          if (onGoingOrderTrip?.driver == null) {
-            await loadDriverDetails();
-          }
-          startDriverDetailsListener();
-
-          //update the rest onGoingTrip details
-          if (event.exists) {
-            onGoingOrderTrip?.status = event.data()?["status"] ?? "failed";
-            unawaited(ActiveTaxiTripService.save(onGoingOrderTrip));
-          }
-          //
-          notifyListeners();
-          loadTripUIByOrderStatus();
-        });
+        .listen(
+          (event) {
+            // Firestore is a wake-up hint. Cached or partial documents must not
+            // overwrite the API state (especially with an invented "failed").
+            if (event.exists && !event.metadata.isFromCache) {
+              unawaited(_refreshTripFromApi());
+            }
+          },
+          onError: (Object _) {
+            // API polling remains active when the realtime channel is offline.
+          },
+        );
     //start order details listening stream
   }
 
@@ -412,7 +402,19 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
       final previousStatus = knownTrip.status;
       final refreshedTrip = await activeTripCoordinator.synchronize(knownTrip);
       if (refreshedTrip == null) return;
+      if (onGoingOrderTrip?.id != knownTrip.id) return;
       onGoingOrderTrip = refreshedTrip;
+      pickupLocation = DeliveryAddress(
+        latitude: refreshedTrip.taxiOrder?.pickupLatitude.toDoubleOrNull(),
+        longitude: refreshedTrip.taxiOrder?.pickupLongitude.toDoubleOrNull(),
+        address: refreshedTrip.taxiOrder?.pickupAddress,
+      );
+      dropoffLocation = DeliveryAddress(
+        latitude: refreshedTrip.taxiOrder?.dropoffLatitude.toDoubleOrNull(),
+        longitude: refreshedTrip.taxiOrder?.dropoffLongitude.toDoubleOrNull(),
+        address: refreshedTrip.taxiOrder?.dropoffAddress,
+      );
+      _restoreTaxiStops();
       final driverAssigned =
           previousDriverId == null && refreshedTrip.driverId != null;
       final statusChanged = previousStatus != refreshedTrip.status;
@@ -428,6 +430,31 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
       // The next interval retries. Firestore remains an optional fast hint.
     } finally {
       _refreshingTrip = false;
+    }
+  }
+
+  void _restoreTaxiStops() {
+    final stops = [...?onGoingOrderTrip?.orderStops]
+      ..sort((a, b) => a.sequence.compareTo(b.sequence));
+    taxiStops =
+        stops
+            .where((stop) => !stop.verified)
+            .map((stop) => stop.deliveryAddress)
+            .whereType<DeliveryAddress>()
+            .toList();
+  }
+
+  DeliveryAddress? get _tripTarget =>
+      onGoingOrderTrip?.canZoomOnPickupLocation == true
+          ? pickupLocation
+          : (taxiStops.isNotEmpty ? taxiStops.first : dropoffLocation);
+
+  Future<void> resumeTripUpdates() async {
+    // Returning from an address/payment picker must preserve a draft booking.
+    if (onGoingOrderTrip == null) return;
+    await _refreshTripFromApi();
+    if (onGoingOrderTrip?.isOngoing == true) {
+      await _refreshDriverLocationFromApi();
     }
   }
 
@@ -532,7 +559,8 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   void _updateRouteProgress(LatLng position) {
     final trip = onGoingOrderTrip;
     if (trip == null || polylineCoordinates.length < 2) return;
-    final phase = trip.canZoomOnPickupLocation ? 'pickup' : 'dropoff';
+    final phase =
+        '${trip.canZoomOnPickupLocation ? 'pickup' : 'dropoff'}:${_tripTarget?.latitude},${_tripTarget?.longitude}';
     if (_liveRoutePhase != phase) {
       unawaited(_refreshLiveRoute(position));
       return;
@@ -600,10 +628,10 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   Future<void> _refreshLiveRoute(LatLng driver) async {
     final trip = onGoingOrderTrip;
     if (trip == null || _refreshingLiveRoute) return;
-    final target =
-        trip.canZoomOnPickupLocation ? pickupLocation : dropoffLocation;
+    final target = _tripTarget;
     if (target?.latitude == null || target?.longitude == null) return;
-    final phase = trip.canZoomOnPickupLocation ? 'pickup' : 'dropoff';
+    final phase =
+        '${trip.canZoomOnPickupLocation ? 'pickup' : 'dropoff'}:${_tripTarget?.latitude},${_tripTarget?.longitude}';
     final now = DateTime.now();
     if (_lastLiveRouteRequestPhase == phase &&
         _lastLiveRouteRefresh != null &&
@@ -633,10 +661,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
   }
 
   void _updateDriverProgress(LatLng position) {
-    final target =
-        onGoingOrderTrip?.canZoomOnPickupLocation == true
-            ? pickupLocation
-            : dropoffLocation;
+    final target = _tripTarget;
     if (target?.latitude == null || target?.longitude == null) return;
     final meters = Geolocator.distanceBetween(
       position.latitude,
@@ -671,12 +696,12 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
         movedMeters < 100) {
       return;
     }
-    final target =
-        onGoingOrderTrip?.canZoomOnPickupLocation == true
-            ? pickupLocation
-            : dropoffLocation;
+    final target = _tripTarget;
     if (target?.latitude == null || target?.longitude == null) return;
     _loadingTrafficEta = true;
+    // Throttle failed requests too while connectivity is poor.
+    _lastTrafficEtaAt = DateTime.now();
+    _lastTrafficEtaPosition = position;
     try {
       final estimate = await getRouteTravelEstimate(
         origin: position,
@@ -836,7 +861,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
       //zoom to driver and dropoff latbound
       updateCameraLocation(
         driverPosition!,
-        LatLng(dropoffLocation!.latitude!, dropoffLocation!.longitude!),
+        LatLng(_tripTarget!.latitude!, _tripTarget!.longitude!),
         googleMapController,
       );
     }
@@ -922,6 +947,7 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
 
   closeOrderSummary({bool clear = true}) {
     if (clear) {
+      taxiStops.clear();
       pickupLocation = null;
       dropoffLocation = null;
       pickupLocationTEC.clear();

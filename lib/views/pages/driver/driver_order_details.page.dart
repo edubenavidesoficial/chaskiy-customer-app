@@ -34,6 +34,7 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
   final ImagePicker _imagePicker = ImagePicker();
   late Order _order = widget.order;
   bool _loading = false;
+  bool _refreshing = false;
   Timer? _refreshTimer;
 
   @override
@@ -61,16 +62,24 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
   }.contains(_order.status.toLowerCase());
 
   Future<void> _refresh({bool silent = false}) async {
+    if (_refreshing || _loading) return;
+    _refreshing = true;
+    final previousOrder = _order;
     try {
-      final order = await _request.getOrderDetails(id: _order.id);
-      if (mounted) setState(() => _order = order);
+      final order = await _request.getOrderDetails(id: previousOrder.id);
+      // A poll begun before a status change must not undo its response.
+      if (mounted && !_loading && identical(_order, previousOrder)) {
+        setState(() => _order = order);
+      }
     } catch (error) {
       if (!silent) _showError(error);
+    } finally {
+      _refreshing = false;
     }
   }
 
-  Future<void> _changeStatus(String status) async {
-    if (_loading) return;
+  Future<bool> _changeStatus(String status) async {
+    if (_loading) return false;
     setState(() => _loading = true);
     try {
       final order = await _request.updateDriverOrder(
@@ -78,8 +87,10 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
         status: status,
       );
       if (mounted) setState(() => _order = order);
+      return order.status.toLowerCase() == status;
     } catch (error) {
       _showError(error);
+      return false;
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -146,9 +157,11 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Confirmar entrega'),
-            content: const Text(
-              'Confirma que entregaste los productos indicados en esta dirección.',
+            title: Text(_isTaxi ? 'Confirmar parada' : 'Confirmar entrega'),
+            content: Text(
+              _isTaxi
+                  ? 'Confirma que llegaste a esta parada con el pasajero.'
+                  : 'Confirma que entregaste los productos indicados en esta dirección.',
             ),
             actions: [
               TextButton(
@@ -182,6 +195,11 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
       'enroute' => 'delivered',
       _ => 'ready',
     };
+    if (next == 'delivered' &&
+        (_order.orderStops ?? []).any((stop) => !stop.verified)) {
+      _showError('Confirma cada parada antes de completar la ruta.');
+      return;
+    }
     final requiresCode =
         AppTaxiSettings.requiredBookingCode &&
         ((next == 'enroute' && AppTaxiSettings.requiredBookingCodeBeforeTrip) ||
@@ -193,8 +211,8 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
       );
       if (verified != true) return;
     }
-    await _changeStatus(next);
-    if (next == 'delivered' && mounted) {
+    final succeeded = await _changeStatus(next);
+    if (succeeded && next == 'delivered' && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Viaje completado correctamente')),
       );
@@ -416,6 +434,22 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
           longitude: taxi.pickupLongitude,
         ),
       );
+      final intermediateStops = [...?_order.orderStops]
+        ..sort((a, b) => a.sequence.compareTo(b.sequence));
+      for (final stop in intermediateStops) {
+        final address = stop.deliveryAddress;
+        if (address == null) continue;
+        stops.add(
+          _Stop(
+            label: 'Parada ${stop.sequence}',
+            address: address.address ?? '',
+            latitude: '${address.latitude}',
+            longitude: '${address.longitude}',
+            stopId: stop.id,
+            verified: stop.verified,
+          ),
+        );
+      }
       stops.add(
         _Stop(
           label: 'Destino',
@@ -636,6 +670,21 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
               ],
             ),
           ],
+          if (!_isTaxi && _order.deliveryFee != null) ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: Text('Valor del envío incluido', style: mutedStyle),
+                ),
+                Text(
+                  "$currencySymbol ${_order.deliveryFee}".currencyFormat(
+                    currencySymbol,
+                  ),
+                ),
+              ],
+            ),
+          ],
           Divider(height: 24, color: scheme.outlineVariant),
           Row(
             children: [
@@ -781,7 +830,7 @@ class _StopTile extends StatelessWidget {
                   ],
                   if (stop.verified)
                     Text(
-                      'Entregado',
+                      'Realizada',
                       style: theme.textTheme.labelMedium?.copyWith(
                         color: Colors.green.shade700,
                         fontWeight: FontWeight.w700,

@@ -279,7 +279,13 @@ class OrderDetailsViewModel extends CheckoutBaseViewModel {
     await fetchOrderDetails(silent: true);
   }
 
-  Future<void> shareTaxiTrip() => TaxiTripShareService.share(order);
+  Future<void> shareTaxiTrip() async {
+    try {
+      await TaxiTripShareService.share(order);
+    } catch (error) {
+      toastError(error.toString());
+    }
+  }
 
   openPaymentMethodSelection() async {
     //

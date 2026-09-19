@@ -78,6 +78,15 @@ class NewTaxiOrderSummaryCollapsed extends StatelessWidget {
                   ],
                 ),
               ),
+              TextButton.icon(
+                onPressed: vm.loadingVehicleTypes ? null : vm.editTaxiStops,
+                icon: const Icon(Icons.add_location_alt_outlined),
+                label: Text(
+                  vm.taxiStops.isEmpty
+                      ? 'Añadir paradas'
+                      : '${vm.taxiStops.length} paradas · Editar',
+                ),
+              ),
               if (vm.hasConfirmedVehicleChoice)
                 _ConfirmedVehicleCard(vm: vm)
               else

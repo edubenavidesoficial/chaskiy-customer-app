@@ -21,7 +21,7 @@ class NewTaxiVehicleTypeListView extends StatelessWidget {
     final cardWidth = (width * .34).clamp(124.0, 154.0);
 
     return LoadingIndicator(
-      loading: vm.busy(vm.vehicleTypes),
+      loading: vm.loadingVehicleTypes,
       child: SizedBox(
         height: 154,
         child:

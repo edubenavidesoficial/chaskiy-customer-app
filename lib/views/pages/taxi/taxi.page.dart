@@ -32,6 +32,7 @@ class _TaxiPageState extends State<TaxiPage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     taxiViewModel = TaxiViewModel(
       context,
       widget.vendorType,
@@ -42,9 +43,16 @@ class _TaxiPageState extends State<TaxiPage> with WidgetsBindingObserver {
   //
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // if (state == AppLifecycleState. resumed) {
-    // }
-    taxiViewModel.setGoogleMapStyle();
+    if (state == AppLifecycleState.resumed) {
+      taxiViewModel.resumeTripUpdates();
+      taxiViewModel.setGoogleMapStyle();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override

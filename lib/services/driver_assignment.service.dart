@@ -32,13 +32,10 @@ class DriverAssignmentService {
       final user = await AuthServices.getCurrentUser();
       if (!user.isOnline) return;
 
-      try {
-        await FirebaseMessaging.instance.subscribeToTopic('d_${user.id}');
-      } catch (_) {
-        // FCM solo adelanta el aviso. El sondeo API sigue funcionando aunque
-        // no exista token, el permiso esté denegado o APNs aún no esté listo.
-      }
-      await _poll();
+      // Subscribe independently: a delayed FCM/APNs handshake must never
+      // block the deterministic API polling channel.
+      unawaited(_subscribeToAssignments(user.id));
+      unawaited(_poll());
       // FCM wakes this service immediately when available. A short API poll is
       // the deterministic fallback for shared hosting, restricted networks and
       // devices where push delivery is delayed.
@@ -50,6 +47,14 @@ class DriverAssignmentService {
       });
     } finally {
       _starting = false;
+    }
+  }
+
+  Future<void> _subscribeToAssignments(int userId) async {
+    try {
+      await FirebaseMessaging.instance.subscribeToTopic('d_$userId');
+    } catch (_) {
+      // Polling continues even when notification registration fails.
     }
   }
 

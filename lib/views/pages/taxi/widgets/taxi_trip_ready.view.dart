@@ -60,6 +60,19 @@ class TaxiTripReadyView extends StatelessWidget {
                   pickup: '${trip.taxiOrder?.pickupAddress}',
                   dropoff: '${trip.taxiOrder?.dropoffAddress}',
                 ),
+                for (final stop in trip.orderStops ?? [])
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      stop.verified
+                          ? Icons.check_circle_outline
+                          : Icons.location_on_outlined,
+                    ),
+                    title: Text(
+                      'Parada ${stop.sequence}: ${stop.deliveryAddress?.address ?? ""}',
+                    ),
+                    subtitle: Text(stop.verified ? 'Realizada' : 'Pendiente'),
+                  ),
                 if (const {
                   'pending',
                   'preparing',
@@ -179,7 +192,7 @@ class _LiveTrackingStatus extends StatelessWidget {
           Expanded(
             child: Text(
               paused
-                  ? 'Ubicación del conductor pausada'
+                  ? 'Sin señal reciente · viaje activo'
                   : stale
                   ? 'Recuperando ubicación del conductor…'
                   : 'En vivo · hace ${age}s',

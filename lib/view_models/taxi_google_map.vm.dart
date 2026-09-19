@@ -26,6 +26,8 @@ import 'package:http/http.dart' as http;
 class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
   //
   int currentOrderStep = 1;
+  int _pickupLookupRevision = 0;
+  List<DeliveryAddress> taxiStops = [];
   int currentAddressSelectionStep = 1;
   bool onTrip = false;
   bool ignoreMapInteraction = false;
@@ -72,6 +74,7 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
 
   //
   dispose() {
+    _pickupLookupRevision++;
     super.dispose();
     currentLocationListener?.cancel();
     nearbyDriversTimer?.cancel();
@@ -482,9 +485,15 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
 
   //setupCurrentLocationAsPickuplocation()
   Future<void> setupCurrentLocationAsPickuplocation() async {
+    final revision = ++_pickupLookupRevision;
+    final originalPickup = pickupLocation;
+    bool canApply() =>
+        revision == _pickupLookupRevision &&
+        !onTrip &&
+        identical(pickupLocation, originalPickup);
     try {
       if (!await Geolocator.isLocationServiceEnabled()) {
-        if (await _useBestKnownPickupLocation()) return;
+        if (await _useBestKnownPickupLocation(canApply)) return;
         _requireManualPickup(
           'Activa la ubicación o selecciona manualmente el punto de partida.',
         );
@@ -497,7 +506,7 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
       }
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        if (await _useBestKnownPickupLocation()) return;
+        if (await _useBestKnownPickupLocation(canApply)) return;
         _requireManualPickup(
           'Permite el acceso a tu ubicación o selecciona manualmente el punto de partida.',
         );
@@ -511,17 +520,30 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
         ),
       );
 
+      if (!canApply()) return;
+      if (!_isReliablePickupPosition(currentLocation)) {
+        _requireManualPickup(
+          'La ubicación tiene poca precisión. Confirma el punto de partida en el mapa.',
+        );
+        return;
+      }
       // Preserve the valid GPS position even when reverse geocoding fails.
       _setPickupLocation(
         latitude: currentLocation.latitude,
         longitude: currentLocation.longitude,
       );
 
+      final appliedPickup = pickupLocation;
       try {
         final addresses = await GeocoderService().findAddressesFromCoordinates(
           Coordinates(currentLocation.latitude, currentLocation.longitude),
         );
-        if (addresses.isNotEmpty) {
+        if (revision == _pickupLookupRevision &&
+            !onTrip &&
+            identical(pickupLocation, appliedPickup) &&
+            addresses.isNotEmpty &&
+            pickupLocation?.latitude == currentLocation.latitude &&
+            pickupLocation?.longitude == currentLocation.longitude) {
           final address = addresses.first;
           _setPickupLocation(
             latitude: currentLocation.latitude,
@@ -534,7 +556,7 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
         // The coordinates already provide a valid pickup point.
       }
     } catch (_) {
-      if (await _useBestKnownPickupLocation()) return;
+      if (await _useBestKnownPickupLocation(canApply)) return;
       _requireManualPickup(
         'No pudimos confirmar tu ubicación actual. Selecciona el punto de partida en el mapa.',
       );
@@ -543,12 +565,13 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
 
   /// Recuperación progresiva para que un timeout breve del GPS no deje al
   /// usuario sin origen ni muestre un error invasivo.
-  Future<bool> _useBestKnownPickupLocation() async {
+  Future<bool> _useBestKnownPickupLocation(bool Function() canApply) async {
     try {
       final lastPosition = await Geolocator.getLastKnownPosition();
-      if (_validCoordinates(lastPosition?.latitude, lastPosition?.longitude)) {
+      if (!canApply()) return true;
+      if (lastPosition != null && _isReliablePickupPosition(lastPosition)) {
         _setPickupLocation(
-          latitude: lastPosition!.latitude,
+          latitude: lastPosition.latitude,
           longitude: lastPosition.longitude,
         );
         return true;
@@ -557,31 +580,20 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
       // Continúa con la dirección persistida por Inicio.
     }
 
-    final savedAddress = await LocationService.restoreSelectedAddress();
-    if (_validCoordinates(savedAddress?.latitude, savedAddress?.longitude)) {
-      _setPickupLocation(
-        latitude: savedAddress!.latitude!,
-        longitude: savedAddress.longitude!,
-        address: savedAddress.address,
-        name: savedAddress.name,
-      );
-      return true;
-    }
-
-    final currentAddress = LocationService.currenctAddress;
-    final latitude = currentAddress?.coordinates?.latitude;
-    final longitude = currentAddress?.coordinates?.longitude;
-    if (_validCoordinates(latitude, longitude)) {
-      _setPickupLocation(
-        latitude: latitude!,
-        longitude: longitude!,
-        address: currentAddress?.addressLine,
-        name: currentAddress?.featureName,
-      );
-      return true;
-    }
+    // Saved addresses have no GPS timestamp or accuracy. They remain
+    // selectable manually, but must never be labelled as the current pickup.
 
     return false;
+  }
+
+  bool _isReliablePickupPosition(Position position) {
+    final age = DateTime.now().difference(position.timestamp);
+    return _validCoordinates(position.latitude, position.longitude) &&
+        age >= Duration.zero &&
+        age <= const Duration(minutes: 2) &&
+        position.accuracy.isFinite &&
+        position.accuracy >= 0 &&
+        position.accuracy <= 75;
   }
 
   bool _validCoordinates(double? latitude, double? longitude) =>
@@ -681,38 +693,37 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     );
     //load the ploylines
     polylineCoordinates.clear();
-    PolylineResult? polylineResult;
-    try {
-      polylineResult = await polylinePoints.getRouteBetweenCoordinates(
-        AppStrings.googleMapApiKey,
-        PointLatLng(pickupLocation!.latitude!, pickupLocation!.longitude!),
-        PointLatLng(dropoffLocation!.latitude!, dropoffLocation!.longitude!),
+    final routePoints = <LatLng>[
+      LatLng(pickupLocation!.latitude!, pickupLocation!.longitude!),
+      for (final stop in taxiStops)
+        if (stop.latitude != null && stop.longitude != null)
+          LatLng(stop.latitude!, stop.longitude!),
+      LatLng(dropoffLocation!.latitude!, dropoffLocation!.longitude!),
+    ];
+    gMapMarkers.removeWhere(
+      (marker) => marker.markerId.value.startsWith('taxiStop'),
+    );
+    for (var i = 1; i < routePoints.length - 1; i++) {
+      gMapMarkers.add(
+        Marker(
+          markerId: MarkerId('taxiStop$i'),
+          position: routePoints[i],
+          infoWindow: InfoWindow(title: 'Parada $i'),
+        ),
       );
-    } catch (_) {
-      polylineResult = null;
     }
-    //get the points from the result
-    List<PointLatLng> result = polylineResult?.points ?? const [];
-    if (result.isEmpty) {
-      result = await getDrivingRoutePoints(
-        LatLng(pickupLocation!.latitude!, pickupLocation!.longitude!),
-        LatLng(dropoffLocation!.latitude!, dropoffLocation!.longitude!),
+    for (var i = 1; i < routePoints.length; i++) {
+      final leg = await getDrivingRoutePoints(
+        routePoints[i - 1],
+        routePoints[i],
       );
-    }
-    //
-    if (result.isNotEmpty) {
-      // loop through all PointLatLng points and convert them
-      // to a list of LatLng, required by the Polyline
-      result.forEach((PointLatLng point) {
-        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-      });
-    } else {
-      // La Directions API heredada puede estar deshabilitada. Nunca dejamos
-      // el viaje sin representación visual: mostramos origen y destino unidos.
-      polylineCoordinates.addAll([
-        LatLng(pickupLocation!.latitude!, pickupLocation!.longitude!),
-        LatLng(dropoffLocation!.latitude!, dropoffLocation!.longitude!),
-      ]);
+      if (leg.isNotEmpty) {
+        polylineCoordinates.addAll(
+          leg.map((point) => LatLng(point.latitude, point.longitude)),
+        );
+      } else {
+        polylineCoordinates.addAll([routePoints[i - 1], routePoints[i]]);
+      }
     }
 
     // with an id, an RGB color and the list of LatLng pairs

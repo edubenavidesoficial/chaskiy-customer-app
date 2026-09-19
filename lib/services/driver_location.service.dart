@@ -47,6 +47,7 @@ class DriverLocationService {
         );
       }
 
+      if (!_shouldRun || !SessionService.isDriver) return;
       final settings = _settings();
       _subscription = Geolocator.getPositionStream(
         locationSettings: settings,
@@ -73,6 +74,13 @@ class DriverLocationService {
   /// Así el pasajero nunca verá "En vivo" sobre un GPS que quedó congelado.
   Future<void> _requestFreshPosition(LocationSettings settings) async {
     if (_checkingPosition || !_shouldRun || !SessionService.isDriver) return;
+    // The stream already supplies fresh fixes while moving. Avoid opening a
+    // second GPS request every heartbeat when a recent fix was delivered.
+    if (_lastPosition != null &&
+        DateTime.now().difference(_lastPosition!.timestamp) <
+            const Duration(seconds: 10)) {
+      return;
+    }
     _checkingPosition = true;
     try {
       final position = await Geolocator.getCurrentPosition(
@@ -169,9 +177,7 @@ class DriverLocationService {
     final subscription = _subscription;
     _subscription = null;
     await subscription?.cancel();
-    _syncing = false;
-    _checkingPosition = false;
-    _starting = false;
+    _lastPosition = null;
     _lastSync = null;
   }
 

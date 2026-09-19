@@ -60,20 +60,23 @@ class VehicleType {
 
   factory VehicleType.fromJson(Map<String, dynamic> json) {
     return VehicleType(
-      id: json["id"],
+      id: int.parse('${json["id"]}'),
       name: json["name"],
-      slug: json["slug"],
+      slug: json["slug"]?.toString() ?? '',
       baseFare: json["base_fare"].toString().toDoubleOrNull() ?? 0,
       distanceFare: json["distance_fare"].toString().toDoubleOrNull() ?? 0,
       timeFare: json["time_fare"].toString().toDoubleOrNull() ?? 0,
       minFare: json["min_fare"].toString().toDoubleOrNull() ?? 0,
       total: json["total"].toString().toDoubleOrNull() ?? 0,
       tax: json["tax"].toString().toDoubleOrNull() ?? 0,
-      isActive: json["is_active"],
-      createdAt: DateTime.parse(json["created_at"]),
-      updatedAt: DateTime.parse(json["updated_at"]),
-      formattedDate: json["formatted_date"],
-      photo: json["photo"],
+      isActive:
+          json["is_active"] == true
+              ? 1
+              : int.tryParse('${json["is_active"]}') ?? 0,
+      createdAt: DateTime.tryParse('${json["created_at"]}') ?? DateTime(1970),
+      updatedAt: DateTime.tryParse('${json["updated_at"]}') ?? DateTime(1970),
+      formattedDate: json["formatted_date"]?.toString() ?? '',
+      photo: json["photo"]?.toString() ?? '',
       encrypted: json["encrypted"],
       currency:
           json["currency"] != null ? Currency.fromJSON(json["currency"]) : null,

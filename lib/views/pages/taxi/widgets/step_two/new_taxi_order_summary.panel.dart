@@ -12,10 +12,8 @@ import 'package:measure_size/measure_size.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class NewTaxiOrderSummaryPanel extends StatelessWidget {
-  const NewTaxiOrderSummaryPanel(
-    this.newTaxiOrderSummaryViewModel, {
-    Key? key,
-  }) : super(key: key);
+  const NewTaxiOrderSummaryPanel(this.newTaxiOrderSummaryViewModel, {Key? key})
+    : super(key: key);
 
   final NewTaxiOrderSummaryViewModel newTaxiOrderSummaryViewModel;
 
@@ -26,59 +24,59 @@ class NewTaxiOrderSummaryPanel extends StatelessWidget {
       onChange: (size) {
         vm.updateGoogleMapPadding(height: size.height + Vx.dp40);
       },
-      child: VStack(
-        [
-          VStack(
-            [
-              //
-              HStack(
-                [
-                  //previous
-                  CustomTextButton(
-                    padding: EdgeInsets.zero,
-                    title: "Back".tr(),
-                    onPressed: newTaxiOrderSummaryViewModel.closePanel,
-                  ).h(24),
-                  UiSpacer.swipeIndicator().px12().expand(),
-                  //cancel book
-                  CustomTextButton(
-                    padding: EdgeInsets.zero,
-                    title: "Cancel".tr(),
-                    titleColor: Colors.red,
-                    onPressed: vm.closeOrderSummary,
-                  ).h(24),
-                ],
-              ),
-              UiSpacer.verticalSpace(),
-              //vehicle types
-              TaxiVehicleTypeListView(vm: vm, min: false).expand(),
-              UiSpacer.vSpace(),
-            ],
-          ).safeArea().p20().expand(),
-          VStack(
-            [
-              //discount section
-              TaxiDiscountSection(vm, fullView: true).box.p8.make().py8(),
-              //selected payment method
-              NewTaxiOrderPaymentMethodSelectionView(
-                vm: newTaxiOrderSummaryViewModel,
-              ),
-              UiSpacer.vSpace(10),
-              OrderTaxiButton(vm),
-            ],
-          )
-              .safeArea(top: false)
-              .pSymmetric(h: 20, v: 12)
-              .box
-              .shadow2xl
+      child:
+          VStack([
+                VStack([
+                  //
+                  HStack([
+                    //previous
+                    CustomTextButton(
+                      padding: EdgeInsets.zero,
+                      title: "Back".tr(),
+                      onPressed: newTaxiOrderSummaryViewModel.closePanel,
+                    ).h(24),
+                    UiSpacer.swipeIndicator().px12().expand(),
+                    //cancel book
+                    CustomTextButton(
+                      padding: EdgeInsets.zero,
+                      title: "Cancel".tr(),
+                      titleColor: Colors.red,
+                      onPressed: vm.closeOrderSummary,
+                    ).h(24),
+                  ]),
+                  UiSpacer.verticalSpace(),
+                  TextButton.icon(
+                    onPressed: vm.editTaxiStops,
+                    icon: const Icon(Icons.add_location_alt_outlined),
+                    label: Text('Paradas: ${vm.taxiStops.length} · Editar'),
+                  ),
+                  //vehicle types
+                  TaxiVehicleTypeListView(vm: vm, min: false).expand(),
+                  UiSpacer.vSpace(),
+                ]).safeArea().p20().expand(),
+                VStack([
+                      //discount section
+                      TaxiDiscountSection(
+                        vm,
+                        fullView: true,
+                      ).box.p8.make().py8(),
+                      //selected payment method
+                      NewTaxiOrderPaymentMethodSelectionView(
+                        vm: newTaxiOrderSummaryViewModel,
+                      ),
+                      UiSpacer.vSpace(10),
+                      OrderTaxiButton(vm),
+                    ])
+                    .safeArea(top: false)
+                    .pSymmetric(h: 20, v: 12)
+                    .box
+                    .shadow2xl
+                    .color(context.theme.colorScheme.surface)
+                    .make(),
+              ]).box
               .color(context.theme.colorScheme.surface)
+              .topRounded(value: 5)
               .make(),
-        ],
-      )
-          .box
-          .color(context.theme.colorScheme.surface)
-          .topRounded(value: 5)
-          .make(),
     );
   }
 }

@@ -36,9 +36,7 @@ class TaxiRequest extends HttpService {
     final apiResult = await get("${Api.vehicleTypes}", forceRefresh: true);
     final apiResponse = ApiResponse.fromResponse(apiResult);
     if (apiResponse.allGood) {
-      return (apiResponse.body as List)
-          .map((object) => VehicleType.fromJson(object))
-          .toList();
+      return parseVehicleTypes(apiResponse.body);
     } else {
       throw apiResponse.message!;
     }
@@ -49,33 +47,51 @@ class TaxiRequest extends HttpService {
     DeliveryAddress pickup,
     DeliveryAddress dropoff, {
     String? countryCode,
+    List<DeliveryAddress> stops = const [],
   }) async {
     //
     final apiResult = await get(
       "${Api.vehicleTypePricing}",
+      forceRefresh: true,
       queryParameters: {
         "pickup": "${pickup.latitude},${pickup.longitude}",
+        for (var i = 0; i < stops.length; i++) ...{
+          'stops[$i][lat]': stops[i].latitude,
+          'stops[$i][lng]': stops[i].longitude,
+          'stops[$i][address]': stops[i].address,
+        },
         "dropoff": "${dropoff.latitude},${dropoff.longitude}",
-        "country_code": "$countryCode",
+        if (countryCode != null && countryCode.trim().isNotEmpty)
+          "country_code": countryCode.trim(),
       },
     );
     final apiResponse = ApiResponse.fromResponse(apiResult);
     if (apiResponse.allGood) {
-      List<VehicleType> vehicleTypes = [];
-      (apiResponse.body as List).forEach((object) {
-        //
-        try {
-          final vehicleType = VehicleType.fromJson(object);
-          vehicleTypes.add(vehicleType);
-        } catch (e) {
-          print(e);
-        }
-      });
-
-      return vehicleTypes;
+      return parseVehicleTypes(apiResponse.body);
     } else {
       throw apiResponse.message!;
     }
+  }
+
+  /// Accept the list and the standard API resource envelope. A malformed
+  /// response is an error, never evidence that no vehicles are available.
+  static List<VehicleType> parseVehicleTypes(dynamic body) {
+    final items = body is Map ? body['data'] : body;
+    if (items is! List) {
+      throw const FormatException('Respuesta de vehículos inválida');
+    }
+    final vehicles = <VehicleType>[];
+    for (final item in items) {
+      try {
+        vehicles.add(VehicleType.fromJson(Map<String, dynamic>.from(item)));
+      } catch (_) {
+        // One malformed option must not hide the remaining valid vehicles.
+      }
+    }
+    if (items.isNotEmpty && vehicles.isEmpty) {
+      throw const FormatException('No se pudieron interpretar los vehículos');
+    }
+    return vehicles;
   }
 
   Future<ApiResponse> locationAvailable(
@@ -100,6 +116,7 @@ class TaxiRequest extends HttpService {
     // sale de la pantalla de búsqueda de conductor
     final apiResult = await get(
       "${Api.currentTaxiBooking}",
+      queryParameters: {'role': 'customer'},
       forceRefresh: true,
     );
     //

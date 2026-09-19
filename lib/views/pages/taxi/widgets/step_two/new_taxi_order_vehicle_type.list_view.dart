@@ -33,7 +33,7 @@ class TaxiVehicleTypeListView extends StatelessWidget {
           padding: EdgeInsets.zero,
           noScrollPhysics: true,
           dataSet: mVehicleTypes,
-          isLoading: vm.busy(vm.vehicleTypes),
+          isLoading: vm.loadingVehicleTypes,
           itemBuilder: (context, index) {
             final vehicleType = mVehicleTypes[index];
             return HorizontalVehicleTypeListItem(vm, vehicleType);

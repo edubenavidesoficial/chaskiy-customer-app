@@ -78,9 +78,9 @@ class _DriverHomePageState extends State<DriverHomePage>
 
     // El modo conductor no pasa por HomeViewModel. Inicializa aquí FCM y el
     // sondeo para recibir asignaciones desde cualquier pestaña del módulo.
+    if (user.isOnline) unawaited(_recoverDriverRuntime());
+    // Notification registration must not delay GPS or assignment polling.
     await SetupService.init();
-    if (!user.isOnline || !mounted) return;
-    unawaited(_recoverDriverRuntime());
   }
 
   Future<void> _recoverDriverRuntime({bool notifyFailure = false}) async {

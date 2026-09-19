@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:chaskiy/constants/app_routes.dart';
 import 'package:chaskiy/constants/app_ui_settings.dart';
 import 'package:chaskiy/models/checkout.dart';
+import 'package:chaskiy/models/delivery_address.dart';
 import 'package:chaskiy/models/coupon.dart';
 import 'package:chaskiy/models/order.dart';
 import 'package:chaskiy/models/payment_method.dart';
@@ -48,6 +49,8 @@ class TaxiViewModel extends TripTaxiViewModel {
   Coupon? coupon;
   TextEditingController couponTEC = TextEditingController();
   bool vehicleTypesLoadFailed = false;
+  int _vehiclePricingRevision = 0;
+  bool get loadingVehicleTypes => busy('vehicleTypePricing');
   String preferredVehicleKind = 'car';
   int? preferredVehicleTypeId;
   bool showAllVehicleOptions = false;
@@ -152,14 +155,20 @@ class TaxiViewModel extends TripTaxiViewModel {
   //checking if taxi booking is enabled in the given location
   checkLocationAvailabilityForStep2() async {
     setBusy(true);
-    final apiResponse = await taxiRequest.locationAvailable(
-      pickupLocation?.latitude ?? 0.00,
-      pickupLocation?.longitude ?? 0.00,
-    );
-    if (apiResponse.allGood) {
-      prepareStep2();
-    } else {
-      setCurrentStep(0);
+    try {
+      final apiResponse = await taxiRequest.locationAvailable(
+        pickupLocation!.latitude!,
+        pickupLocation!.longitude!,
+      );
+      if (apiResponse.allGood) {
+        prepareStep2();
+      } else if (apiResponse.code != null && apiResponse.code! < 500) {
+        setCurrentStep(0);
+      } else {
+        toastError(apiResponse.message ?? 'No se pudo verificar la cobertura');
+      }
+    } catch (_) {
+      toastError('No se pudo verificar la cobertura. Inténtalo nuevamente.');
     }
     setBusy(false);
   }
@@ -173,17 +182,21 @@ class TaxiViewModel extends TripTaxiViewModel {
 
   //vehicle types
   fetchVehicleTypes() async {
-    setBusyForObject(vehicleTypes, true);
+    final revision = ++_vehiclePricingRevision;
+    setBusyForObject('vehicleTypePricing', true);
     vehicleTypesLoadFailed = false;
     vehicleTypes = [];
     selectedVehicleType = null;
     try {
-      vehicleTypes = await taxiRequest.getVehicleTypePricing(
+      final options = await taxiRequest.getVehicleTypePricing(
         pickupLocation!,
         dropoffLocation!,
         countryCode: LocationService.currenctAddress?.countryCode,
+        stops: List.of(taxiStops),
       );
-      vehicleTypesLoadFailed = vehicleTypes.isEmpty;
+
+      if (revision != _vehiclePricingRevision) return;
+      vehicleTypes = options;
       final preferredVehicle = _preferredVehicleFrom(vehicleTypes);
       if (preferredVehicle != null) {
         final exactPreferenceAvailable =
@@ -194,11 +207,107 @@ class TaxiViewModel extends TripTaxiViewModel {
         changeSelectedVehicleType(preferredVehicle, rememberSelection: false);
       }
     } catch (error) {
+      if (revision != _vehiclePricingRevision) return;
       print("Error getting vehicleTypes ==> $error");
       vehicleTypesLoadFailed = true;
     }
-    setBusyForObject(vehicleTypes, false);
+    setBusyForObject('vehicleTypePricing', false);
     notifyListeners();
+  }
+
+  Future<void> editTaxiStops() async {
+    if (onTrip) return;
+    var changed = false;
+    void invalidateQuote() {
+      changed = true;
+      _vehiclePricingRevision++;
+      selectedVehicleType = null;
+      vehicleTypes = [];
+      setBusyForObject('vehicleTypePricing', false);
+      notifyListeners();
+    }
+
+    await showModalBottomSheet<void>(
+      context: viewContext,
+      isScrollControlled: true,
+      builder:
+          (context) => StatefulBuilder(
+            builder: (context, update) {
+              return SafeArea(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Paradas intermedias',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const Text(
+                          'Se visitan en este orden, antes del destino final. La tarifa incluye todas las paradas.',
+                        ),
+                        for (var i = 0; i < taxiStops.length; i++)
+                          ListTile(
+                            title: Text('${i + 1}. ${taxiStops[i].address}'),
+                            trailing: IconButton(
+                              tooltip: 'Quitar parada',
+                              icon: const Icon(Icons.close),
+                              onPressed: () {
+                                update(() => taxiStops.removeAt(i));
+                                invalidateQuote();
+                              },
+                            ),
+                          ),
+                        if (taxiStops.length < 4)
+                          TextButton.icon(
+                            icon: const Icon(Icons.add_location_alt),
+                            label: const Text('Añadir parada'),
+                            onPressed: () async {
+                              final pickup = pickupLocation;
+                              final dropoff = dropoffLocation;
+                              final previousAddress = deliveryAddress;
+                              final previousCheckout =
+                                  checkout?.deliveryAddress;
+                              final pickupText = pickupLocationTEC.text;
+                              final dropoffText = dropoffLocationTEC.text;
+                              deliveryAddress = null;
+                              DeliveryAddress? stop;
+                              try {
+                                stop = await showDeliveryAddressPicker();
+                              } finally {
+                                pickupLocation = pickup;
+                                dropoffLocation = dropoff;
+                                deliveryAddress = previousAddress;
+                                checkout?.deliveryAddress = previousCheckout;
+                                pickupLocationTEC.text = pickupText;
+                                dropoffLocationTEC.text = dropoffText;
+                              }
+                              if (!context.mounted ||
+                                  stop.latitude == null ||
+                                  stop.longitude == null ||
+                                  (stop.address ?? '').isEmpty)
+                                return;
+                              update(() => taxiStops.add(stop!));
+                              invalidateQuote();
+                            },
+                          ),
+                        FilledButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Listo'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+    );
+    if (changed && pickupLocation != null && dropoffLocation != null) {
+      unawaited(drawTripPolyLines());
+      if (currentOrderStep == 2) await fetchVehicleTypes();
+    }
   }
 
   Future<void> selectPreferredVehicleKind(String kind) async {
@@ -358,6 +467,14 @@ class TaxiViewModel extends TripTaxiViewModel {
         "lng": dropoffLocation!.longitude,
         "address": dropoffLocation!.address,
       },
+      "stops": [
+        for (final stop in taxiStops)
+          {
+            'lat': stop.latitude,
+            'lng': stop.longitude,
+            'address': stop.address,
+          },
+      ],
       "sub_total": subTotal,
       "tax": selectedVehicleType?.tax,
       "total": total,
@@ -467,7 +584,11 @@ class TaxiViewModel extends TripTaxiViewModel {
   Future<void> shareTrip() async {
     final trip = onGoingOrderTrip;
     if (trip == null) return;
-    await TaxiTripShareService.share(trip);
+    try {
+      await TaxiTripShareService.share(trip);
+    } catch (error) {
+      toastError(error.toString());
+    }
   }
 
   Future<Order?> getLastTripForRating() async {
