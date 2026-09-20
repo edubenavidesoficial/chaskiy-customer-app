@@ -84,8 +84,8 @@ class MultiDeliveryView extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${vm.checkout!.deliveries.length} entregas × '
-                    '\$${vm.vendor!.perDeliveryFee.toStringAsFixed(2)}',
+                    '${vm.checkout!.deliveries.length} entregas · '
+                    'Envío calculado por la distancia total de la ruta',
                     style: theme.textTheme.labelLarge,
                   ),
                 ],
