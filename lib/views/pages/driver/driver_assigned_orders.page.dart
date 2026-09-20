@@ -308,72 +308,81 @@ class _DriverAssignmentSheet extends StatelessWidget {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              assignment.isTaxi ? 'Nueva carrera' : 'Nuevo pedido',
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 16),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.trip_origin, color: Colors.green),
-              title: const Text('Recoger en'),
-              subtitle: Text(
-                assignment.pickup.isEmpty
-                    ? 'Ubicación por confirmar'
-                    : assignment.pickup,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                assignment.isTaxi ? 'Nueva carrera' : 'Nuevo pedido',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
-            ),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.location_on, color: Colors.red),
-              title: const Text('Entregar en'),
-              subtitle: Text(
-                assignment.dropoff.isEmpty
-                    ? 'Ubicación por confirmar'
-                    : assignment.dropoff,
+              const SizedBox(height: 16),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.trip_origin, color: Colors.green),
+                title: const Text('Recoger en'),
+                subtitle: Text(
+                  assignment.pickup.isEmpty
+                      ? 'Ubicación por confirmar'
+                      : assignment.pickup,
+                ),
               ),
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: _AssignmentAmount(
-                    label: 'Ganancia',
-                    value: assignment.amount,
-                  ),
+              for (var i = 0; i < assignment.stops.length; i++)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.more_horiz),
+                  title: Text('Parada ${i + 1}'),
+                  subtitle: Text(assignment.stops[i]),
                 ),
-                Expanded(
-                  child: _AssignmentAmount(
-                    label: 'Total',
-                    value: assignment.total,
-                  ),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.location_on, color: Colors.red),
+                title: const Text('Entregar en'),
+                subtitle: Text(
+                  assignment.dropoff.isEmpty
+                      ? 'Ubicación por confirmar'
+                      : assignment.dropoff,
                 ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: const Text('Rechazar'),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: _AssignmentAmount(
+                      label: 'Ganancia',
+                      value: assignment.amount,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    child: const Text('Aceptar'),
+                  Expanded(
+                    child: _AssignmentAmount(
+                      label: 'Total',
+                      value: assignment.total,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Rechazar'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Aceptar'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

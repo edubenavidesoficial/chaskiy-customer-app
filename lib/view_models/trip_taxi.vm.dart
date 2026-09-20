@@ -558,7 +558,11 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
 
   void _updateRouteProgress(LatLng position) {
     final trip = onGoingOrderTrip;
-    if (trip == null || polylineCoordinates.length < 2) return;
+    if (trip == null) return;
+    if (polylineCoordinates.length < 2) {
+      unawaited(_refreshLiveRoute(position));
+      return;
+    }
     final phase =
         '${trip.canZoomOnPickupLocation ? 'pickup' : 'dropoff'}:${_tripTarget?.latitude},${_tripTarget?.longitude}';
     if (_liveRoutePhase != phase) {
@@ -646,6 +650,9 @@ class TripTaxiViewModel extends TaxiGoogleMapViewModel {
         driver,
         LatLng(target!.latitude!, target.longitude!),
       );
+      final currentPhase =
+          '${onGoingOrderTrip?.canZoomOnPickupLocation == true ? 'pickup' : 'dropoff'}:${_tripTarget?.latitude},${_tripTarget?.longitude}';
+      if (onGoingOrderTrip?.id != trip.id || currentPhase != phase) return;
       if (route.length < 2) return;
       polylineCoordinates =
           route

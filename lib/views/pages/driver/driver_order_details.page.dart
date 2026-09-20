@@ -526,7 +526,17 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
               isLast: index == stops.length - 1,
               onNavigate: () => _openStop(stops[index]),
               onVerify:
-                  stops[index].stopId == null || stops[index].verified
+                  stops[index].stopId == null ||
+                          stops[index].verified ||
+                          (_isTaxi &&
+                              (_order.status != 'enroute' ||
+                                  stops
+                                      .take(index)
+                                      .any(
+                                        (stop) =>
+                                            stop.stopId != null &&
+                                            !stop.verified,
+                                      )))
                       ? null
                       : () => _verifyStop(stops[index].stopId!),
             ),

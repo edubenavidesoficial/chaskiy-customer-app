@@ -6,7 +6,7 @@ import 'package:chaskiy/services/firebase.service.dart' as app_firebase;
 class GeneralAppService {
   //
 
-//Hnadle background message
+  //Hnadle background message
   @pragma('vm:entry-point')
   static Future<void> onBackgroundMessageHandler(RemoteMessage message) async {
     //if it has not data then it is a normal notification, so ignore it
@@ -14,6 +14,9 @@ class GeneralAppService {
     await Firebase.initializeApp();
     app_firebase.FirebaseService().saveNewNotification(message);
     //normal notifications
-    app_firebase.FirebaseService().showNotification(message);
+    // Notification payloads are already displayed by Android/iOS.
+    if (message.notification == null) {
+      app_firebase.FirebaseService().showNotification(message);
+    }
   }
 }

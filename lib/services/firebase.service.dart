@@ -52,7 +52,16 @@ class FirebaseService {
     return text.isEmpty ? text : text.tr();
   }
 
-  setUpFirebaseMessaging() async {
+  Future<void>? _messagingSetup;
+
+  Future<void> setUpFirebaseMessaging() {
+    return _messagingSetup ??= _configureMessaging().catchError((Object error) {
+      _messagingSetup = null;
+      throw error;
+    });
+  }
+
+  Future<void> _configureMessaging() async {
     // Los listeners y la sincronización del token deben existir aunque el
     // permiso visual esté desactivado; el conductor sigue recibiendo el evento
     // en primer plano y el sondeo API funciona como respaldo.
@@ -64,9 +73,9 @@ class FirebaseService {
     if (!isPermanentlyDenied && isGranted) {
       await FirebaseMessaging.instance
           .setForegroundNotificationPresentationOptions(
-            alert: true,
+            alert: false,
             badge: true,
-            sound: true,
+            sound: false,
           );
     }
     //subscribing to all topic

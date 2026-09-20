@@ -8,6 +8,7 @@ class DriverAssignment {
     required this.amount,
     required this.total,
     required this.isTaxi,
+    this.stops = const [],
     this.expiresAt,
     this.documentPath,
   });
@@ -18,11 +19,11 @@ class DriverAssignment {
   final String amount;
   final String total;
   final bool isTaxi;
+  final List<String> stops;
   final DateTime? expiresAt;
   final String? documentPath;
 
-  bool get isExpired =>
-      expiresAt != null && DateTime.now().isAfter(expiresAt!);
+  bool get isExpired => expiresAt != null && DateTime.now().isAfter(expiresAt!);
 
   factory DriverAssignment.fromJson(
     Map<String, dynamic> json, {
@@ -38,6 +39,13 @@ class DriverAssignment {
       amount: '${json['amount'] ?? '0.00'}',
       total: '${json['total'] ?? json['amount'] ?? '0.00'}',
       isTaxi: json['vehicle_type_id'] != null,
+      stops:
+          json['stops'] is List
+              ? (json['stops'] as List)
+                  .whereType<Map>()
+                  .map((stop) => '${stop['address'] ?? ''}')
+                  .toList()
+              : const [],
       expiresAt: _date(expiryValue),
       documentPath: documentPath,
     );

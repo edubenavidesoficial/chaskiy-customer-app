@@ -75,6 +75,7 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
   //
   dispose() {
     _pickupLookupRevision++;
+    _routeDrawRevision++;
     super.dispose();
     currentLocationListener?.cancel();
     nearbyDriversTimer?.cancel();
@@ -640,7 +641,11 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
   }
 
   //plylines
+  int _routeDrawRevision = 0;
+  String? _drawnRouteKey;
+
   drawTripPolyLines() async {
+    final revision = ++_routeDrawRevision;
     if (pickupLocation == null || dropoffLocation == null) {
       return;
     }
@@ -691,8 +696,8 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
         anchor: Offset(0.5, 0.5),
       ),
     );
-    //load the ploylines
-    polylineCoordinates.clear();
+    // Build locally so overlapping requests cannot mix different routes.
+    final nextCoordinates = <LatLng>[];
     final routePoints = <LatLng>[
       LatLng(pickupLocation!.latitude!, pickupLocation!.longitude!),
       for (final stop in taxiStops)
@@ -712,19 +717,31 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
         ),
       );
     }
+    final routeKey = routePoints
+        .map((p) => '${p.latitude},${p.longitude}')
+        .join(';');
     for (var i = 1; i < routePoints.length; i++) {
       final leg = await getDrivingRoutePoints(
         routePoints[i - 1],
         routePoints[i],
       );
+      if (revision != _routeDrawRevision) return;
       if (leg.isNotEmpty) {
-        polylineCoordinates.addAll(
+        nextCoordinates.addAll(
           leg.map((point) => LatLng(point.latitude, point.longitude)),
         );
       } else {
-        polylineCoordinates.addAll([routePoints[i - 1], routePoints[i]]);
+        // Do not present a straight line as a drivable route.
+        if (_drawnRouteKey == routeKey && polylineCoordinates.isNotEmpty)
+          return;
+        nextCoordinates.clear();
+        break;
       }
     }
+
+    if (revision != _routeDrawRevision) return;
+    polylineCoordinates = nextCoordinates;
+    _drawnRouteKey = nextCoordinates.isEmpty ? null : routeKey;
 
     // with an id, an RGB color and the list of LatLng pairs
     Polyline polyline = Polyline(
@@ -761,6 +778,19 @@ class TaxiGoogleMapViewModel extends CheckoutBaseViewModel {
     LatLng origin,
     LatLng destination,
   ) async {
+    // Use the same Directions-first compatibility path as the trip preview.
+    try {
+      final result = await polylinePoints
+          .getRouteBetweenCoordinates(
+            AppStrings.googleMapApiKey,
+            PointLatLng(origin.latitude, origin.longitude),
+            PointLatLng(destination.latitude, destination.longitude),
+          )
+          .timeout(const Duration(seconds: 12));
+      if (result.points.isNotEmpty) return result.points;
+    } catch (_) {
+      // Existing installations may enable either Directions or Routes.
+    }
     try {
       final response = await http
           .post(
