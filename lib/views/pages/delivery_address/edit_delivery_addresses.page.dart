@@ -80,7 +80,7 @@ class EditDeliveryAddressesPage extends StatelessWidget {
                         'Guardar como lugar frecuente'.tr().text.make(),
                       ])
                       .onInkTap(() => vm.toggleFavorite(!vm.isFavorite))
-                      .wFull()
+                      .wFull(context)
                       .py4(),
 
                   CustomButton(
