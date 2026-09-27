@@ -24,64 +24,64 @@ class NewDeliveryAddressesPage extends StatelessWidget {
           showLeadingAction: true,
           title: "New Delivery Address".tr(),
           body: Form(
-              key: vm.formKey,
-              child: VStack(
+            key: vm.formKey,
+            child: VStack([
+              //
+              CustomTextFormField(
+                labelText: "Name".tr(),
+                textEditingController: vm.nameTEC,
+                validator: FormValidator.validateName,
+              ),
+              //what3words
+              What3wordsView(vm),
+              //
+              CustomTextFormField(
+                labelText: "Address".tr(),
+                isReadOnly: true,
+                textEditingController: vm.addressTEC,
+                validator:
+                    (value) => FormValidator.validateEmpty(
+                      value,
+                      errorTitle: "Address".tr(),
+                    ),
+                onTap: vm.openLocationPicker,
+              ).py2(),
+              // description
+              UiSpacer.verticalSpace(),
+              CustomTextFormField(
+                labelText: "Description".tr(),
+                textEditingController: vm.descriptionTEC,
+                keyboardType: TextInputType.multiline,
+                minLines: 3,
+                textInputAction: TextInputAction.newline,
+              ).py2(),
+              //
+              HStack([
+                    Checkbox(value: vm.isDefault, onChanged: vm.toggleDefault),
+                    //
+                    "Default".tr().text.make(),
+                  ])
+                  .onInkTap(() => vm.toggleDefault(!vm.isDefault))
+                  .wFull(context)
+                  .py12(),
+              HStack(
                 [
-                  //
-                  CustomTextFormField(
-                    labelText: "Name".tr(),
-                    textEditingController: vm.nameTEC,
-                    validator: FormValidator.validateName,
-                  ),
-                  //what3words
-                  What3wordsView(vm),
-                  //
-                  CustomTextFormField(
-                    labelText: "Address".tr(),
-                    isReadOnly: true,
-                    textEditingController: vm.addressTEC,
-                    validator: (value) => FormValidator.validateEmpty(value,
-                        errorTitle: "Address".tr()),
-                    onTap: vm.openLocationPicker,
-                  ).py2(),
-                  // description
-                  UiSpacer.verticalSpace(),
-                  CustomTextFormField(
-                    labelText: "Description".tr(),
-                    textEditingController: vm.descriptionTEC,
-                    keyboardType: TextInputType.multiline,
-                    minLines: 3,
-                    textInputAction: TextInputAction.newline,
-                  ).py2(),
-                  //
-                  HStack(
-                    [
-                      Checkbox(
-                        value: vm.isDefault,
-                        onChanged: vm.toggleDefault,
-                      ),
-                      //
-                      "Default".tr().text.make(),
-                    ],
-                  )
-                      .onInkTap(
-                        () => vm.toggleDefault(!vm.isDefault),
-                      )
-                      .wFull(context)
-                      .py12(),
-
-                  CustomButton(
-                    isFixedHeight: true,
-                    height: Vx.dp48,
-                    title: "Save".tr(),
-                    onPressed: vm.saveNewDeliveryAddress,
-                    loading: vm.isBusy,
-                  ).centered(),
+                  Checkbox(value: vm.isFavorite, onChanged: vm.toggleFavorite),
+                  'Guardar como lugar frecuente'.tr().text.make(),
                 ],
-              )
-                  .p20()
-                  .scrollVertical()
-                  .pOnly(bottom: context.mq.viewInsets.bottom)),
+              ).onInkTap(() => vm.toggleFavorite(!vm.isFavorite)).wFull().py4(),
+
+              CustomButton(
+                isFixedHeight: true,
+                height: Vx.dp48,
+                title: "Save".tr(),
+                onPressed: vm.saveNewDeliveryAddress,
+                loading: vm.isBusy,
+              ).centered(),
+            ]).p20().scrollVertical().pOnly(
+              bottom: context.mq.viewInsets.bottom,
+            ),
+          ),
         );
       },
     );

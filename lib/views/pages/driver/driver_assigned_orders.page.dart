@@ -42,6 +42,7 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
   StreamSubscription<bool>? _refreshSubscription;
   Timer? _refreshTimer;
   bool _showingAssignment = false;
+  bool _showHistory = false;
 
   /// Cada cuánto se vuelve a pedir la lista.
   ///
@@ -66,7 +67,7 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
 
   Future<void> _loadCachedThenRefresh() async {
     final user = await AuthServices.getCurrentUser();
-    final params = {'driver_id': user.id, 'type': 'assigned'};
+    final params = {'driver_id': user.id, 'type': _orderType};
     final cached = await _orderRequest.getCachedOrders(params: params);
     if (mounted && cached.isNotEmpty) {
       setState(() {
@@ -99,7 +100,7 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
       final user = await AuthServices.getCurrentUser();
       final orders = await _orderRequest.getOrders(
         page: 1,
-        params: {'driver_id': user.id, 'type': 'assigned'},
+        params: {'driver_id': user.id, 'type': _orderType},
       );
       if (!mounted) return;
       setState(() {
@@ -176,6 +177,17 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
     await _load();
   }
 
+  String get _orderType => _showHistory ? 'driver_history' : 'assigned';
+
+  Future<void> _changeSection(bool history) async {
+    if (_showHistory == history) return;
+    setState(() {
+      _showHistory = history;
+      _orders = const [];
+    });
+    await _load();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -197,8 +209,30 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
                 ),
               ),
             ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: SegmentedButton<bool>(
+                  segments: const [
+                    ButtonSegment(
+                      value: false,
+                      label: Text('Asignadas'),
+                      icon: Icon(Icons.assignment_outlined),
+                    ),
+                    ButtonSegment(
+                      value: true,
+                      label: Text('Historial'),
+                      icon: Icon(Icons.history_rounded),
+                    ),
+                  ],
+                  selected: {_showHistory},
+                  onSelectionChanged: (values) => _changeSection(values.first),
+                ),
+              ),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
             if (_loading)
-              const SliverFillRemaining(
+              SliverFillRemaining(
                 child: Center(child: CircularProgressIndicator()),
               )
             else if (_error != null)
@@ -211,11 +245,17 @@ class _DriverAssignedOrdersPageState extends State<DriverAssignedOrdersPage> {
                 ),
               )
             else if (_orders.isEmpty)
-              const SliverFillRemaining(
+              SliverFillRemaining(
                 child: _DriverOrderMessage(
                   icon: Icons.inbox_outlined,
-                  title: 'No tienes pedidos asignados',
-                  message: 'Desliza hacia abajo para actualizar.',
+                  title:
+                      _showHistory
+                          ? 'Aún no tienes carreras finalizadas'
+                          : 'No tienes pedidos asignados',
+                  message:
+                      _showHistory
+                          ? 'Aquí verás tus carreras y pedidos completados.'
+                          : 'Desliza hacia abajo para actualizar.',
                 ),
               )
             else

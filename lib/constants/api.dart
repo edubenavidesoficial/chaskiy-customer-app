@@ -97,6 +97,7 @@ class Api {
   static const acceptDriverAssignment = "/taxi/order/asignment/accept";
   static const rejectDriverAssignment = "/taxi/order/asignment/reject";
   static const taxiDriverInfo = "/taxi/driver/info";
+  static const driverReviews = "/drivers";
   static const taxiLocationAvailable = "/taxi/location/available";
   static const taxiTripLocationHistory = "/taxi/location/history";
   static const nearbyTaxiDrivers = "/taxi/nearby/drivers";

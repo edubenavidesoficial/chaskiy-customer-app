@@ -2,6 +2,7 @@ import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/models/order.dart';
 import 'package:chaskiy/widgets/buttons/custom_button.dart';
 import 'package:chaskiy/widgets/custom_image.view.dart';
+import 'package:chaskiy/views/pages/order/widgets/driver_reviews.sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -63,6 +64,17 @@ class OrderDriverInfoView extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                  TextButton.icon(
+                    onPressed:
+                        () => showModalBottomSheet<void>(
+                          context: context,
+                          showDragHandle: true,
+                          builder:
+                              (_) => DriverReviewsSheet(driverId: driver.id),
+                        ),
+                    icon: const Icon(Icons.chat_bubble_outline, size: 16),
+                    label: const Text('Ver opiniones'),
                   ),
                 ],
               ),

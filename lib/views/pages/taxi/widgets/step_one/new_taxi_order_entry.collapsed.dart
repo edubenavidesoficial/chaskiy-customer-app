@@ -172,6 +172,53 @@ class NewTaxiOrderEntryCollapsed extends StatelessWidget {
                           ),
                         ),
                         if (taxiNewOrderViewModel
+                            .frequentAddresses
+                            .isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Lugares frecuentes',
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            height: 42,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemCount:
+                                  taxiNewOrderViewModel
+                                      .frequentAddresses
+                                      .length,
+                              separatorBuilder:
+                                  (_, __) => const SizedBox(width: 8),
+                              itemBuilder: (_, index) {
+                                final address =
+                                    taxiNewOrderViewModel
+                                        .frequentAddresses[index];
+                                return ActionChip(
+                                  avatar: const Icon(
+                                    Icons.favorite_rounded,
+                                    size: 17,
+                                  ),
+                                  label: Text(
+                                    address.name?.trim().isNotEmpty == true
+                                        ? address.name!
+                                        : address.address ?? 'Lugar',
+                                  ),
+                                  onPressed:
+                                      () => taxiNewOrderViewModel
+                                          .onFrequentDestinationSelected(
+                                            address,
+                                          ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                        if (taxiNewOrderViewModel
                             .shortPreviousAddressesList
                             .isNotEmpty) ...[
                           const SizedBox(height: 8),

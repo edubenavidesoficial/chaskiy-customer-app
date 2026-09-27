@@ -179,19 +179,50 @@ class LocationService {
     //   geocodeCurrentLocation(true);
     // });
 
-    //listen
-    currentLocationListener = Geolocator.getPositionStream().listen((
-      Position currentLocation,
-    ) {
-      // Use current location
-      _locationData = LocationData.fromMap(currentLocation.toJson());
-      //
-      geocodeCurrentLocation(true);
-    });
+    // Some Samsung devices keep the previous subscription alive after an
+    // activity resume. Two listeners race and one may publish a stale point.
+    await currentLocationListener?.cancel();
+    currentLocationListener = Geolocator.getPositionStream(
+      locationSettings:
+          Platform.isAndroid
+              ? AndroidSettings(
+                accuracy: LocationAccuracy.high,
+                distanceFilter: 10,
+                intervalDuration: Duration(seconds: 5),
+              )
+              : const LocationSettings(
+                accuracy: LocationAccuracy.high,
+                distanceFilter: 10,
+              ),
+    ).listen(
+      (Position currentLocation) {
+        // Use current location
+        _locationData = LocationData.fromMap(currentLocation.toJson());
+        //
+        geocodeCurrentLocation(oneTime);
+      },
+      onError: (Object error) {
+        // Do not discard the selected address when Android temporarily loses a
+        // GPS fix. A later resume or refresh retries without blocking the app.
+        debugPrint('Location stream unavailable: $error');
+      },
+    );
 
-    //get the current location on send to listeners
-    _locationData = await location.getLocation();
-    geocodeCurrentLocation(oneTime);
+    // The location plugin can wait forever while Samsung's power manager is
+    // recovering GPS. Use geolocator's bounded request and preserve the last
+    // valid location if it times out.
+    try {
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 12),
+        ),
+      );
+      _locationData = LocationData.fromMap(position.toJson());
+      await geocodeCurrentLocation(oneTime);
+    } catch (error) {
+      debugPrint('Initial location unavailable: $error');
+    }
   }
 
   //

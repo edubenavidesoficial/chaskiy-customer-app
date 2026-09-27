@@ -20,6 +20,7 @@ class DeliveryAddress {
     this.latitude,
     this.longitude,
     this.isDefault,
+    this.isFavorite = false,
     this.userId,
     this.createdAt,
     this.updatedAt,
@@ -39,6 +40,7 @@ class DeliveryAddress {
   double? latitude;
   double? longitude;
   int? isDefault;
+  bool isFavorite;
   int? userId;
   DateTime? createdAt;
   DateTime? updatedAt;
@@ -66,6 +68,10 @@ class DeliveryAddress {
             ? null
             : double.parse(json["distance"].toString()),
     isDefault: int.tryParse(json["is_default"].toString()) ?? 0,
+    isFavorite:
+        json["is_favorite"] == true ||
+        json["is_favorite"] == 1 ||
+        json["is_favorite"] == '1',
     userId: int.tryParse(json["user_id"].toString()) ?? 0,
     createdAt:
         json["created_at"] != null ? DateTime.parse(json["created_at"]) : null,
@@ -88,6 +94,7 @@ class DeliveryAddress {
     "longitude": longitude,
     "distance": distance,
     "is_default": isDefault,
+    "is_favorite": isFavorite,
     "user_id": userId,
     "created_at": createdAt?.toIso8601String(),
     "updated_at": updatedAt?.toIso8601String(),
@@ -107,6 +114,7 @@ class DeliveryAddress {
     "latitude": latitude,
     "longitude": longitude,
     "is_default": isDefault,
+    "is_favorite": isFavorite,
   };
 
   bool get defaultDeliveryAddress => isDefault == 1;
@@ -121,6 +129,7 @@ class DeliveryAddress {
     String? country,
     double? latitude,
     double? longitude,
+    bool? isFavorite,
   }) {
     return new DeliveryAddress(
       id: this.id,
@@ -133,6 +142,7 @@ class DeliveryAddress {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       isDefault: this.isDefault,
+      isFavorite: isFavorite ?? this.isFavorite,
       userId: this.userId,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,

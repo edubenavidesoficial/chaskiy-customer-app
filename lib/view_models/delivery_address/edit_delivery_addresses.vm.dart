@@ -15,6 +15,7 @@ class EditDeliveryAddressesViewModel extends BaseDeliveryAddressesViewModel {
   TextEditingController addressTEC = TextEditingController();
   TextEditingController descriptionTEC = TextEditingController();
   bool isDefault = false;
+  bool isFavorite = false;
   DeliveryAddress? deliveryAddress;
 
   //
@@ -29,6 +30,7 @@ class EditDeliveryAddressesViewModel extends BaseDeliveryAddressesViewModel {
     addressTEC.text = deliveryAddress!.address!;
     descriptionTEC.text = deliveryAddress!.description!;
     isDefault = deliveryAddress!.isDefault == 1;
+    isFavorite = deliveryAddress!.isFavorite;
     notifyListeners();
   }
 
@@ -80,6 +82,12 @@ class EditDeliveryAddressesViewModel extends BaseDeliveryAddressesViewModel {
   void toggleDefault(bool? value) {
     isDefault = value ?? false;
     deliveryAddress!.isDefault = isDefault ? 1 : 0;
+    notifyListeners();
+  }
+
+  void toggleFavorite(bool? value) {
+    isFavorite = value ?? false;
+    deliveryAddress!.isFavorite = isFavorite;
     notifyListeners();
   }
 

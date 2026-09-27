@@ -187,6 +187,24 @@ class TaxiRequest extends HttpService {
     return ApiResponse.fromResponse(apiResult);
   }
 
+  Future<List<Map<String, dynamic>>> getDriverReviews(int driverId) async {
+    final result = await get(
+      '${Api.driverReviews}/$driverId/reviews',
+      queryParameters: const {'per_page': 3},
+      forceRefresh: true,
+    );
+    final response = ApiResponse.fromResponse(result);
+    if (!response.allGood)
+      throw response.message ?? 'No se pudieron cargar los comentarios';
+    final body = response.body;
+    final data = body is Map ? body['data'] : body;
+    if (data is! List) return const [];
+    return data
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList();
+  }
+
   Future<List<TaxiOrderLocationHistory>> locationHistory() async {
     final apiResult = await get(Api.taxiTripLocationHistory);
     final apiResponse = ApiResponse.fromResponse(apiResult);

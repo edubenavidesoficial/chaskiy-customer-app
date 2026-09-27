@@ -7,6 +7,7 @@ import 'package:chaskiy/constants/app_ui_sizes.dart';
 import 'package:chaskiy/models/delivery_address.dart';
 import 'package:chaskiy/models/tax_order_location.history.dart';
 import 'package:chaskiy/requests/taxi.request.dart';
+import 'package:chaskiy/requests/delivery_address.request.dart';
 import 'package:chaskiy/services/alert.service.dart';
 import 'package:chaskiy/services/geocoder.service.dart';
 import 'package:chaskiy/view_models/base.view_model.dart';
@@ -25,6 +26,7 @@ class NewTaxiOrderLocationEntryViewModel extends MyBaseViewModel {
   GeocoderService geocoderService = GeocoderService();
   List<TaxiOrderLocationHistory> previousAddresses = [];
   List<TaxiOrderLocationHistory> shortPreviousAddressesList = [];
+  List<DeliveryAddress> frequentAddresses = [];
   final TaxiViewModel taxiViewModel;
   PanelController panelController = PanelController();
   double customViewHeight = AppUISizes.taxiNewOrderIdleHeight;
@@ -36,7 +38,25 @@ class NewTaxiOrderLocationEntryViewModel extends MyBaseViewModel {
 
   initialise() {
     fetchHistoryAddresses();
+    fetchFrequentAddresses();
     handleEntryFocusChanges();
+  }
+
+  Future<void> fetchFrequentAddresses() async {
+    try {
+      final addresses = await DeliveryAddressRequest().getDeliveryAddresses();
+      frequentAddresses =
+          addresses
+              .where(
+                (address) =>
+                    address.isFavorite || address.defaultDeliveryAddress,
+              )
+              .take(4)
+              .toList();
+      notifyListeners();
+    } catch (_) {
+      // The recent-trip history remains available if saved addresses cannot load.
+    }
   }
 
   @override
@@ -139,6 +159,20 @@ class NewTaxiOrderLocationEntryViewModel extends MyBaseViewModel {
     taxiViewModel.dropoffLocation = taxiViewModel.checkout?.deliveryAddress;
     taxiViewModel.dropoffLocationTEC.text =
         taxiViewModel.checkout?.deliveryAddress?.address ?? "";
+    await panelController.open();
+    taxiViewModel.notifyListeners();
+  }
+
+  Future<void> onFrequentDestinationSelected(DeliveryAddress value) async {
+    if (value.latitude == null || value.longitude == null) return;
+    taxiViewModel.checkout?.deliveryAddress = value;
+    await runBusyFuture(
+      getLocationCityName(value),
+      busyObject: frequentAddresses,
+    );
+    taxiViewModel.deliveryAddress = value;
+    taxiViewModel.dropoffLocation = value;
+    taxiViewModel.dropoffLocationTEC.text = value.address ?? '';
     await panelController.open();
     taxiViewModel.notifyListeners();
   }
