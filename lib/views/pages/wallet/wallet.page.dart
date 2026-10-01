@@ -57,7 +57,7 @@ class _WalletPageState extends State<WalletPage> with WidgetsBindingObserver {
             onRefresh: () => vm.loadWalletData(),
             onLoad: () => vm.getWalletTransactions(initialLoading: false),
             dataset: [],
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
             separator: 0.heightBox,
             loading: vm.isBusy,
             child: SingleChildScrollView(
@@ -98,17 +98,70 @@ class _WalletPageState extends State<WalletPage> with WidgetsBindingObserver {
                         ),
                       ],
                     ),
-                    CustomListView(
-                      noScrollPhysics: true,
-                      isLoading: vm.busy(vm.walletTransactions),
-                      dataSet: vm.walletTransactions,
-                      itemBuilder: (context, index) {
-                        return WalletTransactionListItem(
-                          vm.walletTransactions[index],
-                        );
-                      },
-                      separatorBuilder: (_, __) => 10.heightBox,
-                    ),
+                    if (vm.walletTransactions.isEmpty &&
+                        !vm.busy(vm.walletTransactions))
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 28,
+                        ),
+                        decoration: BoxDecoration(
+                          color:
+                              Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerLowest,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outlineVariant.withValues(alpha: .55),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.receipt_long_outlined,
+                              size: 36,
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Aún no tienes movimientos',
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.w700),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Tus recargas y transferencias aparecerán aquí.',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodyMedium?.copyWith(
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      CustomListView(
+                        noScrollPhysics: true,
+                        isLoading: vm.busy(vm.walletTransactions),
+                        dataSet: vm.walletTransactions,
+                        itemBuilder: (context, index) {
+                          return WalletTransactionListItem(
+                            vm.walletTransactions[index],
+                          );
+                        },
+                        separatorBuilder: (_, __) => 10.heightBox,
+                      ),
                   ], spacing: 12),
                 ], spacing: 24),
               ),

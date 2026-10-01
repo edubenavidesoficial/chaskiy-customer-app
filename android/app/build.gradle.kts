@@ -30,7 +30,9 @@ android {
     defaultConfig {
         applicationId = "com.chaskiy.app"
         minSdk = 24
-        targetSdk = 35
+        // Google Play requires Android 16 (API 36) for new submissions from
+        // 31 August 2026 onward.
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

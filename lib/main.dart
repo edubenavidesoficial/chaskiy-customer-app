@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,8 @@ import 'package:chaskiy/services/cart.service.dart';
 import 'package:chaskiy/services/deep_link.service.dart';
 import 'package:chaskiy/services/local_storage.service.dart';
 import 'package:chaskiy/services/phone_util.service.dart';
+import 'package:chaskiy/services/setup.service.dart';
+import 'package:chaskiy/services/general_app.service.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 
 import 'constants/app_languages.dart';
@@ -33,7 +36,8 @@ void main() async {
       }
 
       // Textos en español para todos los pull-to-refresh (easy_refresh)
-      EasyRefresh.defaultHeaderBuilder = () => const ClassicHeader(
+      EasyRefresh.defaultHeaderBuilder =
+          () => const ClassicHeader(
             dragText: 'Desliza para actualizar',
             armedText: 'Suelta para actualizar',
             readyText: 'Actualizando...',
@@ -43,7 +47,8 @@ void main() async {
             failedText: 'No se pudo actualizar',
             messageText: 'Actualizado a las %T',
           );
-      EasyRefresh.defaultFooterBuilder = () => const ClassicFooter(
+      EasyRefresh.defaultFooterBuilder =
+          () => const ClassicFooter(
             dragText: 'Desliza para cargar más',
             armedText: 'Suelta para cargar más',
             readyText: 'Cargando...',
@@ -76,10 +81,14 @@ void main() async {
 
       if (firebaseReady) {
         FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+        FirebaseMessaging.onBackgroundMessage(
+          GeneralAppService.onBackgroundMessageHandler,
+        );
       }
       runApp(LocalizedApp(child: MyApp()));
 
       // Estos servicios no deben retrasar la primera pantalla.
+      if (firebaseReady) unawaited(SetupService.init());
       unawaited(PhoneUtilService.init());
       DeepLinkService().initialize();
     },

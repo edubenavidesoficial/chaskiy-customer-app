@@ -9,12 +9,11 @@ class GeneralAppService {
   //Hnadle background message
   @pragma('vm:entry-point')
   static Future<void> onBackgroundMessageHandler(RemoteMessage message) async {
-    //if it has not data then it is a normal notification, so ignore it
-    if (message.data.isEmpty) return;
     await Firebase.initializeApp();
+    // Persist both notification-only and data messages. Notification-only
+    // messages are displayed by the operating system, while data messages
+    // are rendered by the app's local notification channel.
     app_firebase.FirebaseService().saveNewNotification(message);
-    //normal notifications
-    // Notification payloads are already displayed by Android/iOS.
     if (message.notification == null) {
       app_firebase.FirebaseService().showNotification(message);
     }

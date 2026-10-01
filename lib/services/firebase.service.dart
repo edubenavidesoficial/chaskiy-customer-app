@@ -62,6 +62,16 @@ class FirebaseService {
   }
 
   Future<void> _configureMessaging() async {
+    // Solicitar explícitamente permisos de alertas, sonido y distintivo.
+    // Tener un token FCM no implica que el sistema permita mostrar avisos
+    // cuando la aplicación está en segundo plano o terminada.
+    await firebaseMessaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+      provisional: false,
+    );
+
     // Los listeners y la sincronización del token deben existir aunque el
     // permiso visual esté desactivado; el conductor sigue recibiendo el evento
     // en primer plano y el sondeo API funciona como respaldo.

@@ -259,7 +259,7 @@ class TaxiViewModel extends TripTaxiViewModel {
                               },
                             ),
                           ),
-                        if (taxiStops.length < 4)
+                        if (taxiStops.length < 10)
                           TextButton.icon(
                             icon: const Icon(Icons.add_location_alt),
                             label: const Text('Añadir parada'),
