@@ -12,6 +12,7 @@ import 'package:chaskiy/views/pages/order/widgets/order_payment_info.view.dart';
 import 'package:chaskiy/views/pages/order/widgets/order_status.view.dart';
 import 'package:chaskiy/views/pages/order/widgets/order_details_card.dart';
 import 'package:chaskiy/views/pages/order/widgets/order_status_header.dart';
+import 'package:chaskiy/views/pages/order/widgets/bank_transfer_proof.card.dart';
 import 'package:chaskiy/widgets/base.page.dart';
 import 'package:chaskiy/widgets/busy_indicator.dart';
 import 'package:chaskiy/widgets/cards/order_details_summary.dart';
@@ -75,89 +76,92 @@ class OrderDetailsPage extends StatelessWidget {
                           child: ConstrainedBox(
                             constraints: const BoxConstraints(maxWidth: 720),
                             child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children:
-                                [
-                                  // 1. estado, negocio y código
-                                  OrderStatusHeader(vm: vm),
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children:
+                                  [
+                                    // 1. estado, negocio y código
+                                    OrderStatusHeader(vm: vm),
 
-                                  // 2. de dónde sale y a dónde llega
-                                  if (vm.order.deliveryAddress != null)
+                                    // 2. de dónde sale y a dónde llega
+                                    if (vm.order.deliveryAddress != null)
+                                      OrderDetailsCard(
+                                        title: "Delivery details".tr(),
+                                        child: OrderAddressesView(vm),
+                                      ),
+
+                                    if (!vm.order.isPackageDelivery &&
+                                        vm.order.deliveryAddress == null)
+                                      OrderDetailsCard(
+                                        child: Text(
+                                          "Customer Order Pickup".tr(),
+                                          textAlign: TextAlign.center,
+                                          style: theme.textTheme.bodyLarge,
+                                        ),
+                                      ),
+
+                                    // 3. seguimiento, mientras el pedido siga vivo
+                                    if (_showTrackingCardView(vm))
+                                      OrderDetailsCard(
+                                        title: "Order Status tracking".tr(),
+                                        child: OrderStatusView(vm),
+                                      ),
+
+                                    // 4. qué se pidió
                                     OrderDetailsCard(
-                                      title: "Delivery details".tr(),
-                                      child: OrderAddressesView(vm),
+                                      title: _itemsTitle(vm),
+                                      child: OrderDetailsItemsView(vm),
                                     ),
 
-                                  if (!vm.order.isPackageDelivery &&
-                                      vm.order.deliveryAddress == null)
+                                    // 5. negocio
                                     OrderDetailsCard(
-                                      child: Text(
-                                        "Customer Order Pickup".tr(),
-                                        textAlign: TextAlign.center,
-                                        style: theme.textTheme.bodyLarge,
+                                      title:
+                                          (!vm.order.isSerice
+                                                  ? "Vendor"
+                                                  : "Service Provider")
+                                              .tr(),
+                                      child: OrderDetailsVendorInfoView(vm),
+                                    ),
+
+                                    // 6. conductor, si ya está asignado
+                                    if (vm.order.driver != null)
+                                      OrderDetailsCard(
+                                        title: "Driver".tr(),
+                                        child: OrderDetailsDriverInfoView(vm),
+                                      ),
+
+                                    // 7. nota y adjuntos
+                                    if (vm.order.note.isNotEmpty)
+                                      OrderDetailsCard(
+                                        title: "Note".tr(),
+                                        child: Text(
+                                          vm.order.note,
+                                          style: theme.textTheme.bodyMedium,
+                                        ),
+                                      ),
+
+                                    if (vm.order.attachments != null &&
+                                        vm.order.attachments!.isNotEmpty)
+                                      OrderDetailsCard(
+                                        title: "Attachments".tr(),
+                                        child: OrderAttachmentView(vm),
+                                      ),
+
+                                    // 8. pago y totales
+                                    if ((vm.order.paymentMethod?.slug ?? '')
+                                        .contains('transfer'))
+                                      BankTransferProofCard(order: vm.order),
+                                    OrderDetailsCard(
+                                      title: "Order Summary".tr(),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          OrderPaymentInfoView(vm),
+                                          OrderDetailsSummary(vm.order),
+                                        ],
                                       ),
                                     ),
-
-                                  // 3. seguimiento, mientras el pedido siga vivo
-                                  if (_showTrackingCardView(vm))
-                                    OrderDetailsCard(
-                                      title: "Order Status tracking".tr(),
-                                      child: OrderStatusView(vm),
-                                    ),
-
-                                  // 4. qué se pidió
-                                  OrderDetailsCard(
-                                    title: _itemsTitle(vm),
-                                    child: OrderDetailsItemsView(vm),
-                                  ),
-
-                                  // 5. negocio
-                                  OrderDetailsCard(
-                                    title:
-                                        (!vm.order.isSerice
-                                                ? "Vendor"
-                                                : "Service Provider")
-                                            .tr(),
-                                    child: OrderDetailsVendorInfoView(vm),
-                                  ),
-
-                                  // 6. conductor, si ya está asignado
-                                  if (vm.order.driver != null)
-                                    OrderDetailsCard(
-                                      title: "Driver".tr(),
-                                      child: OrderDetailsDriverInfoView(vm),
-                                    ),
-
-                                  // 7. nota y adjuntos
-                                  if (vm.order.note.isNotEmpty)
-                                    OrderDetailsCard(
-                                      title: "Note".tr(),
-                                      child: Text(
-                                        vm.order.note,
-                                        style: theme.textTheme.bodyMedium,
-                                      ),
-                                    ),
-
-                                  if (vm.order.attachments != null &&
-                                      vm.order.attachments!.isNotEmpty)
-                                    OrderDetailsCard(
-                                      title: "Attachments".tr(),
-                                      child: OrderAttachmentView(vm),
-                                    ),
-
-                                  // 8. pago y totales
-                                  OrderDetailsCard(
-                                    title: "Order Summary".tr(),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        OrderPaymentInfoView(vm),
-                                        OrderDetailsSummary(vm.order),
-                                      ],
-                                    ),
-                                  ),
-                                ].map(_spaced).toList(),
+                                  ].map(_spaced).toList(),
                             ),
                           ),
                         ),

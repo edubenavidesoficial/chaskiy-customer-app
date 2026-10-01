@@ -5,6 +5,8 @@ import 'package:chaskiy/widgets/custom_grid_view.dart';
 import 'package:chaskiy/widgets/list_items/payment_method.list_item.dart';
 import 'package:localize_and_translate/localize_and_translate.dart';
 import 'package:velocity_x/velocity_x.dart';
+import 'package:flutter/services.dart';
+import 'package:chaskiy/requests/bank_transfer.request.dart';
 
 class PaymentMethodsView extends StatelessWidget {
   const PaymentMethodsView(this.vm, {this.embedded = false, Key? key})
@@ -37,6 +39,39 @@ class PaymentMethodsView extends StatelessWidget {
           );
         },
       ).pOnly(top: embedded ? 0 : Vx.dp16),
+      if (vm.paymentMethods.any(
+        (m) => vm.isSelected(m) && m.slug.contains('transfer'),
+      ))
+        FutureBuilder(
+          future: BankTransferRequest().accounts(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return const SizedBox.shrink();
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children:
+                  snapshot.data!
+                      .map(
+                        (account) => Card(
+                          child: ListTile(
+                            title: Text(account.name),
+                            subtitle: Text(
+                              '${account.number}\n${account.instructions ?? ''}',
+                            ),
+                            isThreeLine: true,
+                            trailing: IconButton(
+                              icon: const Icon(Icons.copy),
+                              onPressed:
+                                  () => Clipboard.setData(
+                                    ClipboardData(text: account.number),
+                                  ),
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+            );
+          },
+        ),
       //
       if (!embedded) UiSpacer.divider(thickness: 2).py12(),
     ]);
