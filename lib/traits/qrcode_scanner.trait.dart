@@ -16,6 +16,7 @@ mixin QrcodeScannerTrait {
     final result = await showDialog(
       context: viewContext,
       builder: (context) {
+        var hasResult = false;
         return Dialog(
           child: VStack([
             //qr code preview
@@ -23,10 +24,15 @@ mixin QrcodeScannerTrait {
               key: qrKey,
               onQRViewCreated: (QRViewController controller) {
                 this.controller = controller;
-                // controller.toggleFlash();
                 controller.scannedDataStream.listen((scanData) {
-                  //close dialog
-                  viewContext.pop(scanData.code);
+                  if (hasResult ||
+                      scanData.code == null ||
+                      scanData.code!.isEmpty) {
+                    return;
+                  }
+                  hasResult = true;
+                  controller.pauseCamera();
+                  Navigator.of(context).pop(scanData.code);
                 });
               },
             ).h48(context),

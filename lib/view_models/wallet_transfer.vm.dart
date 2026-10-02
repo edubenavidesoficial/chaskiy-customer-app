@@ -49,16 +49,27 @@ class WalletTransferViewModel extends PaymentViewModel with QrcodeScannerTrait {
   scanWalletAddress() async {
     final walletCode = await openScanner(viewContext);
     if (walletCode == null) {
-      toastError("Operation failed/cancelled".tr());
-    } else {
-      selectedUser = User.fromJson(jsonDecode(walletCode));
+      return;
+    }
+    try {
+      final decoded = jsonDecode(walletCode);
+      if (decoded is! Map<String, dynamic>) {
+        throw const FormatException('QR inválido');
+      }
+      selectedUser = User.fromJson(decoded);
       notifyListeners();
+    } catch (_) {
+      toastError("El código QR no corresponde a una billetera válida".tr());
     }
   }
 
   //
   initiateWalletTransfer() async {
     //
+    if (selectedUser == null) {
+      toastError("Please select reciepent".tr());
+      return;
+    }
     if (formKey.currentState!.validate()) {
       setBusy(true);
       try {
@@ -70,7 +81,9 @@ class WalletTransferViewModel extends PaymentViewModel with QrcodeScannerTrait {
         );
         //
         if (apiResponse.allGood) {
-          toastSuccessful(apiResponse.message ?? "Operación realizada correctamente".tr());
+          toastSuccessful(
+            apiResponse.message ?? "Operación realizada correctamente".tr(),
+          );
           viewContext.pop(true);
         } else {
           toastError(apiResponse.message ?? "La operación falló".tr());
@@ -79,8 +92,6 @@ class WalletTransferViewModel extends PaymentViewModel with QrcodeScannerTrait {
         toastError("$error");
       }
       setBusy(false);
-    } else if (selectedUser == null) {
-      toastError("Please select reciepent".tr());
     }
   }
 }

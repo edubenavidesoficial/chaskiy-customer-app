@@ -64,6 +64,10 @@ class _WalletPageState extends State<WalletPage> with WidgetsBindingObserver {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: VStack([
+                  // Keep the balance card visually separated from the
+                  // navigation bar on devices where the refresh container
+                  // consumes its own top padding.
+                  const SizedBox(height: 20),
                   //
                   WalletManagementView(
                     viewmodel: vm,

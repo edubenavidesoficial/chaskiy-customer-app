@@ -15,6 +15,7 @@ class SearchBarInput extends StatelessWidget {
     this.onChanged,
     this.readOnly = true,
     this.showFilter = false,
+    this.compact = false,
     this.search,
     this.searchTEC,
     Key? key,
@@ -28,6 +29,7 @@ class SearchBarInput extends StatelessWidget {
   final bool readOnly;
   final Search? search;
   final bool? showFilter;
+  final bool compact;
   final TextEditingController? searchTEC;
 
   @override
@@ -69,11 +71,14 @@ class SearchBarInput extends StatelessWidget {
                 minWidth: 44,
                 minHeight: 44,
               ),
-              contentPadding: const EdgeInsets.symmetric(
+              contentPadding: EdgeInsets.symmetric(
                 horizontal: 2,
-                vertical: 11,
+                vertical: compact ? 8 : 11,
               ),
-              constraints: const BoxConstraints(minHeight: 44, maxHeight: 46),
+              constraints: BoxConstraints(
+                minHeight: compact ? 42 : 44,
+                maxHeight: compact ? 44 : 46,
+              ),
               filled: true,
               fillColor: colors.surfaceContainerLow,
             ),

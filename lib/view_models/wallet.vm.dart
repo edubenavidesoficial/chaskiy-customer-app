@@ -121,8 +121,9 @@ class WalletViewModel extends PaymentViewModel {
 
     try {
       final link = await walletRequest.walletTopup(amount);
-      // await openExternalWebpageLink(link);
-      await openWebpageLink(link, embeded: true);
+      // Payment providers may reject an embedded WebView and leave the
+      // wallet screen blank. Open the hosted checkout externally instead.
+      await openWebpageLink(link);
       clearErrors();
     } catch (error) {
       setError(error);

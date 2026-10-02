@@ -93,13 +93,14 @@ class PlainWelcomeHeaderSection extends StatelessWidget {
           }),
 
           //search button
-          UiSpacer.vSpace(),
+          UiSpacer.vSpace(8),
           SearchBarInput(
+            compact: true,
             onTap: () {
               AppService().homePageIndex.add(2);
             },
           ),
-          UiSpacer.vSpace(5),
+          UiSpacer.vSpace(4),
 
           //wallet UI for login user
           //finance section
