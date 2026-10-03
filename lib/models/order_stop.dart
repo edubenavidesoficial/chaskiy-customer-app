@@ -69,10 +69,25 @@ class OrderStop {
                 json["items"].map((item) => Map<String, dynamic>.from(item)),
               )
               : const [],
+      // Taxi stops from older API responses are serialized with their
+      // address fields directly on the stop instead of a nested
+      // `delivery_address` object. Normalize both shapes so the driver can
+      // see and confirm the stop before completing the trip.
       deliveryAddress:
-          json["delivery_address"] == null
-              ? null
-              : DeliveryAddress.fromJson(json["delivery_address"]),
+          json["delivery_address"] != null
+              ? DeliveryAddress.fromJson(json["delivery_address"])
+              : (json["address"] != null &&
+                      json["address"].toString().trim().isNotEmpty
+                  ? DeliveryAddress(
+                    id: json["stop_id"],
+                    address: json["address"].toString(),
+                    latitude: double.tryParse(json["latitude"].toString()),
+                    longitude: double.tryParse(json["longitude"].toString()),
+                    city: json["city"],
+                    state: json["state"],
+                    country: json["country"],
+                  )
+                  : null),
       //attachments
       attachments:
           json["attachments"] == null

@@ -97,7 +97,10 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
   }
 
   Future<void> _startDeliveryVerification() async {
-    final stops = _order.orderStops ?? [];
+    final stops =
+        (_order.orderStops ?? [])
+            .where((stop) => stop.deliveryAddress != null)
+            .toList();
     if (stops.length > 1 && stops.any((stop) => !stop.verified)) {
       _showError('Confirma cada parada antes de completar la ruta.');
       return;
@@ -195,8 +198,10 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
       'enroute' => 'delivered',
       _ => 'ready',
     };
-    if (next == 'delivered' &&
-        (_order.orderStops ?? []).any((stop) => !stop.verified)) {
+    final pendingStops = (_order.orderStops ?? []).where(
+      (stop) => stop.deliveryAddress != null && !stop.verified,
+    );
+    if (next == 'delivered' && pendingStops.isNotEmpty) {
       _showError('Confirma cada parada antes de completar la ruta.');
       return;
     }
