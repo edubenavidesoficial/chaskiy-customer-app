@@ -83,7 +83,9 @@ class _WalletManagementViewState extends State<WalletManagementView>
             stream: AuthServices.listenToAuthState(),
             builder: (ctx, snapshot) {
               //
-              if (!snapshot.hasData && widget.breif) {
+              // The auth stream can emit `false` (which still counts as data).
+              // Never expose wallet balance/actions to guests.
+              if (widget.breif && snapshot.data != true) {
                 return UiSpacer.emptySpace();
               }
               //view for full info

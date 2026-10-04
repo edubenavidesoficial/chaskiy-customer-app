@@ -29,6 +29,9 @@ class SplashViewModel extends MyBaseViewModel {
   bool _loadingSettings = false;
   bool _hasNavigated = false;
 
+  String? get greetingName =>
+      AuthServices.authenticated() ? AuthServices.currentUser?.name : null;
+
   //
   initialise() async {
     super.initialise();

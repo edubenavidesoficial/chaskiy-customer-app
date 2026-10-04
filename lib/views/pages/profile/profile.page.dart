@@ -102,8 +102,9 @@ class _ProfilePageState extends State<ProfilePage>
                       _PreferencesSection(model: model),
                       const SizedBox(height: 18),
                       _HelpSection(model: model),
-                      const SizedBox(height: 18),
-                      _AccountActionsSection(model: model),
+                      if (model.authenticated) const SizedBox(height: 18),
+                      if (model.authenticated)
+                        _AccountActionsSection(model: model),
                       const SizedBox(height: 20),
                       Center(
                         child: Container(
