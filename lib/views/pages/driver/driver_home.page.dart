@@ -20,6 +20,7 @@ import 'package:chaskiy/views/pages/driver/driver_finance.page.dart';
 import 'package:chaskiy/views/pages/driver/driver_order_details.page.dart';
 import 'package:chaskiy/views/pages/splash.page.dart';
 import 'package:chaskiy/views/pages/home.page.dart';
+import 'package:chaskiy/views/pages/wallet/wallet.page.dart';
 import 'package:chaskiy/enums/app_role.dart';
 import 'package:chaskiy/widgets/base.page.dart';
 import 'package:flutter/material.dart';
@@ -202,6 +203,9 @@ class _DriverHomePageState extends State<DriverHomePage>
         onAvailabilityChanged: _toggleAvailability,
         openOrders: () => setState(() => _currentIndex = 1),
         openFinances: () => setState(() => _currentIndex = 2),
+        openWallet: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const WalletPage()),
+        ),
       ),
       DriverAssignedOrdersPage(
         availabilityUser: _user,
@@ -261,6 +265,7 @@ class _DriverDashboard extends StatefulWidget {
     required this.onAvailabilityChanged,
     required this.openOrders,
     required this.openFinances,
+    required this.openWallet,
   });
 
   final User? user;
@@ -268,6 +273,7 @@ class _DriverDashboard extends StatefulWidget {
   final ValueChanged<bool> onAvailabilityChanged;
   final VoidCallback openOrders;
   final VoidCallback openFinances;
+  final VoidCallback openWallet;
 
   @override
   State<_DriverDashboard> createState() => _DriverDashboardState();
@@ -489,6 +495,14 @@ class _DriverDashboardState extends State<_DriverDashboard> {
               subtitle: const Text('Consulta movimientos y pagos'),
               trailing: const Icon(Icons.chevron_right_rounded),
               onTap: widget.openFinances,
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.account_balance_wallet_outlined),
+              title: const Text('Billetera digital'),
+              subtitle: const Text('Consulta saldo, envía y recibe fondos'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: widget.openWallet,
             ),
           ],
         ),

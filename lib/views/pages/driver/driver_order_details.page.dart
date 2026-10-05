@@ -7,6 +7,7 @@ import 'package:chaskiy/constants/app_taxi_settings.dart';
 import 'package:chaskiy/extensions/string.dart';
 import 'package:chaskiy/models/order.dart';
 import 'package:chaskiy/requests/order.request.dart';
+import 'package:chaskiy/requests/bank_transfer.request.dart';
 import 'package:chaskiy/services/auth.service.dart';
 import 'package:chaskiy/services/chat.service.dart';
 import 'package:chaskiy/traits/qrcode_scanner.trait.dart';
@@ -35,6 +36,7 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
   late Order _order = widget.order;
   bool _loading = false;
   bool _refreshing = false;
+  bool _paymentReviewing = false;
   Timer? _refreshTimer;
 
   @override
@@ -93,6 +95,27 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
       return false;
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _reviewBankPayment(bool approve) async {
+    if (_paymentReviewing) return;
+    setState(() => _paymentReviewing = true);
+    try {
+      await BankTransferRequest().driverReview(
+        orderId: _order.id,
+        approve: approve,
+      );
+      await _refresh();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(approve ? 'Pago confirmado.' : 'Pago rechazado.')),
+        );
+      }
+    } catch (error) {
+      _showError(error);
+    } finally {
+      if (mounted) setState(() => _paymentReviewing = false);
     }
   }
 
@@ -680,6 +703,37 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
                   '${_order.paymentMethod?.name}',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (_isTaxi &&
+              const {'delivered', 'completed', 'successful'}.contains(
+                _order.status.toLowerCase(),
+              ) &&
+              _order.paymentMethod?.slug.contains('transfer') == true &&
+              _order.paymentStatus == 'review') ...[
+            const SizedBox(height: 14),
+            const Text(
+              'El cliente envió un comprobante. Confirma si recibiste el pago.',
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed:
+                        _paymentReviewing ? null : () => _reviewBankPayment(false),
+                    child: const Text('No recibido'),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: FilledButton(
+                    onPressed:
+                        _paymentReviewing ? null : () => _reviewBankPayment(true),
+                    child: Text(_paymentReviewing ? 'Procesando…' : 'Recibido'),
                   ),
                 ),
               ],

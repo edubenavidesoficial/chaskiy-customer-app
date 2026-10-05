@@ -62,6 +62,10 @@ class WalletViewModel extends PaymentViewModel {
       setError(error);
     }
     if (showLoading) setBusy(false);
+    // Silent refreshes are used when the app resumes or receives a wallet
+    // update event.  Do not leave the balance widget with the old value:
+    // setBusy(false) is skipped in that path, so notify explicitly.
+    if (!showLoading) notifyListeners();
   }
 
   getWalletTransactions({

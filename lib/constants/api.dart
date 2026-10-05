@@ -112,6 +112,7 @@ class Api {
   static const walletTransfer = "/wallet/address/transfer";
   static const bankTransferAccounts = "/bank-transfer/accounts";
   static const bankTransferProof = "/bank-transfer/orders";
+  static const bankTransferDriverReview = "/bank-transfer/orders";
 
   //loyaltypoints
   static const myLoyaltyPoints = "/loyalty/point/my";
