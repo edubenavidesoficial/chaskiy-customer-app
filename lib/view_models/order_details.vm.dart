@@ -327,7 +327,14 @@ class OrderDetailsViewModel extends CheckoutBaseViewModel {
 
       //
       order = Order.fromJson(apiResponse.body["order"]);
-      if (!["wallet", "cash"].contains(paymentMethod?.slug)) {
+      final selectedSlug = paymentMethod?.slug.toLowerCase() ?? '';
+      final isBankTransfer =
+          (selectedSlug.contains('transfer') ||
+              selectedSlug.contains('deposit') ||
+              selectedSlug.contains('bank'));
+      if (isBankTransfer) {
+        toastSuccessful('El comprobante se enviará al finalizar el viaje.'.tr());
+      } else if (!["wallet", "cash"].contains(paymentMethod?.slug)) {
         if (paymentMethod?.slug == "offline") {
           openExternalWebpageLink(order.paymentLink);
         } else {

@@ -532,7 +532,15 @@ class TaxiViewModel extends TripTaxiViewModel {
       await ActiveTaxiTripService.save(onGoingOrderTrip);
       //payment
       String paymentLink = apiResponse.body["link"];
-      if (paymentLink.isNotBlank) {
+      final paymentSlug = (onGoingOrderTrip?.paymentMethod?.slug ??
+              selectedPaymentMethod?.slug ?? '')
+          .toLowerCase();
+      final isBankTransfer = paymentSlug.contains('transfer') ||
+          paymentSlug.contains('deposit') ||
+          paymentSlug.contains('bank');
+      // Taxi bank transfers are completed after the trip through the native
+      // proof/driver-confirmation flow; never open the generic web checkout.
+      if (paymentLink.isNotBlank && !isBankTransfer) {
         await openWebpageLink(paymentLink);
       }
       //

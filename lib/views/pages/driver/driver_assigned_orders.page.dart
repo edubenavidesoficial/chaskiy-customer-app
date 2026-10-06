@@ -403,6 +403,24 @@ class _DriverAssignmentSheet extends StatelessWidget {
                   ),
                 ],
               ),
+              if (assignment.paymentMethod != null) ...[
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.account_balance),
+                      const SizedBox(width: 10),
+                      Expanded(child: Text('Pago: ${assignment.paymentMethod}')),
+                    ],
+                  ),
+                ),
+              ],
               const SizedBox(height: 20),
               Row(
                 children: [

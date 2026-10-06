@@ -11,6 +11,7 @@ class DriverAssignment {
     this.stops = const [],
     this.expiresAt,
     this.documentPath,
+    this.paymentMethod,
   });
 
   final int orderId;
@@ -22,6 +23,7 @@ class DriverAssignment {
   final List<String> stops;
   final DateTime? expiresAt;
   final String? documentPath;
+  final String? paymentMethod;
 
   bool get isExpired => expiresAt != null && DateTime.now().isAfter(expiresAt!);
 
@@ -39,6 +41,7 @@ class DriverAssignment {
       amount: '${json['amount'] ?? '0.00'}',
       total: '${json['total'] ?? json['amount'] ?? '0.00'}',
       isTaxi: json['vehicle_type_id'] != null,
+      paymentMethod: _paymentMethod(json['payment_method']),
       stops:
           json['stops'] is List
               ? (json['stops'] as List)
@@ -49,6 +52,18 @@ class DriverAssignment {
       expiresAt: _date(expiryValue),
       documentPath: documentPath,
     );
+  }
+
+  static String? _paymentMethod(dynamic value) {
+    if (value is Map) {
+      final name = '${value['name'] ?? ''}'.trim();
+      final slug = '${value['slug'] ?? ''}'.toLowerCase();
+      if (slug.contains('transfer') || slug.contains('deposit') || slug.contains('bank')) {
+        return name.isEmpty ? 'Transferencia bancaria' : name;
+      }
+      return name.isEmpty ? null : name;
+    }
+    return null;
   }
 
   static Map<String, dynamic> _map(dynamic value) {
