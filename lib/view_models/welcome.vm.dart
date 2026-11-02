@@ -86,7 +86,11 @@ class WelcomeViewModel extends MyBaseViewModel {
       });
     }
     try {
-      vendorTypes = await vendorTypeRequest.index();
+      final fetchedVendorTypes = await vendorTypeRequest.index();
+      vendorTypes =
+          fetchedVendorTypes
+              .where((vendorType) => vendorType.isAvailableInCustomerApp)
+              .toList();
       clearErrors();
       notifyListeners();
     } catch (error) {

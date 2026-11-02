@@ -10,6 +10,7 @@ import 'package:chaskiy/models/user.dart';
 import 'package:chaskiy/requests/auth.request.dart';
 import 'package:chaskiy/services/alert.service.dart';
 import 'package:chaskiy/services/auth.service.dart';
+import 'package:chaskiy/services/firebase_token.service.dart';
 import 'package:chaskiy/services/phone_util.service.dart';
 import 'package:chaskiy/services/social_media_login.service.dart';
 import 'package:chaskiy/traits/qrcode_scanner.trait.dart';
@@ -322,6 +323,10 @@ class LoginViewModel extends MyBaseViewModel with QrcodeScannerTrait {
         }
         await AuthServices.setAuthBearerToken(apiResponse.body["token"]);
         await AuthServices.isAuthenticated();
+        // The startup token may have been generated while the app was a
+        // guest. Sync it again now that the API session exists so both the
+        // customer and driver role can receive push notifications.
+        await FirebaseTokenService().handleDeviceTokenSync(force: true);
         setBusy(false);
         //go to home
         // Navigator.of(viewContext).pushNamedAndRemoveUntil(

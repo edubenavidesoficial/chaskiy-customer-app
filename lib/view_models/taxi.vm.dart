@@ -259,6 +259,16 @@ class TaxiViewModel extends TripTaxiViewModel {
                               },
                             ),
                           ),
+                        if (taxiStops.isNotEmpty)
+                          TextButton.icon(
+                            icon: const Icon(Icons.home_outlined),
+                            label: const Text('Regresar al punto de partida'),
+                            onPressed: () async {
+                              await setPickupAsReturnDestination();
+                              changed = true;
+                              update(() {});
+                            },
+                          ),
                         if (taxiStops.length < 10)
                           TextButton.icon(
                             icon: const Icon(Icons.add_location_alt),
@@ -307,6 +317,38 @@ class TaxiViewModel extends TripTaxiViewModel {
     if (changed && pickupLocation != null && dropoffLocation != null) {
       unawaited(drawTripPolyLines());
       if (currentOrderStep == 2) await fetchVehicleTypes();
+    }
+  }
+
+  /// Uses the pickup coordinates as the final destination while preserving
+  /// the intermediate stops. A route with no stop would be a zero-distance
+  /// trip, so a return can only be selected after at least one stop exists.
+  Future<void> setPickupAsReturnDestination() async {
+    final pickup = pickupLocation;
+    if (pickup?.latitude == null || pickup?.longitude == null) {
+      toastError('Selecciona primero el punto de partida'.tr());
+      return;
+    }
+    if (taxiStops.isEmpty) {
+      toastError(
+        'Añade al menos una parada antes de programar el regreso'.tr(),
+      );
+      return;
+    }
+
+    final returnDestination = pickup!.copyWith();
+    dropoffLocation = returnDestination;
+    deliveryAddress = returnDestination;
+    checkout?.deliveryAddress = returnDestination;
+    dropoffLocationTEC.text = returnDestination.address ?? '';
+    _vehiclePricingRevision++;
+    selectedVehicleType = null;
+    vehicleTypes = [];
+    notifyListeners();
+
+    unawaited(drawTripPolyLines());
+    if (currentOrderStep == 2) {
+      await fetchVehicleTypes();
     }
   }
 
@@ -532,10 +574,15 @@ class TaxiViewModel extends TripTaxiViewModel {
       await ActiveTaxiTripService.save(onGoingOrderTrip);
       //payment
       String paymentLink = apiResponse.body["link"];
-      final paymentSlug = (onGoingOrderTrip?.paymentMethod?.slug ??
-              selectedPaymentMethod?.slug ?? '')
-          .toLowerCase();
-      final isBankTransfer = paymentSlug.contains('transfer') ||
+      final paymentSlug =
+          (onGoingOrderTrip?.paymentMethod?.slug ??
+                  selectedPaymentMethod?.slug ??
+                  '')
+              .toLowerCase();
+      final isBankTransfer =
+          onGoingOrderTrip?.paymentMethod?.isBankTransfer == true ||
+          selectedPaymentMethod?.isBankTransfer == true ||
+          paymentSlug.contains('transfer') ||
           paymentSlug.contains('deposit') ||
           paymentSlug.contains('bank');
       // Taxi bank transfers are completed after the trip through the native

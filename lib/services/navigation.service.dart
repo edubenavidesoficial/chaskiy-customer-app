@@ -16,7 +16,6 @@ import 'package:chaskiy/views/pages/commerce/commerce.page.dart';
 import 'package:chaskiy/views/pages/food/food.page.dart';
 import 'package:chaskiy/views/pages/grocery/grocery.page.dart';
 import 'package:chaskiy/views/pages/parcel/parcel.page.dart';
-import 'package:chaskiy/views/pages/pharmacy/pharmacy.page.dart';
 import 'package:chaskiy/views/pages/product/amazon_styled_commerce_product_details.page.dart';
 import 'package:chaskiy/views/pages/product/product_details.page.dart';
 import 'package:chaskiy/views/pages/search/product_search.page.dart';
@@ -36,6 +35,12 @@ class NavigationService {
     required BuildContext context,
     bool loadNext = true,
   }) async {
+    if (!vendorType.isAvailableInCustomerApp) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Este servicio no está disponible.')),
+      );
+      return;
+    }
     Widget nextpage = vendorTypePage(vendorType, context: context);
 
     //
@@ -68,9 +73,6 @@ class NavigationService {
         break;
       case "food":
         homeView = FoodPage(vendorType);
-        break;
-      case "pharmacy":
-        homeView = PharmacyPage(vendorType);
         break;
       case "service":
         // homeView = ServicePage(vendorType);

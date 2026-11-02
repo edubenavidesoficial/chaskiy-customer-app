@@ -71,6 +71,10 @@ class _DeepLinkLoadingPageState extends State<DeepLinkLoadingPage> {
     final vendorRequest = VendorRequest();
     final vendor = await vendorRequest.vendorDetails(int.parse(widget.id));
 
+    if (vendor.isPharmacyType) {
+      throw 'This service is not available.';
+    }
+
     if (mounted) {
       await Navigator.of(AppService().navigatorKey.currentContext!).push(
         MaterialPageRoute(
@@ -84,6 +88,10 @@ class _DeepLinkLoadingPageState extends State<DeepLinkLoadingPage> {
   Future<void> _loadProduct() async {
     final productRequest = ProductRequest();
     final product = await productRequest.productDetails(int.parse(widget.id));
+
+    if (product.vendor.isPharmacyType) {
+      throw 'This product is not available.';
+    }
 
     if (mounted) {
       if (!product.vendor.vendorType.slug.contains("commerce")) {

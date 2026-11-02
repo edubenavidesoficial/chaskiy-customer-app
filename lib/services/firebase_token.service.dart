@@ -19,32 +19,38 @@ class FirebaseTokenService {
   FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
   static String DEVICE_TOKEN_STORE_KEY = "device_token";
-  handleDeviceTokenSync() async {
+  Future<void> handleDeviceTokenSync({bool force = false}) async {
     //get device token
     String? deviceToken = await firebaseMessaging.getToken();
     if (deviceToken != null) {
-      await syncDeviceTokenWithServer(deviceToken);
+      await syncDeviceTokenWithServer(deviceToken, force: force);
     }
-    await firebaseMessaging.onTokenRefresh.listen((event) async {
-      syncDeviceTokenWithServer(event);
+    firebaseMessaging.onTokenRefresh.listen((event) async {
+      await syncDeviceTokenWithServer(event, force: true);
     });
   }
 
-  syncDeviceTokenWithServer(String? deviceToken) async {
+  Future<void> syncDeviceTokenWithServer(
+    String? deviceToken, {
+    bool force = false,
+  }) async {
     try {
+      if (deviceToken == null || deviceToken.isEmpty) return;
+      // A token obtained before login cannot be associated with a user on the
+      // API. Do not mark it as synced until there is an authenticated session.
+      if (!AuthServices.authenticated()) return;
       final storagePref = await LocalStorageService.getPrefs();
       //check if saved token is same as current token
       String? savedToken = storagePref.getString(DEVICE_TOKEN_STORE_KEY);
       //if token is not saved or is different from current token
-      if (savedToken == deviceToken) {
+      if (!force && savedToken == deviceToken) {
         return;
       }
-      //save token
-      await storagePref.setString(DEVICE_TOKEN_STORE_KEY, deviceToken!);
-      //send token to server if the auth is logged in
-      if (AuthServices.authenticated()) {
-        await AuthRequest().updateDeviceToken(deviceToken);
-      }
+      final response = await AuthRequest().updateDeviceToken(deviceToken);
+      if (!response.allGood) return;
+      // Store the token only after the API accepted it. This lets the next
+      // authenticated login retry if the previous sync failed.
+      await storagePref.setString(DEVICE_TOKEN_STORE_KEY, deviceToken);
     } catch (error) {
       log("Error syncing device token with server: $error");
     }

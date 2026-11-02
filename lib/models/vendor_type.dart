@@ -73,6 +73,13 @@ class VendorType {
   bool get isCommerce =>
       ["commerce", "e-commerce"].contains(slug.toLowerCase());
 
+  /// Pharmacy services and prescription products are not offered in the
+  /// customer app, even if a remote configuration returns that vendor type.
+  bool get isPharmacy =>
+      ["pharmacy", "pharmacies"].contains(slug.toLowerCase());
+
+  bool get isAvailableInCustomerApp => !isPharmacy;
+
   Map<String, dynamic> toJson() => {
     "id": id,
     "name": name,

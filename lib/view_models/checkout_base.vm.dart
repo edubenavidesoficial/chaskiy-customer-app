@@ -558,8 +558,11 @@ class CheckoutBaseViewModel extends PaymentViewModel {
       final paymentLink = apiResponse.body["link"].toString();
       if (!paymentLink.isEmptyOrNull) {
         final paymentSlug = checkout?.paymentMethod?.slug.toLowerCase() ?? '';
-        final isBankTransfer = paymentSlug.contains('transfer') ||
-            paymentSlug.contains('deposit') || paymentSlug.contains('bank');
+        final isBankTransfer =
+            checkout?.paymentMethod?.isBankTransfer == true ||
+            paymentSlug.contains('transfer') ||
+            paymentSlug.contains('deposit') ||
+            paymentSlug.contains('bank');
         if (isBankTransfer) {
           AlertService.success(
             text: 'El comprobante se enviará desde el detalle del pedido.'.tr(),

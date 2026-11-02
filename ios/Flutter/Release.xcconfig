@@ -2,8 +2,8 @@
 #include "Generated.xcconfig"
 BUILD_LIBRARY_FOR_DISTRIBUTION = NO
 
-// Primera versión pública configurada en App Store Connect.
-// Se declara después de Generated.xcconfig para que el Archive de Xcode use
-// exactamente la versión y el build esperados por Apple.
-FLUTTER_BUILD_NAME = 1.0
-FLUTTER_BUILD_NUMBER = 97
+// Pharmacy and prescription functionality were removed from this release.
+// Declare the version after Generated.xcconfig so the Xcode archive matches
+// the version submitted to App Store Connect.
+FLUTTER_BUILD_NAME = 1.0.1
+FLUTTER_BUILD_NUMBER = 103

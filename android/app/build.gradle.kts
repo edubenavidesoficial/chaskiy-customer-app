@@ -48,8 +48,12 @@ android {
 
     buildTypes {
         release {
-            isShrinkResources = true
-            isMinifyEnabled = true
+            // flutter_inappwebview's Android plugin is registered at runtime.
+            // R8 removes its registrar in this dependency combination, which
+            // makes a signed release fail during startup. Keep native plugin
+            // classes intact until the dependency can be upgraded safely.
+            isShrinkResources = false
+            isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }

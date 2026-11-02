@@ -147,8 +147,11 @@ class OrderDetailsPage extends StatelessWidget {
                                       ),
 
                                     // 8. pago y totales
-                                    if ((vm.order.paymentMethod?.slug ?? '')
-                                        .contains('transfer'))
+                                    if (vm
+                                            .order
+                                            .paymentMethod
+                                            ?.isBankTransfer ==
+                                        true)
                                       BankTransferProofCard(order: vm.order),
                                     OrderDetailsCard(
                                       title: "Order Summary".tr(),

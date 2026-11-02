@@ -15,6 +15,12 @@ class VendorDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (vendor.isPharmacyType) {
+      return const Scaffold(
+        body: Center(child: Text('Este servicio no está disponible.')),
+      );
+    }
+
     // Check if vendor is parcel type and return directly to avoid screen flash
     if (vendor.isParcelType) {
       return ParcelVendorDetailsPage(vendor: vendor);

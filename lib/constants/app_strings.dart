@@ -35,8 +35,9 @@ class AppStrings {
   static bool get enableFatchByLocation => env('enableFatchByLocation') ?? true;
   static bool get showVendorTypeImageOnly =>
       env('showVendorTypeImageOnly') == "1";
-  static bool get enableUploadPrescription =>
-      env('enableUploadPrescription') == "1";
+  // Prescription uploads are intentionally unavailable in the customer app.
+  // This remains disabled even if a remote configuration enables it.
+  static bool get enableUploadPrescription => false;
   static bool get enableParcelVendorByLocation =>
       env('enableParcelVendorByLocation') == "1";
   static bool get enableParcelMultipleStops =>

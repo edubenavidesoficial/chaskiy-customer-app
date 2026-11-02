@@ -68,7 +68,9 @@ class MainSearchViewModel extends SearchViewModel {
   fetchSearchTabs() async {
     setBusy(true);
     try {
-      final vendorTypes = await VendorTypeRequest().index();
+      final vendorTypes = (await VendorTypeRequest().index()).where(
+        (vendorType) => vendorType.isAvailableInCustomerApp,
+      );
       for (var vendorType in vendorTypes) {
         if (vendorType.isService) {
           showServices = true;
@@ -251,9 +253,7 @@ class MainSearchViewModel extends SearchViewModel {
         rawMessage.contains("type '") ||
         rawMessage.contains("Exception:");
 
-    toastError(
-      isTechnicalError ? ApiResponse.unavailableMessage : rawMessage,
-    );
+    toastError(isTechnicalError ? ApiResponse.unavailableMessage : rawMessage);
   }
 
   //

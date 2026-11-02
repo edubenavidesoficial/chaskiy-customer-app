@@ -12,6 +12,7 @@ import 'package:chaskiy/views/pages/order/widgets/order_payment_info.view.dart';
 import 'package:chaskiy/views/pages/order/widgets/order_driver_info.view.dart';
 import 'package:chaskiy/views/pages/order/widgets/taxi_order_trip_verification.view.dart';
 import 'package:chaskiy/views/pages/order/widgets/order_details_card.dart';
+import 'package:chaskiy/views/pages/order/widgets/bank_transfer_proof.card.dart';
 import 'package:chaskiy/widgets/base.page.dart';
 import 'package:chaskiy/widgets/buttons/custom_button.dart';
 import 'package:chaskiy/widgets/cards/order_summary.dart';
@@ -68,6 +69,11 @@ class _TaxiOrderDetailPageState extends State<TaxiOrderDetailPage> {
                   //payment status
                   if (_showPaymentAction(vm))
                     OrderDetailsCard(child: OrderPaymentInfoView(vm)),
+
+                  // Taxi bank-transfer payments are managed inside the trip,
+                  // not through the wallet top-up checkout.
+                  if (vm.order.paymentMethod?.isBankTransfer == true)
+                    BankTransferProofCard(order: vm.order),
 
                   //driver
                   if (vm.order.driver != null)

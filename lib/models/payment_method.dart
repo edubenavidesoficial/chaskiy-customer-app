@@ -32,6 +32,20 @@ class PaymentMethod {
   String photo;
   bool useExternalBrowser;
 
+  /// Bank transfers may be configured with the generic `offline` slug.
+  /// Use the configured name/instructions as a fallback so taxi payments do
+  /// not open the generic wallet/offline checkout.
+  bool get isBankTransfer {
+    final value = '${slug} ${name} ${instruction ?? ''}'.toLowerCase();
+    return value.contains('transfer') ||
+        value.contains('transferencia') ||
+        value.contains('deposit') ||
+        value.contains('depósito') ||
+        value.contains('deposito') ||
+        value.contains('bank') ||
+        value.contains('bancari');
+  }
+
   factory PaymentMethod.fromJson(Map<String, dynamic> json) {
     return PaymentMethod(
       id: json["id"],
