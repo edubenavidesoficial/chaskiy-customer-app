@@ -2,6 +2,7 @@ import 'package:chaskiy/constants/app_colors.dart';
 import 'package:chaskiy/constants/app_ui_settings.dart';
 import 'package:chaskiy/view_models/taxi.vm.dart';
 import 'package:chaskiy/views/pages/order/widgets/taxi_order_trip_verification.view.dart';
+import 'package:chaskiy/views/pages/order/widgets/bank_transfer_proof.card.dart';
 import 'package:chaskiy/views/pages/taxi/widgets/driver_info.view.dart';
 import 'package:chaskiy/views/pages/taxi/widgets/safety.view.dart';
 import 'package:chaskiy/widgets/buttons/call.button.dart';
@@ -73,6 +74,10 @@ class TaxiTripReadyView extends StatelessWidget {
                     ),
                     subtitle: Text(stop.verified ? 'Realizada' : 'Pendiente'),
                   ),
+                if (trip.paymentMethod?.isBankTransfer == true) ...[
+                  const SizedBox(height: 14),
+                  BankTransferProofCard(order: trip),
+                ],
                 if (const {
                   'pending',
                   'preparing',

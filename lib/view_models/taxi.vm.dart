@@ -65,7 +65,7 @@ class TaxiViewModel extends TripTaxiViewModel {
   double tip = 0.0;
 
   //functions
-  void initialise() async {
+  Future<void> initialise() async {
     unawaited(fetchConfiguredVehicleTypes());
     await fetchTaxiPaymentOptions();
     if (onGoingOrderTrip != null) {

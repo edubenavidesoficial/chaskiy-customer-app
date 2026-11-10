@@ -109,7 +109,9 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
       await _refresh();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(approve ? 'Pago confirmado.' : 'Pago rechazado.')),
+          SnackBar(
+            content: Text(approve ? 'Pago confirmado.' : 'Pago rechazado.'),
+          ),
         );
       }
     } catch (error) {
@@ -709,10 +711,12 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
             ),
           ],
           if (_isTaxi &&
-              const {'delivered', 'completed', 'successful'}.contains(
-                _order.status.toLowerCase(),
-              ) &&
-              _order.paymentMethod?.slug.contains('transfer') == true &&
+              const {
+                'delivered',
+                'completed',
+                'successful',
+              }.contains(_order.status.toLowerCase()) &&
+              _order.paymentMethod?.isBankTransfer == true &&
               _order.paymentStatus == 'review') ...[
             const SizedBox(height: 14),
             const Text(
@@ -724,7 +728,9 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
                 Expanded(
                   child: OutlinedButton(
                     onPressed:
-                        _paymentReviewing ? null : () => _reviewBankPayment(false),
+                        _paymentReviewing
+                            ? null
+                            : () => _reviewBankPayment(false),
                     child: const Text('No recibido'),
                   ),
                 ),
@@ -732,7 +738,9 @@ class _DriverOrderDetailsPageState extends State<DriverOrderDetailsPage>
                 Expanded(
                   child: FilledButton(
                     onPressed:
-                        _paymentReviewing ? null : () => _reviewBankPayment(true),
+                        _paymentReviewing
+                            ? null
+                            : () => _reviewBankPayment(true),
                     child: Text(_paymentReviewing ? 'Procesando…' : 'Recibido'),
                   ),
                 ),
